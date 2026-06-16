@@ -397,7 +397,9 @@ function drawTrackingOverlay(detections, mediaElement) {
     }
 
     // 4. Desenha elementos visuais na tela
-    const color = isMatched ? '#10b981' : '#f59e0b'; // Verde se reconhecido, Laranja se desconhecido
+    // Cor: Vermelho para bloqueados, Verde para reconhecidos, Laranja para desconhecidos
+    const isBlockedPerson = isMatched && registeredFaces.find(f => f.pessoa_id === bestMatchId)?.status === 'bloqueado';
+    const color = isBlockedPerson ? '#ef4444' : isMatched ? '#10b981' : '#f59e0b';
     
     // Caixa delimitadora
     ctx.strokeStyle = color;
@@ -461,21 +463,40 @@ async function logAccessEvent(pessoaId, label, similarity, age = null) {
   const activeCameraId = dom.cameraSelect.value === "webcam_local" ? null : dom.cameraSelect.value;
   const timeString = new Date().toLocaleTimeString('pt-BR');
   
+  // Verifica se a pessoa detectada está bloqueada no cache local
+  const cachedPerson = pessoaId ? registeredFaces.find(f => f.pessoa_id === pessoaId) : null;
+  const isBloqueado = cachedPerson && cachedPerson.status === 'bloqueado';
+  
   // Adiciona imediatamente na UI
   const isUnknown = label === "Desconhecido";
   const logCard = document.createElement('div');
-  logCard.className = `log-card ${isUnknown ? 'unauthorized' : 'success'}`;
   
-  // Icone / Foto padrão
+  let cardClass = 'log-card ';
+  let icon = 'help_outline';
+  if (isBloqueado) {
+    cardClass += 'blocked'; // Vermelho pulsante para bloqueados
+    icon = 'block';
+    // Dispara alerta sonoro de acesso bloqueado
+    triggerBlockedPersonAlert(label);
+  } else if (isUnknown) {
+    cardClass += 'unauthorized';
+    icon = 'help_outline';
+  } else {
+    cardClass += 'success';
+    icon = 'check_circle_outline';
+  }
+
+  logCard.className = cardClass;
+  
   logCard.innerHTML = `
-    <span class="material-icons-round text-dimmed log-avatar" style="font-size: 2.2rem; line-height:36px; text-align:center;">
-      ${isUnknown ? 'help_outline' : 'check_circle_outline'}
+    <span class="material-icons-round log-avatar" style="font-size: 2.2rem; line-height:36px; text-align:center; color: ${isBloqueado ? '#ef4444' : isUnknown ? '#f59e0b' : '#10b981'}">
+      ${icon}
     </span>
     <div class="log-info">
-      <span class="log-name">${label} ${age ? `(${age} anos)` : ''}</span>
+      <span class="log-name">${label} ${age ? `(${age} anos)` : ''}${isBloqueado ? ' <span style="color:#ef4444;font-weight:700;">⛔ BLOQUEADO</span>' : ''}</span>
       <span class="log-time">${timeString}</span>
     </div>
-    <span class="log-score">${isUnknown ? 'Desconhecido' : `${Math.round(similarity * 100)}%`}</span>
+    <span class="log-score" style="${isBloqueado ? 'color:#ef4444;font-weight:700;' : ''}">${isUnknown ? 'Desconhecido' : `${Math.round(similarity * 100)}%`}</span>
   `;
 
   // Insere no início do painel de logs
@@ -489,109 +510,198 @@ async function logAccessEvent(pessoaId, label, similarity, age = null) {
     dom.accessLogs.lastChild.remove();
   }
 
-  // Salva no Supabase `registro_acessos` se logado
+  // Salva no Supabase `reconhecimentos` se logado
   if (supabase) {
     try {
-      await supabase.from('registro_acessos').insert([{
+      await supabase.from('reconhecimentos').insert([{
         camera_id: activeCameraId,
         pessoa_id: pessoaId,
-        similaridade: similarity > 0 ? similarity : null,
-        idade_estimada: age
+        confianca: similarity > 0 ? similarity : null,
+        metadata: age ? { idade_estimada: age } : null
       }]);
     } catch (e) {
-      console.error("[SV] Erro ao gravar registro de acesso remoto:", e);
+      console.error("[SV] Erro ao gravar reconhecimento remoto:", e);
     }
   }
+}
+
+// Dispara alerta sonoro e visual quando pessoa bloqueada é detectada pela câmera
+function triggerBlockedPersonAlert(nome) {
+  // Toca som de alarme duplo
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.4].forEach(startOffset => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime + startOffset);
+      osc.frequency.linearRampToValueAtTime(440, audioCtx.currentTime + startOffset + 0.3);
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime + startOffset);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + startOffset + 0.35);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(audioCtx.currentTime + startOffset);
+      osc.stop(audioCtx.currentTime + startOffset + 0.35);
+    });
+  } catch(e) {}
+
+  // Pisca o log panel em vermelho por 3 segundos
+  dom.accessLogs.style.boxShadow = '0 0 20px rgba(239,68,68,0.7)';
+  dom.accessLogs.style.border = '2px solid #ef4444';
+  setTimeout(() => {
+    dom.accessLogs.style.boxShadow = '';
+    dom.accessLogs.style.border = '';
+  }, 3000);
+
+  console.warn(`[SEGURANÇA] Pessoa BLOQUEADA detectada pela câmera: ${nome}`);
 }
 
 async function loadRegisteredPeople() {
   if (!supabase) return;
   try {
-    // 1. Carrega dados de pessoas
+    // 1. Carrega dados completos de pessoas
     const { data: pessoas, error } = await supabase
       .from('pessoas')
-      .select('id, nome, cpf_encrypted');
+      .select('id, nome, cpf_mascarado, idade, status, consentimento_registrado, foto_url, created_by, created_at, updated_at');
       
     if (error) throw error;
     
-    // 2. Carrega biometrias associadas
-    const { data: biometrias, error: errBio } = await supabase
-      .from('biometria')
-      .select('pessoa_id, descriptor, foto_url');
+    // 2. Carrega embeddings faciais associados
+    const { data: embeddings, error: errEmb } = await supabase
+      .from('face_embeddings')
+      .select('pessoa_id, embedding, foto_url, qualidade_imagem');
       
-    if (errBio) throw errBio;
+    if (errEmb) throw errEmb;
 
-    // Reconstrói cache facial em memória
-    registeredFaces = biometrias.map(b => {
-      const pessoa = pessoas.find(p => p.id === b.pessoa_id);
+    // Reconstrói cache facial em memória (somente pessoas ativas e bloqueadas — inativas são ignoradas)
+    registeredFaces = embeddings.map(e => {
+      const pessoa = pessoas.find(p => p.id === e.pessoa_id);
+      if (!pessoa || pessoa.status === 'inativo') return null;
       
-      // Converte o vetor retornado do Supabase (que vem como string "[0.12, 0.45...]" ou array) para Float32Array
+      // Converte o vetor retornado do Supabase para Float32Array
       let descriptorArray = null;
-      if (typeof b.descriptor === 'string') {
-        descriptorArray = new Float32Array(JSON.parse(b.descriptor));
-      } else if (Array.isArray(b.descriptor)) {
-        descriptorArray = new Float32Array(b.descriptor);
+      if (typeof e.embedding === 'string') {
+        descriptorArray = new Float32Array(JSON.parse(e.embedding));
+      } else if (Array.isArray(e.embedding)) {
+        descriptorArray = new Float32Array(e.embedding);
       }
 
       return {
-        pessoa_id: b.pessoa_id,
-        nome: pessoa ? pessoa.nome : 'Desconhecido',
+        pessoa_id: e.pessoa_id,
+        nome: pessoa.nome,
+        status: pessoa.status,
         descriptor: descriptorArray,
-        foto_url: b.foto_url
+        foto_url: pessoa.foto_url || e.foto_url
       };
-    }).filter(f => f.descriptor !== null);
+    }).filter(f => f !== null && f.descriptor !== null);
 
-    console.log(`[SV] Cache carregado: ${registeredFaces.length} biometrias ativas.`);
+    console.log(`[SV] Cache carregado: ${registeredFaces.length} embeddings ativos.`);
     
     // Atualiza a visualização na aba de pessoas cadastradas
-    renderPeopleList(pessoas, biometrias);
+    renderPeopleList(pessoas, embeddings);
   } catch (err) {
     console.error("[SV] Erro ao sincronizar banco com memória:", err);
   }
 }
 
-function renderPeopleList(pessoas, biometrias) {
+function renderPeopleList(pessoas, embeddings) {
   dom.peopleList.innerHTML = '';
   if (pessoas.length === 0) {
     dom.peopleList.innerHTML = '<p class="text-center text-dimmed p-4">Nenhuma pessoa cadastrada.</p>';
     return;
   }
 
+  const statusConfig = {
+    ativo:     { cls: 'badge-success', icon: 'check_circle',          label: 'Ativo'     },
+    bloqueado: { cls: 'badge-error',   icon: 'block',                 label: 'Bloqueado' },
+    inativo:   { cls: 'badge-warning', icon: 'radio_button_unchecked', label: 'Inativo'  }
+  };
+
   pessoas.forEach(p => {
-    const bio = biometrias.find(b => b.pessoa_id === p.id);
-    const avatarSrc = bio ? bio.foto_url : '';
-    
-    // Tenta decifrar CPF para exibir
-    let cpfExibido = "CPF Protegido";
-    try {
-      const bytes = CryptoJS.AES.decrypt(p.cpf_encrypted, encryptionKey);
-      const dec = bytes.toString(CryptoJS.enc.Utf8);
-      if (dec) cpfExibido = maskCpf(dec); // Exibe o CPF mascarado para proteger dados sensíveis
-    } catch(e) {}
+    const emb = embeddings.find(e => e.pessoa_id === p.id);
+    const avatarSrc = p.foto_url || (emb ? emb.foto_url : '');
+    const statusInfo = statusConfig[p.status] || statusConfig.inativo;
+    const isBloqueado = p.status === 'bloqueado';
+    // CPF já vem mascarado do banco (cpf_mascarado)
+    const cpfExibido = p.cpf_mascarado || 'CPF Protegido';
 
     const card = document.createElement('div');
-    card.className = 'person-card';
+    card.className = `person-card ${isBloqueado ? 'person-card--blocked' : ''}`;
     card.innerHTML = `
       <img src="${avatarSrc || 'https://via.placeholder.com/40'}" class="person-avatar" onerror="this.src='https://via.placeholder.com/40'">
       <div class="person-details">
         <h4>${p.nome}</h4>
         <p>${cpfExibido}</p>
+        <span class="badge ${statusInfo.cls} badge-sm">
+          <span class="material-icons-round" style="font-size:12px;vertical-align:middle;margin-right:2px">${statusInfo.icon}</span>
+          ${statusInfo.label}
+        </span>
       </div>
-      <button class="btn-delete-person" data-id="${p.id}" title="Deletar Cadastro">
-        <span class="material-icons-round">delete_outline</span>
-      </button>
+      <div class="person-card-actions">
+        <button class="btn-edit-person" data-id="${p.id}" title="Editar Cadastro">
+          <span class="material-icons-round">edit</span>
+        </button>
+        <button class="btn-delete-person" data-id="${p.id}" title="Deletar Cadastro">
+          <span class="material-icons-round">delete_outline</span>
+        </button>
+      </div>
     `;
-    
-    // Evento de Deletar Cadastro
+
+    card.querySelector('.btn-edit-person').addEventListener('click', () => enterEditMode(p, embeddings));
+
     card.querySelector('.btn-delete-person').addEventListener('click', async (e) => {
       const id = e.currentTarget.getAttribute('data-id');
-      if (confirm("Deseja realmente excluir este cadastro biométrico permanente?")) {
+      if (confirm("Deseja realmente excluir este cadastro biométrico permanentemente? Esta ação não pode ser desfeita.")) {
         await deletePerson(id);
       }
     });
 
     dom.peopleList.appendChild(card);
   });
+}
+
+function enterEditMode(pessoa, embeddings) {
+  editMode = true;
+  editingPersonId = pessoa.id;
+
+  // Armazena estado original para gerar diff no audit_log
+  // Nota: cpf_mascarado não é editável diretamente — apenas exibido
+  originalPersonData = {
+    nome:   pessoa.nome,
+    idade:  pessoa.idade || '',
+    status: pessoa.status || 'ativo'
+  };
+
+  // Preenche o formulário com os dados atuais
+  dom.cadNome.value   = pessoa.nome  || '';
+  dom.cadCpf.value    = pessoa.cpf_mascarado || '';
+  dom.cadStatus.value = pessoa.status || 'ativo';
+
+  // Preenche data de nascimento (campo mantido no HTML mas não no novo schema — usa idade)
+  if (dom.cadDataNasc) dom.cadDataNasc.value = '';
+  if (dom.cadObs)      dom.cadObs.value      = '';
+
+  // Se houver foto cadastrada, exibe no preview
+  const fotoSrc = pessoa.foto_url || (embeddings.find(e => e.pessoa_id === pessoa.id)?.foto_url);
+  if (fotoSrc) {
+    dom.previewImg.src = fotoSrc;
+    dom.previewImg.classList.remove('hidden');
+    dom.previewCanvas.classList.add('hidden');
+    dom.previewIcon.classList.add('hidden');
+    dom.photoBox.className = 'photo-preview-box success';
+    dom.photoFeedback.innerText = 'Foto atual. Capture/faça upload para substituir a biometria.';
+  }
+
+  dom.cadastroFormTitle.innerText = `Editando: ${pessoa.nome}`;
+  dom.editBadge.classList.remove('hidden');
+  dom.btnCancelEdit.classList.remove('hidden');
+  dom.btnSubmitCadastro.innerHTML = '<span class="material-icons-round">save</span> Salvar Alterações';
+  dom.cadConsent.checked = true;
+
+  dom.btnCadastroTab.click();
+  validateFormInputs();
+
+  console.log(`[SV] Modo de edição ativado para: ${pessoa.nome} (ID: ${pessoa.id})`);
 }
 
 async function deletePerson(id) {
@@ -1205,6 +1315,7 @@ function setupEventListeners() {
   dom.btnUploadPhoto.addEventListener('change', uploadPhotoFromFile);
   
   dom.formCadastro.addEventListener('submit', submitCadastro);
+  dom.btnCancelEdit.addEventListener('click', exitEditMode);
   
   // Validações em tempo real do formulário
   [dom.cadNome, dom.cadCpf, dom.cadConsent].forEach(el => {

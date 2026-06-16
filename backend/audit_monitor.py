@@ -20,8 +20,8 @@ WATCHED_FILES = [
     os.path.normpath("backend/audit_monitor.py"),
     os.path.normpath("backend/authorize_changes.py"),
     os.path.normpath("frontend/index.html"),
-    os.path.normpath("frontend/main.js"),
-    os.path.normpath("frontend/style.css"),
+    os.path.normpath("frontend/src/main.js"),
+    os.path.normpath("frontend/src/style.css"),
 ]
 
 BACKUP_DIR = os.path.normpath(".shadow_backup")
@@ -212,6 +212,7 @@ def monitor():
     # Monitora raiz e subpastas
     observer.schedule(event_handler, path="backend", recursive=True)
     observer.schedule(event_handler, path="frontend", recursive=True)
+    observer.schedule(event_handler, path=os.path.join("frontend", "src"), recursive=False)
     
     observer.start()
     print("[AUDIT] Monitor ativo e vigiando alterações em tempo real.")

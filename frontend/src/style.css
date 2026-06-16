@@ -941,6 +941,48 @@ input:checked + .slider:before {
   background: var(--color-error-glow);
 }
 
+/* Card de pessoa bloqueada */
+.person-card--blocked {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.person-card--blocked .person-avatar {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+/* Ações do card (Editar / Deletar) */
+.person-card-actions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.btn-edit-person {
+  color: var(--text-dimmed);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: var(--transition-fast);
+}
+
+.btn-edit-person:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+/* Badge pequeno para status dentro dos cards */
+.badge-sm {
+  font-size: 0.62rem !important;
+  padding: 0.15rem 0.45rem !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 0.25rem;
+}
+
 /* Access Logs Footer */
 .access-logs-panel {
   grid-row: 2;
@@ -1043,6 +1085,29 @@ input:checked + .slider:before {
 
 .log-card.success .log-score {
   color: #34d399;
+}
+
+/* Log card para pessoas BLOQUEADAS - destaque vermelho pulsante */
+.log-card.blocked {
+  border-color: var(--color-error);
+  background: rgba(239, 68, 68, 0.08);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.3);
+  animation: slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1), blocked-pulse 1.5s ease-in-out 0.3s 3;
+}
+
+.log-card.blocked::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background-color: var(--color-error);
+}
+
+@keyframes blocked-pulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(239, 68, 68, 0.3); }
+  50%       { box-shadow: 0 0 28px rgba(239, 68, 68, 0.7); }
 }
 
 .log-card.empty {

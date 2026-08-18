@@ -35,12 +35,71 @@ function isValidCpf(cpf) {
   return true;
 }
 
+function calculateAgeFromDate(dateString) {
+  if (!dateString) return null;
+
+  const birthDate = new Date(`${dateString}T00:00:00`);
+  if (Number.isNaN(birthDate.getTime())) return null;
+
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  return age >= 0 ? age : null;
+}
+
+function toPgVector(values) {
+  const vector = Array.from(values || [], Number);
+  if (vector.length !== 128 || vector.some(value => !Number.isFinite(value))) {
+    throw new Error("Descriptor facial invalido: vetor biometrico precisa ter 128 numeros.");
+  }
+
+  return `[${vector.join(',')}]`;
+}
+
+function parsePgVector(value) {
+  if (!value) return null;
+
+  try {
+    const vector = Array.isArray(value) ? value : JSON.parse(value);
+    if (!Array.isArray(vector) || vector.length !== 128) return null;
+    return new Float32Array(vector.map(Number));
+  } catch (err) {
+    console.warn("[SV] Embedding invalido recebido do banco:", err);
+    return null;
+  }
+}
+
+function encodeBase64Utf8(value) {
+  const bytes = new TextEncoder().encode(value);
+  let binary = '';
+  bytes.forEach(byte => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary);
+}
+
+function showVideoLoading(message = "Iniciando camera e carregando modelos faciais...") {
+  dom.loading.classList.remove('hidden', 'fade-out');
+  dom.loading.innerHTML = `<div class="spinner"></div><p>${message}</p>`;
+}
+
+function hideVideoLoading() {
+  dom.loading.classList.add('fade-out');
+  setTimeout(() => dom.loading.classList.add('hidden'), 500);
+}
+
 
 
 // --- CONFIGURAÇÃO E ESTADO GLOBAL ---
 let supabase = null;
 let supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 let supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+let backendUrl = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000').replace(/\/$/, '');
 let encryptionKey = 'SecureVisionSecretPassphrase'; // Fallback se não configurado
 
 let modelsLoaded = false;
@@ -192,7 +251,7 @@ function onUserAuthenticated(user) {
 // --- CARREGAMENTO DE MODELOS E VÍDEO ---
 
 async function loadModelsAndStart() {
-  dom.loading.classList.remove('hidden');
+  showVideoLoading("Carregando modelos faciais...");
   try {
     console.log("[SV] Carregando modelos do face-api.js...");
     // Carrega modelos faciais salvos localmente na pasta /models/
@@ -219,7 +278,7 @@ async function startCamera(camType, camUrl = "") {
     currentCameraStream = null;
   }
 
-  dom.loading.classList.remove('hidden');
+  showVideoLoading();
   dom.video.classList.add('hidden');
   dom.mjpegFeed.classList.add('hidden');
 
@@ -234,8 +293,7 @@ async function startCamera(camType, camUrl = "") {
       
       dom.video.onloadedmetadata = () => {
         setupCanvasDimensions(dom.video);
-        dom.loading.classList.add('fade-out');
-        setTimeout(() => dom.loading.classList.add('hidden'), 500);
+        hideVideoLoading();
         startRecognitionLoop();
       };
     } catch (err) {
@@ -248,15 +306,15 @@ async function startCamera(camType, camUrl = "") {
     dom.activeCameraTitle.innerText = `Monitoramento: ${camUrl}`;
     
     // Codifica URL em Base64 para evitar quebra de rota
-    const urlB64 = btoa(camUrl);
-    const feedUrl = `http://localhost:5000/video_feed?url_b64=${urlB64}`;
+    const urlB64 = encodeBase64Utf8(camUrl);
+    const feedUrl = `${backendUrl}/video_feed?url_b64=${encodeURIComponent(urlB64)}`;
     
+    dom.mjpegFeed.crossOrigin = 'anonymous';
     dom.mjpegFeed.src = feedUrl;
     
     dom.mjpegFeed.onload = () => {
       setupCanvasDimensions(dom.mjpegFeed);
-      dom.loading.classList.add('fade-out');
-      setTimeout(() => dom.loading.classList.add('hidden'), 500);
+      hideVideoLoading();
       startRecognitionLoop();
     };
 
@@ -288,12 +346,19 @@ function startRecognitionLoop() {
     if (activeElement.classList.contains('hidden')) return;
 
     // Detecção facial com landmarks, extração de características e estimativa de idade
-    const detections = await faceapi.detectAllFaces(
-      activeElement, 
-      new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 })
-    ).withFaceLandmarks().withFaceDescriptors().withAgeAndGender();
+    if (activeElement instanceof HTMLVideoElement && activeElement.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
+    if (activeElement instanceof HTMLImageElement && (!activeElement.complete || activeElement.naturalWidth === 0)) return;
 
-    drawTrackingOverlay(detections, activeElement);
+    try {
+      const detections = await faceapi.detectAllFaces(
+        activeElement,
+        new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 })
+      ).withFaceLandmarks().withFaceDescriptors().withAgeAndGender();
+
+      drawTrackingOverlay(detections, activeElement);
+    } catch (err) {
+      console.warn("[SV] Frame ignorado no reconhecimento facial:", err);
+    }
   }, 250);
 }
 
@@ -569,36 +634,34 @@ async function loadRegisteredPeople() {
     // 2. Carrega embeddings faciais associados
     const { data: embeddings, error: errEmb } = await supabase
       .from('face_embeddings')
-      .select('pessoa_id, embedding, foto_url, qualidade_imagem');
+      .select('pessoa_id, embedding, qualidade_imagem');
       
     if (errEmb) throw errEmb;
 
     // Reconstrói cache facial em memória (somente pessoas ativas e bloqueadas — inativas são ignoradas)
-    registeredFaces = embeddings.map(e => {
-      const pessoa = pessoas.find(p => p.id === e.pessoa_id);
+    const safePessoas = pessoas || [];
+    const safeEmbeddings = embeddings || [];
+
+    registeredFaces = safeEmbeddings.map(e => {
+      const pessoa = safePessoas.find(p => p.id === e.pessoa_id);
       if (!pessoa || pessoa.status === 'inativo') return null;
       
       // Converte o vetor retornado do Supabase para Float32Array
-      let descriptorArray = null;
-      if (typeof e.embedding === 'string') {
-        descriptorArray = new Float32Array(JSON.parse(e.embedding));
-      } else if (Array.isArray(e.embedding)) {
-        descriptorArray = new Float32Array(e.embedding);
-      }
+      const descriptorArray = parsePgVector(e.embedding);
 
       return {
         pessoa_id: e.pessoa_id,
         nome: pessoa.nome,
         status: pessoa.status,
         descriptor: descriptorArray,
-        foto_url: pessoa.foto_url || e.foto_url
+        foto_url: pessoa.foto_url
       };
     }).filter(f => f !== null && f.descriptor !== null);
 
     console.log(`[SV] Cache carregado: ${registeredFaces.length} embeddings ativos.`);
     
     // Atualiza a visualização na aba de pessoas cadastradas
-    renderPeopleList(pessoas, embeddings);
+    renderPeopleList(safePessoas, safeEmbeddings);
   } catch (err) {
     console.error("[SV] Erro ao sincronizar banco com memória:", err);
   }
@@ -669,16 +732,21 @@ function enterEditMode(pessoa, embeddings) {
   originalPersonData = {
     nome:   pessoa.nome,
     idade:  pessoa.idade || '',
-    status: pessoa.status || 'ativo'
+    status: pessoa.status || 'ativo',
+    foto_url: pessoa.foto_url || ''
   };
 
   // Preenche o formulário com os dados atuais
   dom.cadNome.value   = pessoa.nome  || '';
   dom.cadCpf.value    = pessoa.cpf_mascarado || '';
+  dom.cadCpf.disabled = true;
   dom.cadStatus.value = pessoa.status || 'ativo';
 
   // Preenche data de nascimento (campo mantido no HTML mas não no novo schema — usa idade)
-  if (dom.cadDataNasc) dom.cadDataNasc.value = '';
+  if (dom.cadDataNasc) {
+    dom.cadDataNasc.value = '';
+    dom.cadDataNasc.required = false;
+  }
   if (dom.cadObs)      dom.cadObs.value      = '';
 
   // Se houver foto cadastrada, exibe no preview
@@ -841,7 +909,9 @@ async function submitCadastro(e) {
   try {
     // Obtém administrador autenticado atual
     const { data: { user } } = await supabase.auth.getUser();
+    const adminUserId = user ? user.id : null;
     const adminEmail = user ? user.email : 'admin_sistema';
+    const idade = dataNasc ? calculateAgeFromDate(dataNasc) : (editMode ? originalPersonData?.idade ?? null : null);
 
     // 1. Criptografa o CPF no cliente (para salvar de forma segura)
     const cpfCifrado = CryptoJS.AES.encrypt(cpf, encryptionKey).toString();
@@ -859,11 +929,8 @@ async function submitCadastro(e) {
         .from('pessoas')
         .update({
           nome: nome,
-          cpf_encrypted: cpfCifrado,
-          cpf_hash: cpfHash,
-          data_nascimento: dataNasc,
+          idade: idade,
           status: status,
-          observacoes: obs,
           updated_at: new Date().toISOString()
         })
         .eq('id', editingPersonId);
@@ -880,7 +947,7 @@ async function submitCadastro(e) {
         
         const { error: errUpload } = await supabase.storage
           .from('fotos')
-          .upload(filePath, capturedFaceBlob, { contentType: 'image/jpeg', upsert: true });
+          .upload(filePath, capturedFaceBlob, { contentType: capturedFaceBlob.type || 'image/jpeg', upsert: true });
 
         if (errUpload) throw errUpload;
 
@@ -888,16 +955,29 @@ async function submitCadastro(e) {
           .from('fotos')
           .getPublicUrl(filePath);
 
-        // Deleta biometria anterior e insere a nova
-        await supabase.from('biometria').delete().eq('pessoa_id', editingPersonId);
+        const { error: errPhoto } = await supabase
+          .from('pessoas')
+          .update({ foto_url: publicUrl, updated_at: new Date().toISOString() })
+          .eq('id', editingPersonId);
+
+        if (errPhoto) throw errPhoto;
+
+        // Deleta embedding anterior e insere o novo
+        const { error: errDeleteBio } = await supabase
+          .from('face_embeddings')
+          .delete()
+          .eq('pessoa_id', editingPersonId);
+
+        if (errDeleteBio) throw errDeleteBio;
         
         const descriptorArray = Array.from(capturedFaceDescriptor);
         const { error: errBio } = await supabase
-          .from('biometria')
+          .from('face_embeddings')
           .insert([{
             pessoa_id: editingPersonId,
-            descriptor: descriptorArray,
-            foto_url: publicUrl
+            embedding: toPgVector(descriptorArray),
+            modelo_usado: 'face-api.js/ssdMobilenetv1',
+            qualidade_imagem: 1
           }]);
 
         if (errBio) throw errBio;
@@ -906,9 +986,8 @@ async function submitCadastro(e) {
       // 4. Registra Logs de Auditoria detalhando mudanças de valores
       const diff = {};
       if (originalPersonData.nome !== nome) diff.nome = { old: originalPersonData.nome, new: nome };
-      if (originalPersonData.data_nascimento !== dataNasc) diff.data_nascimento = { old: originalPersonData.data_nascimento, new: dataNasc };
+      if (originalPersonData.idade !== idade) diff.idade = { old: originalPersonData.idade, new: idade };
       if (originalPersonData.status !== status) diff.status = { old: originalPersonData.status, new: status };
-      if (originalPersonData.observacoes !== obs) diff.observacoes = { old: originalPersonData.observacoes || '', new: obs };
       if (capturedFaceDescriptor) diff.foto = { old: 'Foto Anterior', new: 'Nova Foto Biométrica' };
 
       if (Object.keys(diff).length > 0) {
@@ -1025,6 +1104,8 @@ function exitEditMode() {
   dom.editBadge.classList.add('hidden');
   dom.btnCancelEdit.classList.add('hidden');
   dom.btnSubmitCadastro.innerText = "Concluir Cadastro";
+  dom.cadCpf.disabled = false;
+  dom.cadDataNasc.required = true;
   
   dom.formCadastro.reset();
   resetPhotoPreview();
@@ -1048,10 +1129,11 @@ function validateFormInputs() {
   const dataNascVal = dom.cadDataNasc.value;
   const consentVal = dom.cadConsent.checked;
   
-  const isCpfValido = isValidCpf(cpfVal);
+  const isCpfValido = editMode ? cpfVal.length > 0 : isValidCpf(cpfVal);
+  const hasRequiredDate = editMode || dataNascVal !== '';
   const needsPhoto = editMode ? false : (capturedFaceDescriptor === null);
   
-  const isFormValid = nomeVal.length >= 3 && isCpfValido && dataNascVal !== '' && consentVal && !needsPhoto;
+  const isFormValid = nomeVal.length >= 3 && isCpfValido && hasRequiredDate && consentVal && !needsPhoto;
   dom.btnSubmitCadastro.disabled = !isFormValid;
 }
 
@@ -1318,7 +1400,7 @@ function setupEventListeners() {
   dom.btnCancelEdit.addEventListener('click', exitEditMode);
   
   // Validações em tempo real do formulário
-  [dom.cadNome, dom.cadCpf, dom.cadConsent].forEach(el => {
+  [dom.cadNome, dom.cadCpf, dom.cadDataNasc, dom.cadStatus, dom.cadConsent].forEach(el => {
     el.addEventListener('input', validateFormInputs);
     el.addEventListener('change', validateFormInputs);
   });

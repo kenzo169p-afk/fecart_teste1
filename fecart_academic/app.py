@@ -15,7 +15,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 from database import (
     init_db, get_dashboard_stats, get_cameras_list, get_recent_events,
     get_all_persons, register_person, delete_person, toggle_emergency_lockdown,
-    get_audit_logs, get_integrity_logs, log_recognition, add_audit_log
+    get_audit_logs, get_integrity_logs, log_recognition, add_audit_log,
+    authenticate_user, register_user
 )
 from camera_config import CameraConfigManager
 from detector import PersonDetector
@@ -38,6 +39,53 @@ feature_extractor = FeatureExtractor()
 def index():
     """Renderiza a aplicação SPA completa do SecureVision AI."""
     return render_template("index.html")
+
+# --- Rotas de Autenticação e Usuários ---
+
+@app.route("/api/login", methods=["POST"])
+def api_login():
+    """Valida login, senha e data de nascimento do operador."""
+    try:
+        data = request.get_json() or {}
+        login_or_name = data.get("username", "").strip()
+        senha = data.get("password", "").strip()
+        data_nasc = data.get("birthdate", "").strip()
+
+        if not login_or_name or not senha or not data_nasc:
+            return jsonify({"error": "Preencha todos os campos: Nome de usuário / Login, Senha e Data de Nascimento."}), 400
+
+        user = authenticate_user(login_or_name, senha, data_nasc)
+        if user:
+            return jsonify({"success": True, "user": user})
+        else:
+            return jsonify({"error": "Credenciais inválidas ou Data de Nascimento incorreta."}), 401
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/register", methods=["POST"])
+def api_register():
+    """Cria uma nova conta no sistema respeitando o limite de 1 nome e 1 login por conta."""
+    try:
+        data = request.get_json() or {}
+        user_id = data.get("username", "").strip().lower()
+        nome = data.get("nome", "").strip()
+        senha = data.get("password", "").strip()
+        data_nasc = data.get("birthdate", "").strip()
+        role = data.get("role", "operador")
+        clearance = data.get("clearance_level", "Level 2 (Staff)")
+
+        if not user_id or not nome or not senha or not data_nasc:
+            return jsonify({"error": "Todos os campos são obrigatórios para cadastro."}), 400
+
+        if len(senha) < 4:
+            return jsonify({"error": "A senha deve conter no mínimo 4 caracteres."}), 400
+
+        uid = register_user(user_id, nome, senha, data_nasc, role, clearance)
+        return jsonify({"success": True, "user_id": uid, "message": "Conta criada com sucesso!"})
+    except ValueError as ve:
+        return jsonify({"error": str(ve)}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # --- Rotas da API REST ---
 

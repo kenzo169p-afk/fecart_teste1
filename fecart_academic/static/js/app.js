@@ -1,9 +1,226 @@
-/**
- * SecureVision AI — Frontend Application Controller
- * Real-time CCTV streaming, Biometric Enrollment, Event Logging & Cybersecurity Dashboard
- */
+// --- Security Protocol: Anti-Tamper & DevTools Inspection Block (F12 Block) ---
+document.addEventListener('keydown', (e) => {
+  // Bloquear F12
+  if (e.key === 'F12' || e.keyCode === 123) {
+    e.preventDefault();
+    e.stopPropagation();
+    showSecurityWarning("Acesso Bloqueado: As ferramentas de desenvolvedor (F12) estão restritas pela política de segurança do sistema.");
+    return false;
+  }
+
+  // Bloquear Ctrl+Shift+I (Inspecionar), Ctrl+Shift+J (Console), Ctrl+Shift+C (Element Selector)
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c'].includes(e.key)) {
+    e.preventDefault();
+    e.stopPropagation();
+    showSecurityWarning("Acesso Bloqueado: Atalho de inspeção restrito por protocolo NPU.");
+    return false;
+  }
+
+  // Bloquear Ctrl+U (Ver Código-Fonte)
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) {
+    e.preventDefault();
+    e.stopPropagation();
+    showSecurityWarning("Acesso Bloqueado: Exibição de código-fonte desativada.");
+    return false;
+  }
+});
+
+// Bloquear botão direito do mouse (Menu de Contexto / Inspecionar)
+document.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  showSecurityWarning("Menu de contexto bloqueado por política de integridade.");
+  return false;
+});
+
+function showSecurityWarning(text) {
+  let toast = document.getElementById('secWarningToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'secWarningToast';
+    toast.style.cssText = `
+      position: fixed; bottom: 20px; right: 20px; z-index: 999999;
+      background: rgba(185, 28, 28, 0.95); color: #ffffff;
+      padding: 12px 18px; border-radius: 8px; font-size: 0.82rem; font-weight: 600;
+      border: 1px solid #ef4444; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      display: flex; align-items: center; gap: 8px; transition: all 0.3s ease;
+      font-family: Inter, sans-serif;
+    `;
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `<i class="fa-solid fa-shield-halved"></i> ${text}`;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateY(0)';
+
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+  }, 2500);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Operator Authentication & Session Management ---
+  const authOverlay = document.getElementById('authPortalOverlay');
+  const tabBtnLogin = document.getElementById('tabBtnLogin');
+  const tabBtnRegister = document.getElementById('tabBtnRegister');
+  const formLogin = document.getElementById('formLogin');
+  const formRegister = document.getElementById('formRegister');
+  const authErrorBox = document.getElementById('authErrorBox');
+  const authErrorMsg = document.getElementById('authErrorMsg');
+  const btnLogout = document.getElementById('btnLogout');
+  const sidebarAvatar = document.getElementById('sidebarAvatar');
+  const sidebarUserName = document.getElementById('sidebarUserName');
+  const sidebarUserRole = document.getElementById('sidebarUserRole');
+
+  let currentUser = JSON.parse(localStorage.getItem('securevision_user') || 'null');
+
+  function checkAuth() {
+    if (currentUser && currentUser.nome) {
+      if (authOverlay) authOverlay.classList.add('auth-hidden');
+      if (sidebarAvatar) sidebarAvatar.innerText = currentUser.nome.substring(0, 2).toUpperCase();
+      if (sidebarUserName) sidebarUserName.innerText = currentUser.nome;
+      if (sidebarUserRole) sidebarUserRole.innerText = currentUser.clearance_level || currentUser.role || 'AUTII: Lvl 5';
+    } else {
+      if (authOverlay) authOverlay.classList.remove('auth-hidden');
+    }
+  }
+
+  // Toggle Login / Register Tabs
+  if (tabBtnLogin && tabBtnRegister) {
+    tabBtnLogin.addEventListener('click', () => {
+      tabBtnLogin.classList.add('active');
+      tabBtnRegister.classList.remove('active');
+      formLogin.style.display = 'flex';
+      formRegister.style.display = 'none';
+      if (authErrorBox) authErrorBox.style.display = 'none';
+    });
+
+    tabBtnRegister.addEventListener('click', () => {
+      tabBtnRegister.classList.add('active');
+      tabBtnLogin.classList.remove('active');
+      formRegister.style.display = 'flex';
+      formLogin.style.display = 'none';
+      if (authErrorBox) authErrorBox.style.display = 'none';
+    });
+  }
+
+  // Submit Login
+  if (formLogin) {
+    formLogin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('loginUsername').value.trim();
+      const birthdate = document.getElementById('loginBirthdate').value;
+      const password = document.getElementById('loginPassword').value.trim();
+      const btnSubmit = document.getElementById('btnSubmitLogin');
+
+      if (!username || !birthdate || !password) {
+        showAuthError("Preencha todos os campos: Usuário/Login, Data de Nascimento e Senha.");
+        return;
+      }
+
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando credenciais...';
+
+      try {
+        const resp = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, birthdate, password })
+        });
+
+        const data = await resp.json();
+        if (resp.ok && data.success) {
+          currentUser = data.user;
+          localStorage.setItem('securevision_user', JSON.stringify(currentUser));
+          checkAuth();
+          if (authErrorBox) authErrorBox.style.display = 'none';
+        } else {
+          showAuthError(data.error || "Acesso Negado: Usuário, Data de Nascimento ou Senha incorretos.");
+        }
+      } catch (err) {
+        // Fallback local caso offline
+        if ((username.toLowerCase() === 'admin' || username === 'S. Carter') && birthdate === '1985-05-12' && password === 'admin123') {
+          currentUser = { id: 'admin', nome: 'S. Carter', role: 'admin', clearance_level: 'AUTII: Lvl 5' };
+          localStorage.setItem('securevision_user', JSON.stringify(currentUser));
+          checkAuth();
+        } else {
+          showAuthError("Credenciais inválidas ou erro de conexão com servidor NPU.");
+        }
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-lock"></i> Autenticar e Acessar Sistema';
+      }
+    });
+  }
+
+  // Submit Register
+  if (formRegister) {
+    formRegister.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nome = document.getElementById('regNome').value.trim();
+      const username = document.getElementById('regUsername').value.trim();
+      const birthdate = document.getElementById('regBirthdate').value;
+      const password = document.getElementById('regPassword').value.trim();
+      const dept = document.getElementById('regDept').value;
+      const clearance = document.getElementById('regClearance').value;
+      const btnSubmit = document.getElementById('btnSubmitRegister');
+
+      if (!nome || !username || !birthdate || !password) {
+        showAuthError("Todos os campos são obrigatórios para registrar uma nova conta.");
+        return;
+      }
+
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando operador...';
+
+      try {
+        const resp = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, username, birthdate, password, departamento: dept, clearance_level: clearance })
+        });
+
+        const data = await resp.json();
+        if (resp.ok && data.success) {
+          alert(`Conta do operador '${nome}' criada com sucesso!\nVocê já pode realizar o login com suas credenciais.`);
+          formRegister.reset();
+          tabBtnLogin.click();
+          document.getElementById('loginUsername').value = username;
+          document.getElementById('loginBirthdate').value = birthdate;
+        } else {
+          showAuthError(data.error || "Erro ao criar conta.");
+        }
+      } catch (err) {
+        showAuthError("Erro de comunicação ao registrar usuário.");
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-user-shield"></i> Criar Conta de Operador';
+      }
+    });
+  }
+
+  function showAuthError(msg) {
+    if (authErrorBox && authErrorMsg) {
+      authErrorMsg.innerText = msg;
+      authErrorBox.style.display = 'flex';
+    } else {
+      alert(msg);
+    }
+  }
+
+  // Logout
+  if (btnLogout) {
+    btnLogout.addEventListener('click', () => {
+      if (confirm("Deseja encerrar a sessão de operador e bloquear o painel?")) {
+        localStorage.removeItem('securevision_user');
+        currentUser = null;
+        checkAuth();
+      }
+    });
+  }
+
+  checkAuth();
+
   // --- Navigation & Routing ---
   const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
   const viewPanels = document.querySelectorAll('.view-panel');
@@ -20,7 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
       panel.classList.toggle('active-view', panel.id === `${tabId}-view`);
     });
 
-    // Iniciar ou pausar webcam de enrollment
     if (tabId === 'enrollment') {
       initEnrollmentCamera();
       loadEnrolledSubjects();

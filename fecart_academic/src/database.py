@@ -32,9 +32,11 @@ def init_db(force_recreate=False):
     CREATE TABLE IF NOT EXISTS users_profiles (
         id TEXT PRIMARY KEY,
         user_id TEXT UNIQUE NOT NULL,
-        nome TEXT NOT NULL,
+        nome TEXT UNIQUE NOT NULL,
+        data_nascimento TEXT NOT NULL,
+        senha_hash TEXT NOT NULL,
         role TEXT CHECK(role IN ('admin', 'operador', 'visualizador')) DEFAULT 'admin',
-        clearance_level TEXT DEFAULT 'Level 4 (Executive)',
+        clearance_level TEXT DEFAULT 'AUTII: Lvl 5',
         avatar_url TEXT,
         status TEXT CHECK(status IN ('ativo', 'inativo')) DEFAULT 'ativo',
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
@@ -174,14 +176,16 @@ def seed_data(cursor):
         ) VALUES (1, 0, 'High', 59.8, 82, 4, 4, 42, 1, 12, 99.9, 1482);
         """)
 
-    # 2. Usuário administrador
+    # 2. Usuário administrador padrão
     cursor.execute("SELECT COUNT(*) FROM users_profiles;")
     if cursor.fetchone()[0] == 0:
         admin_id = str(uuid.uuid4())
+        # Senha padrão: admin123 -> SHA-256
+        admin_pass_hash = hashlib.sha256(b"admin123").hexdigest()
         cursor.execute("""
-        INSERT INTO users_profiles (id, user_id, nome, role, clearance_level, status)
-        VALUES (?, 'admin_carter', 'S. Carter', 'admin', 'AUTII: Lvl 5', 'ativo');
-        """, (admin_id,))
+        INSERT INTO users_profiles (id, user_id, nome, data_nascimento, senha_hash, role, clearance_level, status)
+        VALUES (?, 'admin', 'S. Carter', '1985-05-12', ?, 'admin', 'AUTII: Lvl 5', 'ativo');
+        """, (admin_id, admin_pass_hash))
 
     # 3. Câmeras (4 câmeras das imagens)
     cursor.execute("SELECT COUNT(*) FROM cameras;")
@@ -523,7 +527,54 @@ def get_integrity_logs(limit=50):
     cursor.execute("SELECT * FROM source_integrity_logs ORDER BY created_at DESC LIMIT ?;", (limit,))
     rows = cursor.fetchall()
     conn.close()
-    return [dict(r) for r in rows]
+def authenticate_user(login_or_name, senha, data_nascimento):
+    """Verifica credenciais de usuário (Login ou Nome, Senha e Data de Nascimento)."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    senha_hash = hashlib.sha256(senha.encode('utf-8')).hexdigest()
+    cursor.execute("""
+    SELECT * FROM users_profiles 
+    WHERE (user_id = ? OR nome = ?) AND data_nascimento = ? AND senha_hash = ? AND status = 'ativo';
+    """, (login_or_name, login_or_name, data_nascimento, senha_hash))
+    user = cursor.fetchone()
+    conn.close()
+    if user:
+        user_dict = dict(user)
+        # Não expõe hash da senha
+        user_dict.pop("senha_hash", None)
+        add_audit_log(user_dict["nome"], "USER_LOGIN_SUCCESS", "users_profiles", user_dict["id"], {"role": user_dict["role"]})
+        return user_dict
+    else:
+        add_audit_log(login_or_name, "USER_LOGIN_FAILED", "users_profiles", None, {"reason": "Credenciais ou data de nascimento inválidas"})
+        return None
+
+def register_user(user_id, nome, senha, data_nascimento, role="operador", clearance="Level 2 (Staff)"):
+    """Cria uma nova conta garantindo que só pode haver um nome e um login por conta."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # Valida unicidade estrita: login e nome devem ser únicos
+    cursor.execute("SELECT id, user_id, nome FROM users_profiles WHERE user_id = ? OR nome = ?;", (user_id, nome))
+    existing = cursor.fetchone()
+    if existing:
+        conn.close()
+        if existing["user_id"] == user_id:
+            raise ValueError("Este nome de usuário / login já está cadastrado no sistema.")
+        else:
+            raise ValueError("Já existe uma conta registrada com este Nome Completo.")
+        
+    uid = str(uuid.uuid4())
+    senha_hash = hashlib.sha256(senha.encode('utf-8')).hexdigest()
+    
+    cursor.execute("""
+    INSERT INTO users_profiles (id, user_id, nome, data_nascimento, senha_hash, role, clearance_level, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'ativo');
+    """, (uid, user_id, nome, data_nascimento, senha_hash, role, clearance))
+    
+    conn.commit()
+    conn.close()
+    add_audit_log("system", "USER_REGISTER", "users_profiles", uid, {"user_id": user_id, "nome": nome, "clearance": clearance})
+    return uid
 
 if __name__ == "__main__":
     init_db(force_recreate=True)

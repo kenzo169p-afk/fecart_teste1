@@ -13,6 +13,132 @@
   <!-- Fullscreen Emergency Lockdown Flash Overlay -->
   <div id="lockdownOverlay" class="lockdown-fullscreen-overlay"></div>
 
+  <!-- Operator Authentication Portal (Restricted Login Screen) -->
+  <div id="authPortalOverlay" class="auth-portal-overlay">
+    <div class="auth-card-box">
+      
+      <div class="auth-header">
+        <div class="auth-shield-logo">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="auth-title">SecureVision AI</div>
+        <div class="auth-subtitle">Restricted Access Protocol • NPU Lvl 5</div>
+      </div>
+
+      <div class="auth-tabs">
+        <button id="tabBtnLogin" class="auth-tab-btn active" type="button">Autenticação (Login)</button>
+        <button id="tabBtnRegister" class="auth-tab-btn" type="button">Novo Acesso (Cadastro)</button>
+      </div>
+
+      <div class="auth-body">
+        
+        <div id="authErrorBox" class="auth-error-box">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span id="authErrorMsg">Credenciais incorretas</span>
+        </div>
+
+        <!-- FORM LOGIN -->
+        <form id="formLogin" style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="form-group">
+            <label class="form-label">
+              <span>Nome do Usuário ou Login</span>
+              <span class="badge-aes">Identificador Único</span>
+            </label>
+            <input type="text" id="loginUsername" class="form-input" placeholder="Ex: admin ou S. Carter" required autocomplete="username">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <span>Data de Nascimento</span>
+              <span class="badge-aes">Validação de Identidade</span>
+            </label>
+            <input type="date" id="loginBirthdate" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <span>Senha de Acesso</span>
+              <span class="badge-aes">SHA-256</span>
+            </label>
+            <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+
+          <div class="auth-hint-box">
+            <i class="fa-solid fa-circle-info" style="color: var(--accent-cyan);"></i>
+            Acesso Padrão: Login: <strong>admin</strong> | Nascimento: <strong>1985-05-12</strong> | Senha: <strong>admin123</strong>
+          </div>
+
+          <button type="submit" id="btnSubmitLogin" class="btn-enroll-submit" style="width: 100%; margin-top: 4px;">
+            <i class="fa-solid fa-lock"></i> Autenticar e Acessar Sistema
+          </button>
+        </form>
+
+        <!-- FORM CADASTRO DE NOVO OPERADOR -->
+        <form id="formRegister" style="display: none; flex-direction: column; gap: 14px;">
+          <div class="form-group">
+            <label class="form-label">
+              <span>Nome Completo</span>
+              <span class="badge-aes">1 Nome por Conta</span>
+            </label>
+            <input type="text" id="regNome" class="form-input" placeholder="Ex: Dr. Roberto Santos" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <span>Nome de Usuário / Login</span>
+              <span class="badge-aes">Login Único</span>
+            </label>
+            <input type="text" id="regUsername" class="form-input" placeholder="Ex: rsantos" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <span>Data de Nascimento</span>
+              <span class="badge-aes">Obrigatório</span>
+            </label>
+            <input type="date" id="regBirthdate" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <span>Definir Senha</span>
+              <span class="badge-aes">Mínimo 4 caracteres</span>
+            </label>
+            <input type="password" id="regPassword" class="form-input" placeholder="••••••••" required>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Departamento</label>
+              <select id="regDept" class="form-select">
+                <option value="Engineering">Engineering</option>
+                <option value="Security">Security</option>
+                <option value="IT Infrastructure">IT Infrastructure</option>
+                <option value="Administration">Administration</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Nível de Acesso</label>
+              <select id="regClearance" class="form-select">
+                <option value="AUTII: Lvl 5">AUTII: Lvl 5 (Admin)</option>
+                <option value="Level 4 (Executive)">Level 4 (Executive)</option>
+                <option value="Level 3 (Senior)">Level 3 (Senior)</option>
+                <option value="Level 2 (Staff)">Level 2 (Staff)</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" id="btnSubmitRegister" class="btn-enroll-submit" style="width: 100%; margin-top: 4px; background: var(--accent-green);">
+            <i class="fa-solid fa-user-shield"></i> Criar Conta de Operador
+          </button>
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+
   <!-- Sidebar Navigation (Exact Match to Visual References) -->
   <aside class="sidebar">
     <div class="sidebar-header">
@@ -57,12 +183,17 @@
         <span>Support</span>
       </div>
 
-      <div class="user-profile-badge">
-        <div class="user-avatar">SC</div>
-        <div class="user-info">
-          <div class="user-name">S. Carter</div>
-          <div class="user-role">AUTII: Lvl 5 (Admin)</div>
+      <div class="user-profile-badge" style="justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="user-avatar" id="sidebarAvatar">SC</div>
+          <div class="user-info">
+            <div class="user-name" id="sidebarUserName">S. Carter</div>
+            <div class="user-role" id="sidebarUserRole">AUTII: Lvl 5</div>
+          </div>
         </div>
+        <button id="btnLogout" class="action-icon-btn" title="Encerrar Sessão / Logout" style="width: 28px; height: 28px; font-size: 0.75rem;">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
       </div>
     </div>
   </aside>

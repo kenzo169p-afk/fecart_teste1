@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecureVision AI — NPU Surveillance & Biometric Control</title>
+  <!-- FontAwesome Icons & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- Fullscreen Emergency Lockdown Flash Overlay -->
+  <div id="lockdownOverlay" class="lockdown-fullscreen-overlay"></div>
+
+  <!-- Sidebar Navigation (Exact Match to Visual References) -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-title">
+        <i class="fa-solid fa-shield-halved shield-icon"></i> SecureVision AI
+      </div>
+      <div class="vigilance-badge">
+        <span class="status-dot"></span> Vigilance Level: High
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-item" data-tab="status">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>System Status</span>
+      </div>
+      <div class="nav-item active" data-tab="monitoring">
+        <i class="fa-solid fa-video"></i>
+        <span>Monitoring</span>
+      </div>
+      <div class="nav-item" data-tab="enrollment">
+        <i class="fa-solid fa-user-plus"></i>
+        <span>Enrollment</span>
+      </div>
+      <div class="nav-item" data-tab="logs">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <span>Logs</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button id="lockdownBtn" class="btn-lockdown">
+        <i class="fa-solid fa-triangle-exclamation"></i> Emergency Lockdown
+      </button>
+
+      <div class="nav-item" style="padding: 6px 12px; margin: 0;">
+        <i class="fa-solid fa-gear"></i>
+        <span>Settings</span>
+      </div>
+      <div class="nav-item" style="padding: 6px 12px; margin: 0;">
+        <i class="fa-solid fa-circle-question"></i>
+        <span>Support</span>
+      </div>
+
+      <div class="user-profile-badge">
+        <div class="user-avatar">SC</div>
+        <div class="user-info">
+          <div class="user-name">S. Carter</div>
+          <div class="user-role">AUTII: Lvl 5 (Admin)</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+
+    <!-- Topbar Navigation & Live Telemetry -->
+    <header class="topbar">
+      <div class="topbar-stats">
+        <div class="stat-item">
+          <span class="stat-label">FPS (Avg)</span>
+          <span class="stat-val highlight" id="statFps">59.8</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Edge GPU</span>
+          <span class="stat-val highlight" id="statGpu">82%</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Active Streams</span>
+          <span class="stat-val" id="statStreams">4 / 4</span>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search camera feeds, logs, personnel...">
+        </div>
+
+        <button id="themeToggleBtn" class="action-icon-btn" title="Toggle Theme">
+          <i class="fa-solid fa-sun"></i>
+        </button>
+        <button class="action-icon-btn" title="Notifications">
+          <i class="fa-solid fa-bell"></i>
+        </button>
+        <button class="action-icon-btn" title="Security Protocols">
+          <i class="fa-solid fa-shield"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- TAB 1: MONITORING VIEW (Matches Image 1 & 2) -->
+    <main id="monitoring-view" class="view-panel active-view">
+      <div class="monitoring-container">
+        
+        <!-- Left: 2x2 Grid + Integrity Monitor -->
+        <div class="video-grid-wrapper">
+          <div class="camera-grid-2x2">
+            
+            <!-- CAM 01: LOBBY -->
+            <div class="camera-card">
+              <img src="/api/feed/cam_01" class="camera-feed-img" alt="CAM_01_LOBBY">
+            </div>
+
+            <!-- CAM 04: EXTERIOR (ALERT ACTIVE) -->
+            <div class="camera-card alert-active">
+              <img src="/api/feed/cam_04" class="camera-feed-img" alt="CAM_04_EXTERIOR">
+            </div>
+
+            <!-- CAM 07: DATACENTER -->
+            <div class="camera-card">
+              <img src="/api/feed/cam_07" class="camera-feed-img" alt="CAM_07_DATACENTER">
+            </div>
+
+            <!-- CAM 02: ENTRANCE -->
+            <div class="camera-card">
+              <img src="/api/feed/cam_02" class="camera-feed-img" alt="CAM_02_ENTRANCE">
+            </div>
+
+          </div>
+
+          <!-- Bottom: System Integrity Monitor (Matches Image 1) -->
+          <div class="integrity-banner-card">
+            <div class="integrity-info">
+              <h4><i class="fa-solid fa-server" style="color: var(--accent-cyan);"></i> System Integrity Monitor</h4>
+              <p>NODE_CLUSTER_ALPHA • Last Check: 0.2s ago</p>
+            </div>
+            
+            <div class="integrity-metrics">
+              <div class="metric-group">
+                <span class="metric-label">Files Scanned</span>
+                <span class="metric-val">1,482</span>
+              </div>
+              <div class="metric-group">
+                <span class="metric-label">Core Modules</span>
+                <span class="metric-status-ok"><i class="fa-solid fa-check"></i> kernel_sys.dll OK</span>
+                <span class="metric-status-ok"><i class="fa-solid fa-check"></i> auth_module.so OK</span>
+              </div>
+              <div class="badge-secure">
+                <i class="fa-solid fa-shield-check"></i> SECURE
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Live Security Log (Matches Image 1 & 2) -->
+        <aside class="live-log-container">
+          <div class="log-header">
+            <h3><i class="fa-solid fa-list-check" style="color: var(--accent-blue);"></i> Live Security Log</h3>
+            <span style="font-size: 0.72rem; color: var(--accent-blue); cursor: pointer;" onclick="document.querySelector('[data-tab=logs]').click()">Filter</span>
+          </div>
+
+          <div class="log-list" id="liveLogList">
+            <!-- Dynamic entries loaded via JS polling -->
+          </div>
+        </aside>
+
+      </div>
+    </main>
+
+    <!-- TAB 2: ENROLLMENT VIEW (Matches Image 3 & 4) -->
+    <main id="enrollment-view" class="view-panel">
+      <div class="enrollment-container">
+        
+        <!-- Left Column: Identity Capture -->
+        <div class="card-enroll">
+          <div>
+            <h3 class="enroll-section-title"><i class="fa-solid fa-camera" style="color: var(--accent-cyan);"></i> Identity Capture</h3>
+            <p class="enroll-section-sub">Extract local 128D facial mathematical vector in zero-trust isolation.</p>
+          </div>
+
+          <div class="capture-frame-box">
+            <video id="enrollVideo" class="capture-video" autoplay playsinline muted></video>
+            <canvas id="enrollCanvas" class="canvas-overlay"></canvas>
+
+            <div class="capture-hud-badge">
+              <span class="status-dot"></span> Sensor Active • Zero-Trust NPU
+            </div>
+
+            <div class="capture-stats-badge">
+              Yaw: -2.4° • Pitch: 0.8° • Quality: 98% • Latency: 12ms
+            </div>
+
+            <button id="btnCapturePhoto" type="button" class="btn-capture-circle" title="Capturar Foto">
+              <i class="fa-solid fa-camera"></i>
+            </button>
+          </div>
+
+          <!-- Hidden Upload alternative -->
+          <input type="file" id="photoUploadInput" accept="image/*" style="display: none;">
+          <button id="btnTriggerUpload" type="button" class="btn-lockdown" style="background: var(--bg-input); border-color: var(--border-color); color: var(--text-secondary); box-shadow: none;">
+            <i class="fa-solid fa-upload"></i> Upload Image from File
+          </button>
+
+          <!-- 128D Embedding Generated Banner (Matches Image 4) -->
+          <div id="generatedHashBox" class="embedding-generated-banner" style="display: none;">
+            <div>
+              <div style="font-weight: 700; color: var(--accent-green); font-size: 0.88rem;">
+                <i class="fa-solid fa-circle-check"></i> 128D Embedding Generated
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Vector normalized to unit sphere (L2)</div>
+            </div>
+            <div id="hashDisplay" class="emb-hash-code">HASH: 9a2f_4c1b</div>
+          </div>
+        </div>
+
+        <!-- Right Column: Subject Details & LGPD (Matches Image 3 & 4) -->
+        <div class="card-enroll">
+          <div>
+            <h3 class="enroll-section-title"><i class="fa-solid fa-id-card" style="color: var(--accent-blue);"></i> Subject Identity</h3>
+            <p class="enroll-section-sub">Link mathematical biometric vector to legal subject profile.</p>
+          </div>
+
+          <form id="enrollSubjectForm" style="display: flex; flex-direction: column; gap: 16px;">
+            
+            <div class="form-group">
+              <label class="form-label">
+                <span>Full Legal Name</span>
+                <span class="badge-aes">AES-256</span>
+              </label>
+              <input type="text" id="inputName" class="form-input" placeholder="Enter legal name" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <span>National ID (CPF)</span>
+                <span class="badge-aes">AES-256 Encrypted</span>
+              </label>
+              <input type="text" id="inputCpf" class="form-input" placeholder="000.000.000-00" maxlength="14" required>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">Department</label>
+                <select id="selectDept" class="form-select">
+                  <option value="Engineering">Engineering</option>
+                  <option value="IT Infrastructure">IT Infrastructure</option>
+                  <option value="Security">Security</option>
+                  <option value="Administration">Administration</option>
+                  <option value="Visitor">Visitor</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Clearance Level</label>
+                <select id="selectClearance" class="form-select">
+                  <option value="Level 1 (Basic)">Level 1 (Basic)</option>
+                  <option value="Level 2 (Staff)">Level 2 (Staff)</option>
+                  <option value="Level 3 (Senior)">Level 3 (Senior)</option>
+                  <option value="Level 4 (Executive)">Level 4 (Executive)</option>
+                </select>
+              </div>
+            </div>
+
+            <input type="hidden" id="inputIdade" value="30">
+
+            <!-- LGPD Compliance Notice (Exact Match) -->
+            <div class="lgpd-card-notice">
+              <h5><i class="fa-solid fa-scale-balanced" style="color: var(--accent-cyan);"></i> LGPD Compliance Notice</h5>
+              <p>
+                Biometric data collection requires explicit subject consent in accordance with the General Data Protection Law (Lei nº 13.709/2018 - LGPD). This data is stored locally as an irreversible 128D mathematical vector.<br>
+                <strong>Data Controller:</strong> SecureVision AI Systems Inc. / FECAP
+              </p>
+              
+              <label class="consent-checkbox-row">
+                <input type="checkbox" id="consentCheckbox">
+                <span class="consent-text">
+                  I confirm the subject has reviewed and signed the Biometric Data Processing Agreement pursuant to LGPD regulations.
+                </span>
+              </label>
+            </div>
+
+            <button id="btnSubmitEnroll" type="submit" class="btn-enroll-submit" disabled>
+              <i class="fa-solid fa-lock"></i> Enroll Identity
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Enrolled Entities List -->
+      <div style="max-width: 1280px; margin: 0 auto; width: 100%; margin-top: 24px;">
+        <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 12px;">Active Enrolled Entities</h4>
+        <div id="enrolledSubjectsList" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;"></div>
+      </div>
+    </main>
+
+    <!-- TAB 3: SYSTEM STATUS VIEW (Matches Image 2 Analytics) -->
+    <main id="status-view" class="view-panel">
+      <div style="max-width: 1280px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 24px;">
+        
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">System Integrity & Performance Overview</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Continuous NPU edge node monitoring and camera health telemetry.</p>
+        </div>
+
+        <!-- 4 KPI Cards -->
+        <div class="stats-cards-grid">
+          <div class="stat-kpi-card">
+            <span class="kpi-title">AI Processing Load</span>
+            <span class="kpi-number" id="statusProcessingLoad">42%</span>
+            <span class="kpi-sub"><i class="fa-solid fa-check"></i> Stable</span>
+          </div>
+          <div class="stat-kpi-card" style="border-color: rgba(239, 68, 68, 0.4);">
+            <span class="kpi-title" style="color: var(--accent-red);">Active Anomalies</span>
+            <span class="kpi-number" id="statusAnomalies" style="color: var(--accent-red);">1</span>
+            <span class="kpi-sub" style="color: var(--accent-red);"><i class="fa-solid fa-triangle-exclamation"></i> Requires Attention</span>
+          </div>
+          <div class="stat-kpi-card">
+            <span class="kpi-title">Frame Latency</span>
+            <span class="kpi-number" id="statusLatency">12ms</span>
+            <span class="kpi-sub"><i class="fa-solid fa-gauge-high"></i> Optimal</span>
+          </div>
+          <div class="stat-kpi-card">
+            <span class="kpi-title">System Uptime</span>
+            <span class="kpi-number" id="statusUptime">99.9%</span>
+            <span class="kpi-sub"><i class="fa-solid fa-circle-nodes"></i> Edge Nodes Online</span>
+          </div>
+        </div>
+
+        <!-- Stream Node Diagnostics Table -->
+        <div class="data-table-card">
+          <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-weight: 700;">
+            Camera Stream Nodes Diagnostic Matrix
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Location</th>
+                <th>Type</th>
+                <th>Resolution</th>
+                <th>Target FPS</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>CAM_01_LOBBY</strong></td>
+                <td>Main Lobby Entrance (Bldg A)</td>
+                <td>NPU Synthetic / RTSP</td>
+                <td>1080p</td>
+                <td>60 FPS</td>
+                <td><span class="badge-secure">ONLINE</span></td>
+              </tr>
+              <tr>
+                <td><strong>CAM_04_EXTERIOR</strong></td>
+                <td>Server Room B Corridor</td>
+                <td>NPU Synthetic / RTSP</td>
+                <td>1080p</td>
+                <td>60 FPS</td>
+                <td><span class="badge-secure" style="background: rgba(239,68,68,0.15); color: var(--accent-red); border-color: var(--accent-red);">ALERT</span></td>
+              </tr>
+              <tr>
+                <td><strong>CAM_07_DATACENTER</strong></td>
+                <td>Datacenter Vault Sub-2</td>
+                <td>NPU Synthetic / RTSP</td>
+                <td>4K</td>
+                <td>60 FPS</td>
+                <td><span class="badge-secure">ONLINE</span></td>
+              </tr>
+              <tr>
+                <td><strong>CAM_02_ENTRANCE</strong></td>
+                <td>North Turnstiles</td>
+                <td>NPU Synthetic / RTSP</td>
+                <td>1080p</td>
+                <td>60 FPS</td>
+                <td><span class="badge-secure">ONLINE</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- TAB 4: AUDIT & SOURCE INTEGRITY LOGS -->
+    <main id="logs-view" class="view-panel">
+      <div style="max-width: 1280px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px;">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">Audit & Source Integrity Logs</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Immutable activity trail of all biometric operations, logins, and system changes (LGPD Art. 6º VII).</p>
+        </div>
+
+        <div class="data-table-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Operator</th>
+                <th>Action</th>
+                <th>Target Entity</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="auditLogsTableBody">
+              <!-- Loaded via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

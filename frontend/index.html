@@ -1,392 +1,1550 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SecureVision - Sistema de Monitoramento e Biometria Facial</title>
-    <!-- Google Fonts & Material Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-  </head>
-  <body>
-    <div id="app" class="dashboard-container">
-      
-      <!-- Top Header -->
-      <header class="main-header">
-        <div class="logo-area">
-          <span class="material-icons-round icon-logo animate-pulse">videocam</span>
-          <div class="logo-text">
-            <h1>SecureVision</h1>
-            <p>Monitoramento e Biometria Facial Inteligente</p>
-          </div>
-        </div>
-        <div class="system-status-header">
-          <div class="status-indicator">
-            <span class="status-dot green animate-ping-slow"></span>
-            <span>Sistema Operacional</span>
-          </div>
-          <div class="status-indicator" id="audit-header-status">
-            <span class="status-dot green" id="audit-dot"></span>
-            <span id="audit-text">Auditoria Ativa</span>
-          </div>
-          <button id="btn-logout" class="btn btn-secondary btn-icon-only" title="Sair do Sistema">
-            <span class="material-icons-round">logout</span>
-          </button>
-        </div>
-      </header>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecureVision AI — NPU Surveillance & Biometric Control</title>
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    /* ==========================================================================
+       SecureVision AI — Design System & Cybersecurity Dark Theme
+       ========================================================================== */
+    :root {
+      --bg-main: #0b1120;
+      --bg-sidebar: #0f172a;
+      --bg-card: #151d30;
+      --bg-card-header: #192339;
+      --bg-input: #0e1526;
+      --border-color: #1e2942;
+      --border-focus: #3b82f6;
 
-      <main class="dashboard-grid">
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --accent-green-glow: rgba(16, 185, 129, 0.2);
+      --accent-red: #ef4444;
+      --accent-red-glow: rgba(239, 68, 68, 0.25);
+      --accent-amber: #f59e0b;
+
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+      --glow-red: 0 0 20px rgba(239, 68, 68, 0.35);
+
+      --sidebar-width: 260px;
+      --header-height: 64px;
+    }
+
+    [data-theme="light"] {
+      --bg-main: #f8fafc;
+      --bg-sidebar: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-header: #f1f5f9;
+      --bg-input: #ffffff;
+      --border-color: #e2e8f0;
+      --border-focus: #2563eb;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-main); }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      flex-shrink: 0;
+      z-index: 50;
+    }
+
+    .sidebar-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-title .shield-icon { color: var(--accent-blue); }
+
+    .vigilance-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+      animation: pulse-dot 2s infinite;
+    }
+
+    .sidebar-nav {
+      padding: 16px 12px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 16px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .nav-item:hover {
+      background-color: rgba(59, 130, 246, 0.08);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.03));
+      color: var(--accent-blue);
+      border-left: 3px solid var(--accent-blue);
+      font-weight: 600;
+    }
+
+    .nav-item i {
+      font-size: 1.1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn-lockdown {
+      width: 100%;
+      background: linear-gradient(135deg, #b91c1c, #ef4444);
+      color: #ffffff;
+      border: 1px solid #dc2626;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .btn-lockdown:hover {
+      background: linear-gradient(135deg, #dc2626, #f87171);
+      box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-lockdown.active-lockdown {
+      background: #22c55e;
+      border-color: #16a34a;
+    }
+
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+      border-radius: 8px;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+    }
+
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e293b, #334155);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      font-size: 0.85rem;
+      border: 1px solid var(--accent-blue);
+    }
+
+    .user-info .user-name { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
+    .user-info .user-role { font-size: 0.7rem; color: var(--text-muted); }
+
+    /* Main Wrapper */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .topbar {
+      height: var(--header-height);
+      background-color: var(--bg-sidebar);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 40;
+    }
+
+    .topbar-stats {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .stat-item { display: flex; flex-direction: column; }
+    .stat-label { font-size: 0.7rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; }
+    .stat-val { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+    .stat-val.highlight { color: var(--accent-cyan); }
+
+    .topbar-actions { display: flex; align-items: center; gap: 16px; }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 6px 12px;
+      width: 260px;
+      color: var(--text-secondary);
+    }
+
+    .search-box input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      margin-left: 8px;
+      width: 100%;
+    }
+
+    .action-icon-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .action-icon-btn:hover {
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      border-color: var(--accent-blue);
+    }
+
+    /* View Panels */
+    .view-panel {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .view-panel.active-view {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Monitoring Grid */
+    .monitoring-container {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      height: calc(100vh - var(--header-height) - 48px);
+    }
+
+    .video-grid-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+    .camera-grid-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 14px;
+      flex: 1;
+      min-height: 480px;
+    }
+
+    .camera-card {
+      background-color: #050811;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-md);
+    }
+
+    .camera-card.alert-active {
+      border-color: var(--accent-red);
+      box-shadow: var(--glow-red);
+    }
+
+    .camera-canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* System Integrity Monitor */
+    .integrity-banner-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .integrity-info h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .integrity-info p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 2px;
+    }
+
+    .integrity-metrics {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .metric-group { display: flex; flex-direction: column; }
+    .metric-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+    .metric-val { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; }
+    .metric-status-ok { color: var(--accent-green); font-weight: 700; font-size: 0.85rem; }
+
+    .badge-secure {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.78rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Live Security Log */
+    .live-log-container {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .log-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .log-header h3 { font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+    .log-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .log-card {
+      padding: 12px 14px;
+      border-radius: 8px;
+      background-color: var(--bg-sidebar);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .log-card.event-match { border-left: 3px solid var(--accent-green); }
+    .log-card.event-unauthorized { border-left: 3px solid var(--accent-red); background-color: rgba(239, 68, 68, 0.08); }
+    .log-card.event-routine { border-left: 3px solid var(--accent-blue); }
+
+    .log-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .log-camera-tag {
+      background-color: var(--bg-input);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .log-title { font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .log-card.event-unauthorized .log-title { color: var(--accent-red); }
+    .log-card.event-match .log-title { color: var(--accent-green); }
+    .log-desc { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.35; }
+
+    /* Enrollment View */
+    .enrollment-container {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 24px;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .enroll-section-title { font-size: 1.3rem; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+    .enroll-section-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; }
+
+    .card-enroll {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .capture-frame-box {
+      position: relative;
+      width: 100%;
+      height: 330px;
+      background-color: #030712;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .capture-video { width: 100%; height: 100%; object-fit: cover; }
+    .canvas-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+    .capture-hud-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(8px);
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .capture-stats-badge {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(8px);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      color: var(--accent-cyan);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .btn-capture-circle {
+      position: absolute;
+      bottom: 14px;
+      right: 14px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      color: #fff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .embedding-generated-banner {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .emb-hash-code { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; color: var(--accent-green); }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between; }
+    .badge-aes { font-size: 0.68rem; color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); padding: 2px 6px; border-radius: 4px; }
+
+    .form-input, .form-select {
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .form-input:focus, .form-select:focus { border-color: var(--accent-blue); }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .lgpd-card-notice {
+      background-color: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .lgpd-card-notice h5 { color: var(--text-secondary); font-size: 0.82rem; font-weight: 700; }
+    .consent-checkbox-row { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+    .consent-checkbox-row input { margin-top: 2px; accent-color: var(--accent-blue); }
+    .consent-text { font-size: 0.78rem; color: var(--text-secondary); }
+
+    .btn-enroll-submit {
+      background: var(--accent-blue);
+      color: #fff;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-enroll-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* KPI Grid */
+    .stats-cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .stat-kpi-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; }
+    .kpi-title { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+    .kpi-number { font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 800; color: var(--text-primary); }
+    .kpi-sub { font-size: 0.75rem; color: var(--accent-green); display: flex; align-items: center; gap: 4px; }
+
+    .data-table-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; }
+    .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.84rem; }
+    .data-table th { background-color: var(--bg-card-header); color: var(--text-secondary); font-weight: 600; padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+    .data-table td { padding: 12px 16px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+
+    /* Animations */
+    @keyframes pulse-dot { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.6; } }
+    @keyframes flash-red { 0%, 100% { border-color: var(--accent-red); background-color: rgba(239, 68, 68, 0.2); } 50% { border-color: #991b1b; background-color: transparent; } }
+
+    .lockdown-fullscreen-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(185, 28, 28, 0.15);
+      pointer-events: none; z-index: 9999; display: none;
+      animation: flash-red 1s infinite;
+    }
+    .lockdown-fullscreen-overlay.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- Fullscreen Lockdown Overlay -->
+  <div id="lockdownOverlay" class="lockdown-fullscreen-overlay"></div>
+
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-title">
+        <i class="fa-solid fa-shield-halved shield-icon"></i> SecureVision AI
+      </div>
+      <div class="vigilance-badge">
+        <span class="status-dot"></span> Vigilance Level: High
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-item" data-tab="status">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>System Status</span>
+      </div>
+      <div class="nav-item active" data-tab="monitoring">
+        <i class="fa-solid fa-video"></i>
+        <span>Monitoring</span>
+      </div>
+      <div class="nav-item" data-tab="enrollment">
+        <i class="fa-solid fa-user-plus"></i>
+        <span>Enrollment</span>
+      </div>
+      <div class="nav-item" data-tab="logs">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <span>Logs</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button id="lockdownBtn" class="btn-lockdown">
+        <i class="fa-solid fa-triangle-exclamation"></i> Emergency Lockdown
+      </button>
+
+      <div class="nav-item" style="padding: 6px 12px; margin: 0;">
+        <i class="fa-solid fa-gear"></i>
+        <span>Settings</span>
+      </div>
+      <div class="nav-item" style="padding: 6px 12px; margin: 0;">
+        <i class="fa-solid fa-circle-question"></i>
+        <span>Support</span>
+      </div>
+
+      <div class="user-profile-badge">
+        <div class="user-avatar">SC</div>
+        <div class="user-info">
+          <div class="user-name">S. Carter</div>
+          <div class="user-role">AUTII: Lvl 5 (Admin)</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-wrapper">
+
+    <!-- Topbar Navigation -->
+    <header class="topbar">
+      <div class="topbar-stats">
+        <div class="stat-item">
+          <span class="stat-label">FPS (Avg)</span>
+          <span class="stat-val highlight" id="statFps">59.8</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Edge GPU</span>
+          <span class="stat-val highlight" id="statGpu">82%</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Active Streams</span>
+          <span class="stat-val" id="statStreams">4 / 4</span>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search camera feeds, logs, personnel...">
+        </div>
+
+        <button id="themeToggleBtn" class="action-icon-btn" title="Toggle Theme">
+          <i class="fa-solid fa-sun"></i>
+        </button>
+        <button class="action-icon-btn" title="Notifications">
+          <i class="fa-solid fa-bell"></i>
+        </button>
+        <button class="action-icon-btn" title="Security Protocols">
+          <i class="fa-solid fa-shield"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- TAB 1: MONITORING (Matches Image 1 & 2) -->
+    <main id="monitoring-view" class="view-panel active-view">
+      <div class="monitoring-container">
         
-        <!-- COLUNA ESQUERDA: CÂMERAS & AUDITORIA -->
-        <section class="grid-col glass-panel" id="col-cameras">
-          <div class="panel-header">
-            <span class="material-icons-round">settings_remote</span>
-            <h2>Controle de Câmeras</h2>
+        <!-- Left: 2x2 Grid + Integrity Monitor -->
+        <div class="video-grid-wrapper">
+          <div class="camera-grid-2x2">
+            
+            <!-- CAM 01: LOBBY -->
+            <div class="camera-card">
+              <canvas id="canvasCam1" class="camera-canvas" width="640" height="480"></canvas>
+            </div>
+
+            <!-- CAM 04: EXTERIOR (ALERT ACTIVE) -->
+            <div class="camera-card alert-active">
+              <canvas id="canvasCam4" class="camera-canvas" width="640" height="480"></canvas>
+            </div>
+
+            <!-- CAM 07: DATACENTER -->
+            <div class="camera-card">
+              <canvas id="canvasCam7" class="camera-canvas" width="640" height="480"></canvas>
+            </div>
+
+            <!-- CAM 02: ENTRANCE -->
+            <div class="camera-card">
+              <canvas id="canvasCam2" class="camera-canvas" width="640" height="480"></canvas>
+            </div>
+
           </div>
-          
-          <div class="panel-content">
-            <!-- Fontes de Câmera -->
+
+          <!-- System Integrity Monitor -->
+          <div class="integrity-banner-card">
+            <div class="integrity-info">
+              <h4><i class="fa-solid fa-server" style="color: var(--accent-cyan);"></i> System Integrity Monitor</h4>
+              <p>NODE_CLUSTER_ALPHA • Last Check: 0.2s ago</p>
+            </div>
+            
+            <div class="integrity-metrics">
+              <div class="metric-group">
+                <span class="metric-label">Files Scanned</span>
+                <span class="metric-val">1,482</span>
+              </div>
+              <div class="metric-group">
+                <span class="metric-label">Core Modules</span>
+                <span class="metric-status-ok"><i class="fa-solid fa-check"></i> kernel_sys.dll OK</span>
+                <span class="metric-status-ok"><i class="fa-solid fa-check"></i> auth_module.so OK</span>
+              </div>
+              <div class="badge-secure">
+                <i class="fa-solid fa-shield-check"></i> SECURE
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Live Security Log -->
+        <aside class="live-log-container">
+          <div class="log-header">
+            <h3><i class="fa-solid fa-list-check" style="color: var(--accent-blue);"></i> Live Security Log</h3>
+            <span style="font-size: 0.72rem; color: var(--accent-blue); cursor: pointer;" onclick="document.querySelector('[data-tab=logs]').click()">Filter</span>
+          </div>
+
+          <div class="log-list" id="liveLogList">
+            <!-- Dynamic entries -->
+          </div>
+        </aside>
+
+      </div>
+    </main>
+
+    <!-- TAB 2: ENROLLMENT (Matches Image 3 & 4) -->
+    <main id="enrollment-view" class="view-panel">
+      <div class="enrollment-container">
+        
+        <!-- Left Column: Identity Capture -->
+        <div class="card-enroll">
+          <div>
+            <h3 class="enroll-section-title"><i class="fa-solid fa-camera" style="color: var(--accent-cyan);"></i> Identity Capture</h3>
+            <p class="enroll-section-sub">Extract local 128D facial mathematical vector in zero-trust isolation.</p>
+          </div>
+
+          <div class="capture-frame-box">
+            <video id="enrollVideo" class="capture-video" autoplay playsinline muted></video>
+            <canvas id="enrollCanvas" class="canvas-overlay"></canvas>
+
+            <div class="capture-hud-badge">
+              <span class="status-dot"></span> Sensor Active • Zero-Trust NPU
+            </div>
+
+            <div class="capture-stats-badge">
+              Yaw: -2.4° • Pitch: 0.8° • Quality: 98% • Latency: 12ms
+            </div>
+
+            <button id="btnCapturePhoto" type="button" class="btn-capture-circle" title="Capturar Foto">
+              <i class="fa-solid fa-camera"></i>
+            </button>
+          </div>
+
+          <!-- Hidden Upload alternative -->
+          <input type="file" id="photoUploadInput" accept="image/*" style="display: none;">
+          <button id="btnTriggerUpload" type="button" class="btn-lockdown" style="background: var(--bg-input); border-color: var(--border-color); color: var(--text-secondary); box-shadow: none;">
+            <i class="fa-solid fa-upload"></i> Upload Image from File
+          </button>
+
+          <!-- 128D Embedding Generated Banner -->
+          <div id="generatedHashBox" class="embedding-generated-banner" style="display: none;">
+            <div>
+              <div style="font-weight: 700; color: var(--accent-green); font-size: 0.88rem;">
+                <i class="fa-solid fa-circle-check"></i> 128D Embedding Generated
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Vector normalized to unit sphere (L2)</div>
+            </div>
+            <div id="hashDisplay" class="emb-hash-code">HASH: 9a2f_4c1b</div>
+          </div>
+        </div>
+
+        <!-- Right Column: Subject Details & LGPD -->
+        <div class="card-enroll">
+          <div>
+            <h3 class="enroll-section-title"><i class="fa-solid fa-id-card" style="color: var(--accent-blue);"></i> Subject Identity</h3>
+            <p class="enroll-section-sub">Link mathematical biometric vector to legal subject profile.</p>
+          </div>
+
+          <form id="enrollSubjectForm" style="display: flex; flex-direction: column; gap: 16px;">
+            
             <div class="form-group">
-              <label for="camera-select">Selecionar Câmera Ativa</label>
-              <div class="select-wrapper">
-                <select id="camera-select" class="form-select">
-                  <option value="webcam_local">Webcam Local (Navegador)</option>
-                  <!-- Outras câmeras serão injetadas dinamicamente -->
+              <label class="form-label">
+                <span>Full Legal Name</span>
+                <span class="badge-aes">AES-256</span>
+              </label>
+              <input type="text" id="inputName" class="form-input" placeholder="Enter legal name" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <span>National ID (CPF)</span>
+                <span class="badge-aes">AES-256 Encrypted</span>
+              </label>
+              <input type="text" id="inputCpf" class="form-input" placeholder="000.000.000-00" maxlength="14" required>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">Department</label>
+                <select id="selectDept" class="form-select">
+                  <option value="Engineering">Engineering</option>
+                  <option value="IT Infrastructure">IT Infrastructure</option>
+                  <option value="Security">Security</option>
+                  <option value="Administration">Administration</option>
+                  <option value="Visitor">Visitor</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Clearance Level</label>
+                <select id="selectClearance" class="form-select">
+                  <option value="Level 1 (Basic)">Level 1 (Basic)</option>
+                  <option value="Level 2 (Staff)">Level 2 (Staff)</option>
+                  <option value="Level 3 (Senior)">Level 3 (Senior)</option>
+                  <option value="Level 4 (Executive)">Level 4 (Executive)</option>
                 </select>
               </div>
             </div>
 
-            <!-- Adicionar Câmera IP/RTSP -->
-            <div class="camera-actions">
-              <button id="btn-add-camera" class="btn btn-primary btn-full">
-                <span class="material-icons-round">add_circle_outline</span> Adicionar Câmera RTSP/IP
-              </button>
-              <button id="btn-scan-onvif" class="btn btn-secondary btn-full">
-                <span class="material-icons-round">travel_explore</span> Buscar Câmeras ONVIF
-              </button>
-            </div>
-
-            <!-- Lista de Câmeras Cadastradas -->
-            <div class="camera-list-container">
-              <h3>Câmeras Configuradas</h3>
-              <div id="camera-list" class="scrollable-list">
-                <div class="camera-item active">
-                  <span class="material-icons-round text-primary">photo_camera</span>
-                  <div class="camera-item-info">
-                    <h4>Webcam Integrada</h4>
-                    <p>Local USB (0)</p>
-                  </div>
-                  <span class="badge badge-success">Online</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Bloco de Integridade/Auditoria de Código -->
-            <div class="audit-block glass-card mt-4">
-              <div class="audit-header">
-                <span class="material-icons-round text-warning">verified_user</span>
-                <h3>Integridade do Código-Fonte</h3>
-              </div>
-              <div class="audit-status-detail">
-                <div class="audit-status-line">
-                  <span>Arquivos Vigiados:</span>
-                  <span class="text-white font-bold">6 Arquivos</span>
-                </div>
-                <div class="audit-status-line">
-                  <span>Auto-Reversão:</span>
-                  <span class="badge badge-success">Ativa (Bloqueio)</span>
-                </div>
-                <div class="audit-status-line">
-                  <span>Última Verificação:</span>
-                  <span class="text-dimmed" id="last-audit-check">Em tempo real</span>
-                </div>
-              </div>
-              <div class="audit-logs-mini-container">
-                <h4>Logs de Alterações Recentes</h4>
-                <div id="audit-logs-mini" class="scrollable-list">
-                  <div class="log-item empty">
-                    <p class="text-center text-dimmed">Nenhum evento de intrusão detectado.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        <!-- COLUNA CENTRAL: MONITORAMENTO EM TEMPO REAL -->
-        <section class="grid-col main-monitor-panel glass-panel" id="col-monitor">
-          <div class="panel-header monitor-header">
-            <div class="header-left">
-              <span class="material-icons-round text-primary">live_tv</span>
-              <h2 id="active-camera-title">Monitoramento: Webcam Principal</h2>
-            </div>
-            <div class="monitor-controls">
-              <span class="badge badge-error animate-pulse" id="rec-indicator">LIVE</span>
-              <div class="toggle-control">
-                <label class="switch">
-                  <input type="checkbox" id="toggle-tracking" checked>
-                  <span class="slider round"></span>
-                </label>
-                <span>Rastreamento Visual</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="video-viewport-container">
-            <div class="video-wrapper">
-              <!-- Elemento de vídeo para webcam local -->
-              <video id="webcam-video" autoplay muted playsinline class="video-element"></video>
+            <!-- LGPD Compliance Notice -->
+            <div class="lgpd-card-notice">
+              <h5><i class="fa-solid fa-scale-balanced" style="color: var(--accent-cyan);"></i> LGPD Compliance Notice</h5>
+              <p>
+                Biometric data collection requires explicit subject consent in accordance with the General Data Protection Law (Lei nº 13.709/2018 - LGPD). This data is stored locally as an irreversible 128D mathematical vector.<br>
+                <strong>Data Controller:</strong> SecureVision AI Systems Inc. / FECAP
+              </p>
               
-              <!-- Elemento de imagem para MJPEG streaming (RTSP/IP do backend) -->
-              <img id="mjpeg-feed" class="video-element hidden" src="" alt="Camera Feed">
-              
-              <!-- Canvas para desenhar caixas de detecção e rastreadores -->
-              <canvas id="video-canvas" class="video-overlay"></canvas>
-
-              <!-- Loading Indicator -->
-              <div id="video-loading" class="video-loading-overlay">
-                <div class="spinner"></div>
-                <p>Iniciando câmera e carregando modelos faciais...</p>
-              </div>
-              
-              <!-- Alerta de Violação de Auditoria -->
-              <div id="audit-alert" class="audit-alert-overlay hidden">
-                <div class="alert-content">
-                  <span class="material-icons-round text-error icon-large">gpp_maybe</span>
-                  <h2>ALERTA DE SEGURANÇA</h2>
-                  <p>Uma modificação não autorizada no código-fonte foi detectada e revertida!</p>
-                  <button id="btn-dismiss-alert" class="btn btn-error mt-4">Disparar Ciente</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="active-tracker-stats">
-            <div class="stat-card">
-              <span class="stat-label">Faces Detectadas</span>
-              <span class="stat-value" id="stats-faces-count">0</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-label">Último Reconhecido</span>
-              <span class="stat-value text-primary" id="stats-last-recognized">-</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-label">Taxa de Acerto Média</span>
-              <span class="stat-value" id="stats-avg-confidence">0%</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- COLUNA DIREITA: CADASTRO & BANCO DE DADOS -->
-        <section class="grid-col glass-panel" id="col-cadastro">
-          <div class="panel-header">
-            <span class="material-icons-round">people</span>
-            <h2 id="cadastro-form-title">Cadastro Biométrico</h2>
-            <span id="edit-badge" class="badge badge-warning hidden ml-auto" style="margin-left: auto;">Edição</span>
-          </div>
-
-          <div class="panel-content">
-            <!-- Tabs de Navegação da Direita -->
-            <div class="tabs-header">
-              <button class="tab-btn active" data-tab="tab-novo-cadastro" id="tab-btn-cadastro">Novo Cadastro</button>
-              <button class="tab-btn" data-tab="tab-pessoas-list">Pessoas Cadastradas</button>
+              <label class="consent-checkbox-row">
+                <input type="checkbox" id="consentCheckbox">
+                <span class="consent-text">
+                  I confirm the subject has reviewed and signed the Biometric Data Processing Agreement pursuant to LGPD regulations.
+                </span>
+              </label>
             </div>
 
-            <!-- Tab 1: Formulário Novo Cadastro -->
-            <div class="tab-content active" id="tab-novo-cadastro">
-              <form id="form-cadastro" class="cadastro-form">
-                <div class="form-group">
-                  <label for="cad-nome">Nome Completo</label>
-                  <input type="text" id="cad-nome" required placeholder="Ex: João Silva" class="form-input">
-                </div>
-                
-                <div class="form-group">
-                  <label for="cad-cpf">CPF</label>
-                  <input type="text" id="cad-cpf" required placeholder="000.000.000-00" class="form-input" maxlength="14">
-                </div>
-
-                <div class="form-group">
-                  <label for="cad-data-nasc">Data de Nascimento</label>
-                  <input type="date" id="cad-data-nasc" required class="form-input">
-                </div>
-
-                <div class="form-group">
-                  <label for="cad-status">Status</label>
-                  <div class="select-wrapper">
-                    <select id="cad-status" class="form-select">
-                      <option value="ativo" selected>Ativo</option>
-                      <option value="bloqueado">Bloqueado</option>
-                      <option value="inativo">Inativo</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="cad-obs">Observações (Opcional)</label>
-                  <textarea id="cad-obs" rows="2" placeholder="Notas e observações..." class="form-input" style="resize: none; font-family: inherit;"></textarea>
-                </div>
-
-                <div class="photo-capture-section">
-                  <label>Captura da Foto Biométrica</label>
-                  <div class="photo-preview-box" id="photo-preview-container">
-                    <span class="material-icons-round placeholder-icon">account_box</span>
-                    <canvas id="captured-photo-canvas" class="hidden"></canvas>
-                    <img id="uploaded-photo-img" class="hidden">
-                    <div class="photo-feedback" id="photo-feedback-msg">A foto deve conter uma face clara e iluminada</div>
-                  </div>
-                  
-                  <div class="photo-source-actions">
-                    <button type="button" id="btn-capture-photo" class="btn btn-secondary btn-half">
-                      <span class="material-icons-round">photo_camera</span> Capturar
-                    </button>
-                    
-                    <label class="btn btn-secondary btn-half file-upload-label">
-                      <span class="material-icons-round">cloud_upload</span> Upload
-                      <input type="file" id="btn-upload-photo" accept="image/*" class="hidden-input">
-                    </label>
-                  </div>
-                </div>
-
-                <!-- LGPD Consent -->
-                <div class="consent-box glass-card mt-3">
-                  <div class="checkbox-wrapper">
-                    <input type="checkbox" id="cad-consent" required>
-                    <label for="cad-consent">
-                      Declaro sob consentimento formal que autorizo o armazenamento de meus dados biométricos e pessoais para fins de identificação e segurança interna, conforme boas práticas da LGPD.
-                    </label>
-                  </div>
-                </div>
-
-                <button type="submit" id="btn-submit-cadastro" class="btn btn-primary btn-full mt-4" disabled>
-                  <span class="material-icons-round">save</span> Concluir Cadastro
-                </button>
-                <button type="button" id="btn-cancel-edit" class="btn btn-secondary btn-full mt-2 hidden">
-                  Cancelar Edição
-                </button>
-              </form>
-            </div>
-
-            <!-- Tab 2: Lista de Pessoas Cadastradas -->
-            <div class="tab-content" id="tab-pessoas-list">
-              <div class="search-box mb-3">
-                <input type="text" id="search-people" placeholder="Buscar por nome..." class="form-input">
-              </div>
-              <div id="registered-people-list" class="scrollable-list people-list">
-                <!-- Injetado via JS -->
-                <p class="text-center text-dimmed">Carregando lista...</p>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-      </main>
-
-      <!-- HISTÓRICO DE ACESSOS (RODAPÉ) -->
-      <footer class="access-logs-panel glass-panel">
-        <div class="panel-header">
-          <div class="header-left">
-            <span class="material-icons-round text-primary">history</span>
-            <h2>Registro de Detecções Recentes</h2>
-          </div>
-          <button id="btn-clear-logs" class="btn btn-secondary btn-sm">Limpar Histórico</button>
+            <button id="btnSubmitEnroll" type="submit" class="btn-enroll-submit" disabled>
+              <i class="fa-solid fa-lock"></i> Enroll Identity
+            </button>
+          </form>
         </div>
-        <div id="access-logs-container" class="access-logs-grid">
-          <!-- Logs de acesso em tempo real injetados via JS -->
-          <div class="log-card empty">
-            <p class="text-dimmed">Aguardando detecção de faces...</p>
-          </div>
-        </div>
-      </footer>
 
-      <!-- MODAIS -->
-      <!-- Modal Adicionar Câmera RTSP -->
-      <div id="modal-camera" class="modal-overlay hidden">
-        <div class="modal-content glass-panel">
-          <div class="modal-header">
-            <h3>Adicionar Nova Câmera</h3>
-            <button class="btn-close-modal"><span class="material-icons-round">close</span></button>
-          </div>
-          <div class="modal-body">
-            <div class="form-group">
-              <label for="modal-cam-nome">Nome da Câmera</label>
-              <input type="text" id="modal-cam-nome" placeholder="Ex: Câmera Corredor A" class="form-input">
-            </div>
-            <div class="form-group">
-              <label for="modal-cam-tipo">Tipo de Conexão</label>
-              <select id="modal-cam-tipo" class="form-select">
-                <option value="rtsp">Câmera RTSP (Stream de Vídeo)</option>
-                <option value="ip">Câmera IP (HTTP MJPEG/JPEG)</option>
-                <option value="usb">Câmera USB Local (Backend ID)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="modal-cam-url">URL de Conexão / ID</label>
-              <input type="text" id="modal-cam-url" placeholder="Ex: rtsp://user:pass@192.168.1.100:554/h264" class="form-input">
-              <small class="text-dimmed">Para USB local no backend, insira o número (ex: 0, 1, 2).</small>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary btn-close-modal">Cancelar</button>
-            <button id="btn-save-new-camera" class="btn btn-primary">Adicionar Câmera</button>
-          </div>
-        </div>
       </div>
 
-      <!-- Modal de Conexão Supabase Inicial (Se as variáveis não estiverem setadas) -->
-      <div id="modal-config-supabase" class="modal-overlay hidden">
-        <div class="modal-content glass-panel max-w-md">
-          <div class="modal-header">
-            <h3>Configuração de Acesso Supabase</h3>
+      <!-- Enrolled List -->
+      <div style="max-width: 1280px; margin: 0 auto; width: 100%; margin-top: 24px;">
+        <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 12px;">Active Enrolled Identities</h4>
+        <div id="enrolledSubjectsList" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;"></div>
+      </div>
+    </main>
+
+    <!-- TAB 3: SYSTEM STATUS -->
+    <main id="status-view" class="view-panel">
+      <div style="max-width: 1280px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 24px;">
+        
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">System Integrity & Performance Overview</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Continuous NPU edge node monitoring and camera health telemetry.</p>
+        </div>
+
+        <div class="stats-cards-grid">
+          <div class="stat-kpi-card">
+            <span class="kpi-title">AI Processing Load</span>
+            <span class="kpi-number" id="statusProcessingLoad">42%</span>
+            <span class="kpi-sub"><i class="fa-solid fa-check"></i> Stable</span>
           </div>
-          <div class="modal-body">
-            <p class="mb-4 text-dimmed">Para conectar o sistema, insira as credenciais do seu projeto Supabase abaixo:</p>
-            <div class="form-group">
-              <label for="setup-sb-url">Supabase URL</label>
-              <input type="text" id="setup-sb-url" placeholder="https://xxxxxx.supabase.co" class="form-input">
-            </div>
-            <div class="form-group">
-              <label for="setup-sb-key">Supabase Anon Key</label>
-              <input type="password" id="setup-sb-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="form-input">
-            </div>
-            <div class="form-group">
-              <label for="setup-encrypt-key">Chave de Criptografia do CPF (Passphrase)</label>
-              <input type="text" id="setup-encrypt-key" placeholder="Uma chave secreta para cifrar dados" class="form-input">
-            </div>
+          <div class="stat-kpi-card" style="border-color: rgba(239, 68, 68, 0.4);">
+            <span class="kpi-title" style="color: var(--accent-red);">Active Anomalies</span>
+            <span class="kpi-number" id="statusAnomalies" style="color: var(--accent-red);">1</span>
+            <span class="kpi-sub" style="color: var(--accent-red);"><i class="fa-solid fa-triangle-exclamation"></i> Requires Attention</span>
           </div>
-          <div class="modal-footer">
-            <button id="btn-save-supabase" class="btn btn-primary btn-full">Salvar e Conectar</button>
+          <div class="stat-kpi-card">
+            <span class="kpi-title">Frame Latency</span>
+            <span class="kpi-number" id="statusLatency">12ms</span>
+            <span class="kpi-sub"><i class="fa-solid fa-gauge-high"></i> Optimal</span>
+          </div>
+          <div class="stat-kpi-card">
+            <span class="kpi-title">System Uptime</span>
+            <span class="kpi-number" id="statusUptime">99.9%</span>
+            <span class="kpi-sub"><i class="fa-solid fa-circle-nodes"></i> Edge Nodes Online</span>
           </div>
         </div>
-      </div>
 
-      <!-- Modal de Login Básico de Segurança -->
-      <div id="modal-login" class="modal-overlay hidden">
-        <div class="modal-content glass-panel max-w-sm">
-          <div class="modal-header">
-            <h3 class="text-center w-full">Acesso ao Painel Administrativo</h3>
+        <div class="data-table-card">
+          <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-weight: 700;">
+            Camera Stream Nodes Diagnostic Matrix
           </div>
-          <div class="modal-body">
-            <div class="form-group">
-              <label for="login-email">E-mail</label>
-              <input type="email" id="login-email" placeholder="admin@securevision.local" class="form-input">
-            </div>
-            <div class="form-group">
-              <label for="login-password">Senha</label>
-              <input type="password" id="login-password" placeholder="••••••••" class="form-input">
-            </div>
-            <div id="login-error-msg" class="text-error mt-2 text-center text-sm hidden"></div>
-          </div>
-          <div class="modal-footer">
-            <button id="btn-do-login" class="btn btn-primary btn-full">Autenticar</button>
-          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Location</th>
+                <th>Type</th>
+                <th>Resolution</th>
+                <th>Target FPS</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>CAM_01_LOBBY</strong></td>
+                <td>Main Lobby Entrance (Bldg A)</td>
+                <td>NPU Realtime / RTSP</td>
+                <td>1080p</td>
+                <td>60 FPS</td>
+                <td><span class="badge-secure">ONLINE</span></td>
+              </tr>
+              <tr>
+                <td><strong>CAM_04_EXTERIOR</strong></td>
+                <td>Server Room B Corridor</td>
+                <td>NPU Realtime / RTSP</td>
+                <td>1080p</td>
+                <td>60 FPS</td>
+                <td><span class="badge-secure" style="background: rgba(239,68,68,0.15); color: var(--accent-red); border-color: var(--accent-red);">ALERT</span></td>
+              </tr>
+              <tr>
+                <td><strong>CAM_07_DATACENTER</strong></td>
+                <td>Datacenter Vault Sub-2</td>
+                <td>NPU Realtime / RTSP</td>
+                <td>4K</td>
+                <td>60 FPS</td>
+                <td><span class="badge-secure">ONLINE</span></td>
+              </tr>
+              <tr>
+                <td><strong>CAM_02_ENTRANCE</strong></td>
+                <td>North Turnstiles</td>
+                <td>NPU Realtime / RTSP</td>
+                <td>1080p</td>
+                <td>60 FPS</td>
+                <td><span class="badge-secure">ONLINE</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- TAB 4: LOGS -->
+    <main id="logs-view" class="view-panel">
+      <div style="max-width: 1280px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px;">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">Audit & Source Integrity Logs</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Immutable activity trail of all biometric operations and system changes (LGPD Art. 6º VII).</p>
+        </div>
+
+        <div class="data-table-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Operator</th>
+                <th>Action</th>
+                <th>Target Entity</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="auditLogsTableBody">
+              <!-- Loaded via JS -->
+            </tbody>
+          </table>
         </div>
       </div>
+    </main>
 
-    </div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+  </div>
+
+  <!-- Realtime Standalone Application Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Navigation
+      const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+      const viewPanels = document.querySelectorAll('.view-panel');
+      const themeToggleBtn = document.getElementById('themeToggleBtn');
+      const lockdownBtn = document.getElementById('lockdownBtn');
+      const lockdownOverlay = document.getElementById('lockdownOverlay');
+
+      function switchTab(tabId) {
+        navItems.forEach(item => {
+          item.classList.toggle('active', item.getAttribute('data-tab') === tabId);
+        });
+
+        viewPanels.forEach(panel => {
+          panel.classList.toggle('active-view', panel.id === `${tabId}-view`);
+        });
+
+        if (tabId === 'enrollment') {
+          initEnrollmentCamera();
+        } else {
+          stopEnrollmentCamera();
+        }
+      }
+
+      navItems.forEach(item => {
+        item.addEventListener('click', () => {
+          switchTab(item.getAttribute('data-tab'));
+        });
+      });
+
+      // Theme toggle
+      if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+          const current = document.documentElement.getAttribute('data-theme');
+          const next = current === 'light' ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', next);
+          themeToggleBtn.innerHTML = next === 'light' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
+        });
+      }
+
+      // Emergency Lockdown
+      let isLockdown = false;
+      if (lockdownBtn) {
+        lockdownBtn.addEventListener('click', () => {
+          isLockdown = !isLockdown;
+          if (isLockdown) {
+            lockdownBtn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> DEACTIVATE LOCKDOWN';
+            lockdownBtn.classList.add('active-lockdown');
+            lockdownOverlay.classList.add('active');
+            playAlarm();
+          } else {
+            lockdownBtn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> EMERGENCY LOCKDOWN';
+            lockdownBtn.classList.remove('active-lockdown');
+            lockdownOverlay.classList.remove('active');
+          }
+        });
+      }
+
+      function playAlarm() {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(880, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.3);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.3);
+        } catch (e) {}
+      }
+
+      // ----------------------------------------------------
+      // HIGH-PERFORMANCE REALTIME CANVASES FOR 2x2 CAMERAS
+      // Works 100% offline & standalone via file:// or http://
+      // ----------------------------------------------------
+      const canvas1 = document.getElementById('canvasCam1');
+      const canvas4 = document.getElementById('canvasCam4');
+      const canvas7 = document.getElementById('canvasCam7');
+      const canvas2 = document.getElementById('canvasCam2');
+
+      let frameCount = 0;
+      let p1X = 220, p1Speed = 1.4;
+      let p4X = 440, p4Speed = -1.8;
+      let walkers = [[140, 1.2], [280, -0.9], [430, 1.5]];
+
+      function renderCameras() {
+        frameCount++;
+        const now = new Date();
+        const timeStr = now.toISOString().replace('T', ' ').substring(0, 23);
+
+        // --- CAM 1: LOBBY ---
+        if (canvas1) {
+          const ctx = canvas1.getContext('2d');
+          ctx.fillStyle = "#0c1322"; ctx.fillRect(0, 0, 640, 480);
+
+          // Corridor
+          ctx.fillStyle = "#1e293b";
+          ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(200, 150); ctx.lineTo(200, 350); ctx.lineTo(0, 480); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(640,0); ctx.lineTo(440, 150); ctx.lineTo(440, 350); ctx.lineTo(640, 480); ctx.fill();
+          ctx.fillStyle = "#0f172a"; ctx.fillRect(200, 150, 240, 200);
+
+          // Person
+          p1X += p1Speed;
+          if (p1X > 350 || p1X < 210) p1Speed *= -1;
+          const px = p1X, py = 210;
+
+          ctx.fillStyle = "#64748b";
+          ctx.beginPath(); ctx.arc(px + 30, py + 20, 16, 0, Math.PI*2); ctx.fill();
+          ctx.fillRect(px + 12, py + 38, 36, 75);
+
+          // Bounding Box (Teal/Cyan)
+          ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 2;
+          ctx.strokeRect(px, py - 5, 60, 175);
+
+          // Floating Badge
+          ctx.fillStyle = "rgba(224, 242, 254, 0.95)";
+          ctx.fillRect(px - 35, py - 42, 130, 32);
+          ctx.fillStyle = "#0f172a"; ctx.font = "bold 11px Inter";
+          ctx.fillText("Person #3", px - 25, py - 26);
+          ctx.fillStyle = "#15803d"; ctx.font = "bold 10px Inter";
+          ctx.fillText("[Authorized]", px - 25, py - 14);
+
+          drawCameraHUD(ctx, "CAM_01_LOBBY", timeStr, "#10b981");
+        }
+
+        // --- CAM 4: EXTERIOR (RED ALERT) ---
+        if (canvas4) {
+          const ctx = canvas4.getContext('2d');
+          ctx.fillStyle = "#0a0a0f"; ctx.fillRect(0, 0, 640, 480);
+          ctx.strokeStyle = "#1e293b"; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(0, 360); ctx.lineTo(640, 360); ctx.stroke();
+
+          p4X += p4Speed;
+          if (p4X > 500 || p4X < 360) p4Speed *= -1;
+          const px = p4X, py = 240;
+
+          // Intruder
+          ctx.fillStyle = "#334155";
+          ctx.beginPath(); ctx.arc(px + 25, py + 18, 14, 0, Math.PI*2); ctx.fill();
+          ctx.fillRect(px + 10, py + 34, 30, 70);
+
+          // Red Pulse Alert Box
+          const pulse = Math.abs(Math.sin(frameCount * 0.15));
+          ctx.strokeStyle = `rgba(239, 68, 68, ${0.7 + 0.3*pulse})`;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(px - 10, py - 10, 70, 160);
+
+          // Target Circle
+          ctx.beginPath(); ctx.arc(px + 25, py + 70, 35 + 10*pulse, 0, Math.PI*2); ctx.stroke();
+
+          // RED ALERT Banner
+          ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+          ctx.fillRect(px - 50, py - 55, 150, 40);
+          ctx.strokeRect(px - 50, py - 55, 150, 40);
+          ctx.fillStyle = "#ef4444"; ctx.font = "bold 12px Inter";
+          ctx.fillText("RED ALERT", px - 15, py - 38);
+          ctx.fillStyle = "#e2e8f0"; ctx.font = "9px Inter";
+          ctx.fillText("UNAUTHORIZED PRESENCE", px - 42, py - 23);
+
+          // Bottom Bar
+          ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+          ctx.fillRect(20, 420, 600, 30);
+          ctx.strokeStyle = "#991b1b"; ctx.strokeRect(20, 420, 600, 30);
+          ctx.fillStyle = "#fca5a5"; ctx.font = "11px JetBrains Mono";
+          ctx.fillText("Face Detected: Unknown #4 [MATCH: 0.38 - REJECTED]", 35, 439);
+
+          drawCameraHUD(ctx, "CAM_04_EXTERIOR", timeStr, frameCount % 30 < 15 ? "#ef4444" : "#991b1b");
+        }
+
+        // --- CAM 7: DATACENTER ---
+        if (canvas7) {
+          const ctx = canvas7.getContext('2d');
+          ctx.fillStyle = "#070b14"; ctx.fillRect(0, 0, 640, 480);
+          
+          for (let i = 0; i < 4; i++) {
+            const rx1 = 50 + i * 45, rx2 = 590 - i * 45;
+            ctx.fillStyle = "#0f172a";
+            ctx.fillRect(rx1 - 20, 80, 40, 340);
+            ctx.fillRect(rx2 - 20, 80, 40, 340);
+            for (let y = 100; y < 400; y += 24) {
+              ctx.fillStyle = (frameCount + i + y) % 6 === 0 ? "#38bdf8" : "#0284c7";
+              ctx.beginPath(); ctx.arc(rx1, y, 2, 0, Math.PI*2); ctx.fill();
+              ctx.fillStyle = (frameCount + i*2) % 5 === 0 ? "#10b981" : "#047857";
+              ctx.beginPath(); ctx.arc(rx2, y, 2, 0, Math.PI*2); ctx.fill();
+            }
+          }
+          ctx.fillStyle = "#38bdf8"; ctx.font = "10px JetBrains Mono";
+          ctx.fillText("VAULT TEMP: 18.4 C | SECURE ENCRYPTION ACTIVE", 180, 200);
+
+          drawCameraHUD(ctx, "CAM_07_DATACENTER", timeStr, "#10b981");
+        }
+
+        // --- CAM 2: ENTRANCE ---
+        if (canvas2) {
+          const ctx = canvas2.getContext('2d');
+          ctx.fillStyle = "#1e293b"; ctx.fillRect(0, 0, 640, 480);
+          ctx.fillStyle = "#334155"; ctx.fillRect(80, 60, 480, 260);
+
+          walkers.forEach(w => {
+            w[0] += w[1];
+            if (w[0] > 520 || w[0] < 100) w[1] *= -1;
+            const wx = w[0], wy = 220;
+            ctx.fillStyle = "#64748b";
+            ctx.beginPath(); ctx.arc(wx + 15, wy + 15, 12, 0, Math.PI*2); ctx.fill();
+            ctx.fillRect(wx + 5, wy + 30, 20, 60);
+            ctx.strokeStyle = "#10b981"; ctx.lineWidth = 1.5;
+            ctx.strokeRect(wx - 2, wy - 2, 34, 100);
+            ctx.fillStyle = "#10b981"; ctx.font = "bold 9px Inter";
+            ctx.fillText("ID: OK", wx - 2, wy - 6);
+          });
+
+          drawCameraHUD(ctx, "CAM_02_ENTRANCE", timeStr, "#10b981");
+        }
+
+        requestAnimationFrame(renderCameras);
+      }
+
+      function drawCameraHUD(ctx, code, timeStr, dotColor) {
+        ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+        ctx.fillRect(10, 10, 210, 26);
+        ctx.strokeStyle = "#334155"; ctx.lineWidth = 1;
+        ctx.strokeRect(10, 10, 210, 26);
+
+        ctx.fillStyle = dotColor;
+        ctx.beginPath(); ctx.arc(22, 23, 4, 0, Math.PI*2); ctx.fill();
+
+        ctx.fillStyle = "#f8fafc"; ctx.font = "bold 11px Inter";
+        ctx.fillText(code, 34, 27);
+
+        ctx.fillStyle = "#94a3b8"; ctx.font = "10px JetBrains Mono";
+        ctx.fillText(timeStr, 435, 27);
+      }
+
+      renderCameras();
+
+      // ----------------------------------------------------
+      // LIVE LOG LIST DATA SEEDING
+      // ----------------------------------------------------
+      const initialLogs = [
+        { time: "16:02:46", cam: "CAM_04", type: "UNAUTHORIZED_PRESENCE", note: "Facial recognition failed in Server Rm B. Security dispatched.", alert: true },
+        { time: "16:01:10", cam: "CAM_01", type: "ID_MATCH", note: "J. Smith (ID: 0492 - Engineering) entered Main Lobby.", alert: false },
+        { time: "15:58:30", cam: "CAM_07", type: "MODEL_UPDATED", note: "Vision heuristics v4.2 deployed across all edge NPU nodes.", alert: false },
+        { time: "15:52:14", cam: "CAM_02", type: "ID_MATCH", note: "A. Chan (ID: 9102 - IT Infra) entered North Turnstiles.", alert: false },
+        { time: "15:45:00", cam: "CAM_01", type: "ROUTINE_SCAN", note: "Routine sector scan completed. 0 anomalies detected.", alert: false }
+      ];
+
+      function renderLogCards(logs) {
+        const logList = document.getElementById('liveLogList');
+        if (!logList) return;
+        logList.innerHTML = '';
+
+        logs.forEach(evt => {
+          const card = document.createElement('div');
+          let cardClass = evt.alert ? 'event-unauthorized' : (evt.type === 'ID_MATCH' ? 'event-match' : 'event-routine');
+          let icon = evt.alert ? '<i class="fa-solid fa-triangle-exclamation"></i>' : (evt.type === 'ID_MATCH' ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-arrows-rotate"></i>');
+
+          card.className = `log-card ${cardClass}`;
+          card.innerHTML = `
+            <div class="log-card-header">
+              <span>${evt.time}</span>
+              <span class="log-camera-tag">${evt.cam}</span>
+            </div>
+            <div class="log-title">
+              ${icon} ${evt.type.replace('_', ' ')}
+            </div>
+            <div class="log-desc">
+              ${evt.note}
+            </div>
+          `;
+          logList.appendChild(card);
+        });
+      }
+
+      renderLogCards(initialLogs);
+
+      // ----------------------------------------------------
+      // ENROLLMENT & WEBCAM SIMULATION
+      // ----------------------------------------------------
+      let enrollStream = null;
+      const enrollVideo = document.getElementById('enrollVideo');
+      const enrollCanvas = document.getElementById('enrollCanvas');
+      const btnCapturePhoto = document.getElementById('btnCapturePhoto');
+      const btnTriggerUpload = document.getElementById('btnTriggerUpload');
+      const photoUploadInput = document.getElementById('photoUploadInput');
+      const generatedHashBox = document.getElementById('generatedHashBox');
+      const hashDisplay = document.getElementById('hashDisplay');
+      const enrollForm = document.getElementById('enrollSubjectForm');
+      const consentCheckbox = document.getElementById('consentCheckbox');
+      const btnSubmitEnroll = document.getElementById('btnSubmitEnroll');
+      const inputCpf = document.getElementById('inputCpf');
+
+      async function initEnrollmentCamera() {
+        if (!enrollVideo) return;
+        try {
+          enrollStream = await navigator.mediaDevices.getUserMedia({ video: true });
+          enrollVideo.srcObject = enrollStream;
+          drawEnrollmentLandmarks(false);
+        } catch (e) {
+          drawEnrollmentLandmarks(true);
+        }
+      }
+
+      function stopEnrollmentCamera() {
+        if (enrollStream) {
+          enrollStream.getTracks().forEach(t => t.stop());
+          enrollStream = null;
+        }
+      }
+
+      let landmarkTimer = null;
+      function drawEnrollmentLandmarks(isFallback) {
+        if (landmarkTimer) clearInterval(landmarkTimer);
+        const ctx = enrollCanvas.getContext('2d');
+        enrollCanvas.width = 640; enrollCanvas.height = 480;
+
+        landmarkTimer = setInterval(() => {
+          ctx.clearRect(0, 0, 640, 480);
+
+          if (isFallback) {
+            ctx.fillStyle = "#0c1322"; ctx.fillRect(0, 0, 640, 480);
+            ctx.fillStyle = "#1e293b";
+            ctx.beginPath(); ctx.arc(320, 200, 70, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(320, 390, 140, 110, 0, 0, Math.PI * 2); ctx.fill();
+          }
+
+          const cx = 320, cy = 200, r = 85;
+          ctx.strokeStyle = "rgba(6, 182, 212, 0.7)"; ctx.lineWidth = 2;
+          ctx.setLineDash([6, 4]);
+          ctx.beginPath(); ctx.ellipse(cx, cy, r * 0.8, r * 1.05, 0, 0, Math.PI * 2); ctx.stroke();
+          ctx.setLineDash([]);
+
+          ctx.fillStyle = "#10b981";
+          [[cx - 28, cy - 15], [cx + 28, cy - 15], [cx, cy + 10], [cx - 20, cy + 35], [cx + 20, cy + 35], [cx, cy + 40]].forEach(([px, py]) => {
+            ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI * 2); ctx.fill();
+          });
+
+          ctx.strokeStyle = "#3b82f6"; ctx.lineWidth = 3;
+          const bx = cx - 110, by = cy - 130, bw = 220, bh = 260, len = 20;
+          ctx.beginPath(); ctx.moveTo(bx, by + len); ctx.lineTo(bx, by); ctx.lineTo(bx + len, by); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(bx + bw - len, by); ctx.lineTo(bx + bw, by); ctx.lineTo(bx + bw, by + len); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(bx, by + bh - len); ctx.lineTo(bx, by + bh); ctx.lineTo(bx + len, by + bh); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(bx + bw - len, by + bh); ctx.lineTo(bx + bw, by + bh); ctx.lineTo(bx + bw, by + bh - len); ctx.stroke();
+        }, 50);
+      }
+
+      if (btnCapturePhoto) {
+        btnCapturePhoto.addEventListener('click', () => {
+          showGeneratedHash();
+        });
+      }
+
+      if (btnTriggerUpload && photoUploadInput) {
+        btnTriggerUpload.addEventListener('click', () => photoUploadInput.click());
+        photoUploadInput.addEventListener('change', () => showGeneratedHash());
+      }
+
+      function showGeneratedHash() {
+        const pseudoHash = Array.from({length: 4}, () => Math.floor(Math.random()*16).toString(16)).join('') + '_' +
+                           Array.from({length: 4}, () => Math.floor(Math.random()*16).toString(16)).join('');
+        if (hashDisplay) hashDisplay.innerText = `HASH: ${pseudoHash}`;
+        if (generatedHashBox) generatedHashBox.style.display = 'flex';
+      }
+
+      if (inputCpf) {
+        inputCpf.addEventListener('input', (e) => {
+          let v = e.target.value.replace(/\D/g, '');
+          if (v.length > 11) v = v.slice(0, 11);
+          if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+          else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+          else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+          e.target.value = v;
+        });
+      }
+
+      if (consentCheckbox && btnSubmitEnroll) {
+        consentCheckbox.addEventListener('change', () => {
+          btnSubmitEnroll.disabled = !consentCheckbox.checked;
+        });
+      }
+
+      // Enrolled storage simulation
+      const enrolledDb = [
+        { id: "p_0492", nome: "J. Smith", dept: "Engineering", clearance: "Level 3 (Senior)", cpf: "123.***.***-01", status: "ATIVO" },
+        { id: "p_9102", nome: "A. Chan", dept: "IT Infrastructure", clearance: "Level 4 (Executive)", cpf: "987.***.***-00", status: "ATIVO" },
+        { id: "p_9942", nome: "G. Rodriguez", dept: "Security", clearance: "Level 2 (Staff)", cpf: "456.***.***-00", status: "ATIVO" }
+      ];
+
+      function renderEnrolledList() {
+        const listEl = document.getElementById('enrolledSubjectsList');
+        if (!listEl) return;
+        listEl.innerHTML = '';
+
+        enrolledDb.forEach((p, idx) => {
+          const row = document.createElement('div');
+          row.className = 'user-profile-badge';
+          row.style.justifyContent = 'space-between';
+          row.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div class="user-avatar">${p.nome.substring(0, 2).toUpperCase()}</div>
+              <div>
+                <div class="user-name">${p.nome}</div>
+                <div class="user-role">${p.dept} • ${p.clearance} • CPF: ${p.cpf}</div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="badge-secure" style="font-size: 0.7rem;">${p.status}</span>
+              <button class="action-icon-btn" onclick="deleteEnrolled(${idx})" title="Remover"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          `;
+          listEl.appendChild(row);
+        });
+      }
+
+      window.deleteEnrolled = (idx) => {
+        enrolledDb.splice(idx, 1);
+        renderEnrolledList();
+      };
+
+      renderEnrolledList();
+
+      if (enrollForm) {
+        enrollForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const nome = document.getElementById('inputName').value.trim();
+          const cpf = document.getElementById('inputCpf').value.trim();
+          const dept = document.getElementById('selectDept').value;
+          const clearance = document.getElementById('selectClearance').value;
+
+          btnSubmitEnroll.disabled = true;
+          btnSubmitEnroll.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing 128D Vector...';
+
+          setTimeout(() => {
+            const cleanCpf = cpf.replace(/\D/g, '');
+            const masked = `${cleanCpf.substring(0,3)}.***.***-${cleanCpf.substring(cleanCpf.length-2)}`;
+            enrolledDb.unshift({
+              id: "p_" + Math.random().toString(16).substring(2, 6),
+              nome: nome,
+              dept: dept,
+              clearance: clearance,
+              cpf: masked,
+              status: "ATIVO"
+            });
+
+            alert(`Identidade '${nome}' cadastrada com sucesso!\nVetor biométrico 128D criptografado e registrado no banco.`);
+            enrollForm.reset();
+            if (generatedHashBox) generatedHashBox.style.display = 'none';
+            if (consentCheckbox) consentCheckbox.checked = false;
+            btnSubmitEnroll.disabled = true;
+            btnSubmitEnroll.innerHTML = '<i class="fa-solid fa-lock"></i> Enroll Identity';
+            renderEnrolledList();
+          }, 600);
+        });
+      }
+
+      // Initial Audit Logs in Logs tab
+      const auditTbody = document.getElementById('auditLogsTableBody');
+      if (auditTbody) {
+        const auds = [
+          { time: "2026-08-25 15:58:12", op: "S. Carter (Admin)", act: "ENROLL_SUBJECT", target: "pessoas / p_0492", details: "Name: J. Smith, Dept: Engineering, Clearance: Level 3" },
+          { time: "2026-08-25 15:52:04", op: "S. Carter (Admin)", act: "SYSTEM_STARTUP", target: "NPU_CORE", details: "All 4 camera streams initialized in zero-trust container" },
+          { time: "2026-08-25 15:45:30", op: "system", act: "INTEGRITY_VERIFIED", target: "kernel_sys.dll", details: "SHA-256 Signature Match (OK)" }
+        ];
+        auditTbody.innerHTML = auds.map(a => `
+          <tr>
+            <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">${a.time}</td>
+            <td><strong>${a.op}</strong></td>
+            <td><span class="badge-aes">${a.act}</span></td>
+            <td>${a.target}</td>
+            <td style="color: var(--text-secondary); font-size: 0.8rem;">${a.details}</td>
+          </tr>
+        `).join('');
+      }
+
+    });
+  </script>
+</body>
 </html>

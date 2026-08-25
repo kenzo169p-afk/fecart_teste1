@@ -1,47 +1,27 @@
 @echo off
 chcp 65001 > nul
-echo ===================================================
-echo             SISTEMA SECUREVISION
-echo ===================================================
+title SecureVision AI - NPU Surveillance System
+echo =============================================================
+echo             SISTEMA SECUREVISION AI - FECART 2026
+echo =============================================================
 echo.
 
-:: Verifica se o arquivo .env existe. Se não, cria a partir de .env.example
-if not exist .env (
-    echo [AVISO] Arquivo .env não encontrado na raiz. Criando a partir de .env.example...
-    copy .env.example .env
-    echo [CONFIG] Arquivo .env criado. IMPORTANTE: Abra o arquivo .env e edite as chaves do seu Supabase.
-)
-
-:: Copia o arquivo .env para o diretório backend para que os scripts Python tenham acesso
-copy .env backend\.env > nul
-
-:: Inicializa o banco de assinaturas de código para o monitor
-echo [SETUP] Inicializando assinaturas autorizadas e backups locais de segurança...
-python backend/authorize_changes.py --key ChaveSecretaAuditoriaDeCodigo123!
+echo [1/2] Verificando dependencias...
+pip install -r fecart_academic/requirements.txt --user --quiet
 
 echo.
-echo [INFO] Iniciando serviços em segundo plano...
-echo.
+echo [2/2] Inicializando Servidor SecureVision AI...
+start "SecureVision AI - Server Core" cmd /k "cd fecart_academic && python app.py"
 
-:: 1. Inicia o Servidor Backend Flask
-start "SecureVision - Flask Backend" cmd /k "python backend/app.py"
-
-:: 2. Inicia o Monitor de Auditoria de Código
-start "SecureVision - Monitor de Auditoria" cmd /k "python backend/audit_monitor.py"
-
-:: 3. Inicia o Servidor Frontend Vite
-cd frontend
-start "SecureVision - Vite Frontend" cmd /k "npm run dev"
-
-cd ..
+timeout /t 2 > nul
 
 echo.
-echo ===================================================
-echo [SUCESSO] Todos os serviços foram inicializados!
+echo [OK] Abrindo painel no seu navegador...
+start http://localhost:5000
+
 echo.
-echo - Frontend: Verifique a janela do Vite para a URL local (geralmente http://localhost:5173)
-echo - Backend: Rodando em http://localhost:5000
-echo - Auditoria: Monitoramento ativo em tempo real
-echo ===================================================
-echo.
-pause
+echo =============================================================
+echo  Servidor Ativo em: http://localhost:5000
+echo  Pressione qualquer tecla para fechar esta janela auxiliar.
+echo =============================================================
+pause > nul

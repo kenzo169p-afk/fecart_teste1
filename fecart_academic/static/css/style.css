@@ -510,6 +510,66 @@ body {
   box-shadow: var(--glow-red);
 }
 
+.camera-top-overlay {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.cam-tag-badge {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-toggle-cam-source {
+  pointer-events: auto;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(6, 182, 212, 0.5);
+  color: var(--text-primary);
+  padding: 5px 11px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.btn-toggle-cam-source:hover {
+  background: rgba(6, 182, 212, 0.25);
+  border-color: var(--accent-cyan);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+}
+
+.btn-toggle-cam-source.active {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.35));
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.5);
+}
+
 .camera-feed-img {
   width: 100%;
   height: 100%;

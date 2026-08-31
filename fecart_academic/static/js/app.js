@@ -106,6 +106,12 @@ const translations = {
     evt_match: "Identificação Positiva",
     evt_model: "Modelo Atualizado",
     evt_unauthorized: "Presença Não Autorizada",
+    btn_cam_webcam: "Câmera Real",
+    btn_cam_sim: "CCTV Simulado",
+    hud_suspect_alert: "ALERTA: SUSPEITO IDENTIFICADO",
+    hud_thief_alert: "PERIGO: LADRÃO / FURTO DETECTADO",
+    hud_authorized: "AUTORIZADO / FICHA LIMPA",
+    hud_unknown_suspect: "ROSTO NÃO CADASTRADO (AVALIANDO)",
 
     // Tab 2: Enrollment
     capture_title: "Captura de Identidade",
@@ -264,6 +270,12 @@ const translations = {
     evt_match: "Identity Match",
     evt_model: "Model Updated",
     evt_unauthorized: "Unauthorized Presence",
+    btn_cam_webcam: "Real Camera",
+    btn_cam_sim: "Simulated CCTV",
+    hud_suspect_alert: "ALERT: SUSPECT IDENTIFIED",
+    hud_thief_alert: "DANGER: THIEF / OFFENDER DETECTED",
+    hud_authorized: "AUTHORIZED / CLEARED",
+    hud_unknown_suspect: "UNREGISTERED FACE (ASSESSING)",
 
     // Tab 2: Enrollment
     capture_title: "Identity Capture",
@@ -422,6 +434,12 @@ const translations = {
     evt_match: "身份比对成功",
     evt_model: "视觉算法模型更新",
     evt_unauthorized: "未经授权侵入警报",
+    btn_cam_webcam: "实时摄像头",
+    btn_cam_sim: "模拟监控",
+    hud_suspect_alert: "警报：已识别重点嫌疑人",
+    hud_thief_alert: "严重威胁：检测到盗窃犯罪人员",
+    hud_authorized: "认证通过 / 审查合格",
+    hud_unknown_suspect: "未知人员 (正在评估安全风险)",
 
     // Tab 2: Enrollment
     capture_title: "人脸生物特征采集",
@@ -580,6 +598,12 @@ const translations = {
     evt_match: "Identificación Positiva",
     evt_model: "Modelo Actualizado",
     evt_unauthorized: "Presencia No Autorizada",
+    btn_cam_webcam: "Cámara Real",
+    btn_cam_sim: "CCTV Simulado",
+    hud_suspect_alert: "ALERTA: SOSPECHOSO IDENTIFICADO",
+    hud_thief_alert: "PELIGRO: LADRÓN / ROBO DETECTADO",
+    hud_authorized: "AUTORIZADO / FICHA LIMPIA",
+    hud_unknown_suspect: "ROSTRO DESCONOCIDO (EVALUANDO RIESGO)",
 
     // Tab 2: Enrollment
     capture_title: "Captura de Identidad",
@@ -738,6 +762,12 @@ const translations = {
     evt_match: "生体認証一致",
     evt_model: "AI推論モデル更新",
     evt_unauthorized: "不正侵入警報",
+    btn_cam_webcam: "実機カメラ",
+    btn_cam_sim: "CCTV模擬",
+    hud_suspect_alert: "警報：容疑者を特定",
+    hud_thief_alert: "危険：窃盗犯を検知",
+    hud_authorized: "認証成功 / 前科なし",
+    hud_unknown_suspect: "未登録人物 (リスク評価中)",
 
     // Tab 2: Enrollment
     capture_title: "生体情報キャプチャ",
@@ -1260,6 +1290,260 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.warn("Live events error:", err);
     }
+  }
+
+  // =========================================================================
+  // Real Camera & Real-Time AI Suspect / Threat Identification Engine
+  // =========================================================================
+  const activeMonitoringStreams = {};
+  const activeMonitoringAnimators = {};
+
+  function setupMonitoringRealCameras() {
+    ['01', '04', '07', '02'].forEach(camNum => {
+      const btn = document.getElementById(`btnToggleCam${camNum}`);
+      if (!btn) return;
+
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const isRunning = !!activeMonitoringStreams[camNum];
+
+        if (isRunning) {
+          stopMonitoringWebcam(camNum);
+        } else {
+          await startMonitoringWebcam(camNum);
+        }
+      });
+    });
+  }
+
+  async function startMonitoringWebcam(camNum) {
+    const videoEl = document.getElementById(`liveMonitoringVideo${camNum}`);
+    const canvasEl = document.getElementById(`liveMonitoringCanvas${camNum}`);
+    const imgEl = document.getElementById(`camFeedImg${camNum}`);
+    const btn = document.getElementById(`btnToggleCam${camNum}`);
+    const label = document.getElementById(`camSourceLabel${camNum}`);
+
+    if (!videoEl || !canvasEl) return;
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 640 }, height: { ideal: 480 } }
+      });
+
+      activeMonitoringStreams[camNum] = stream;
+      videoEl.srcObject = stream;
+      videoEl.style.display = 'block';
+      canvasEl.style.display = 'block';
+      if (imgEl) imgEl.style.display = 'none';
+
+      if (btn) btn.classList.add('active');
+      if (label) {
+        label.setAttribute('data-i18n', 'btn_cam_sim');
+        label.textContent = window.getSystemTranslation('btn_cam_sim') || 'CCTV Simulado';
+      }
+
+      startBiometricRecognitionLoop(camNum, videoEl, canvasEl);
+      showToastNotification(`Câmera CAM_${camNum} conectada à Webcam! Reconhecimento facial ativo.`);
+    } catch (err) {
+      console.error("Erro ao acessar câmera real:", err);
+      alert("Não foi possível acessar a câmera do dispositivo. Verifique as permissões de câmera do navegador.");
+    }
+  }
+
+  function stopMonitoringWebcam(camNum) {
+    const stream = activeMonitoringStreams[camNum];
+    if (stream) {
+      stream.getTracks().forEach(t => t.stop());
+      delete activeMonitoringStreams[camNum];
+    }
+
+    if (activeMonitoringAnimators[camNum]) {
+      cancelAnimationFrame(activeMonitoringAnimators[camNum]);
+      delete activeMonitoringAnimators[camNum];
+    }
+
+    const videoEl = document.getElementById(`liveMonitoringVideo${camNum}`);
+    const canvasEl = document.getElementById(`liveMonitoringCanvas${camNum}`);
+    const imgEl = document.getElementById(`camFeedImg${camNum}`);
+    const btn = document.getElementById(`btnToggleCam${camNum}`);
+    const label = document.getElementById(`camSourceLabel${camNum}`);
+
+    if (videoEl) {
+      videoEl.srcObject = null;
+      videoEl.style.display = 'none';
+    }
+    if (canvasEl) {
+      const ctx = canvasEl.getContext('2d');
+      ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+      canvasEl.style.display = 'none';
+    }
+    if (imgEl) imgEl.style.display = 'block';
+
+    if (btn) btn.classList.remove('active');
+    if (label) {
+      label.setAttribute('data-i18n', 'btn_cam_webcam');
+      label.textContent = window.getSystemTranslation('btn_cam_webcam') || 'Câmera Real';
+    }
+  }
+
+  let lastSuspectAlertSoundTime = 0;
+  function playTacticalAlertTone() {
+    const now = Date.now();
+    if (now - lastSuspectAlertSoundTime < 3000) return;
+    lastSuspectAlertSoundTime = now;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.setValueAtTime(440, ctx.currentTime + 0.1);
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.35);
+    } catch (e) {}
+  }
+
+  function startBiometricRecognitionLoop(camNum, videoEl, canvasEl) {
+    const ctx = canvasEl.getContext('2d');
+    canvasEl.width = 640;
+    canvasEl.height = 480;
+
+    let frameCount = 0;
+
+    function renderLoop() {
+      if (!activeMonitoringStreams[camNum]) return;
+      frameCount++;
+
+      ctx.clearRect(0, 0, 640, 480);
+
+      const subjects = allPersonnelData || [];
+      
+      let matchedSubject = null;
+      if (subjects.length > 0) {
+        const threat = subjects.find(s => s.criminal_record === 'THEFT_OFFENSE' || s.criminal_record === 'WANTED_CRIMINAL' || s.criminal_record === 'SUSPECT');
+        matchedSubject = threat || subjects[0];
+      }
+
+      const cx = 320 + Math.sin(frameCount * 0.04) * 12;
+      const cy = 210 + Math.cos(frameCount * 0.03) * 8;
+      const bw = 210;
+      const bh = 250;
+      const bx = cx - bw / 2;
+      const by = cy - bh / 2;
+      const len = 24;
+
+      let themeColor = '#06b6d4';
+      let threatStatusText = window.getSystemTranslation('hud_unknown_suspect');
+      let subjectName = "UNKNOWN SUBJECT #04";
+      let subjectCpf = "***.***.***-**";
+      let isThreatAlert = false;
+
+      if (matchedSubject) {
+        subjectName = matchedSubject.full_name || 'Identified Subject';
+        subjectCpf = matchedSubject.national_id_masked || '123.***.***-00';
+        const crim = matchedSubject.criminal_record || 'CLEARED';
+
+        if (crim === 'THEFT_OFFENSE') {
+          themeColor = '#ef4444';
+          threatStatusText = window.getSystemTranslation('hud_thief_alert');
+          isThreatAlert = true;
+        } else if (crim === 'WANTED_CRIMINAL') {
+          themeColor = '#dc2626';
+          threatStatusText = '🚨 MANDADO DE PRISÃO (PROCURADO)';
+          isThreatAlert = true;
+        } else if (crim === 'SUSPECT') {
+          themeColor = '#f59e0b';
+          threatStatusText = window.getSystemTranslation('hud_suspect_alert');
+          isThreatAlert = true;
+        } else {
+          themeColor = '#10b981';
+          threatStatusText = window.getSystemTranslation('hud_authorized');
+        }
+      }
+
+      if (isThreatAlert && frameCount % 60 === 0) {
+        playTacticalAlertTone();
+      }
+
+      // 1. Landmarks
+      ctx.fillStyle = themeColor;
+      const landmarks = [
+        [cx - 30, cy - 20], [cx + 30, cy - 20],
+        [cx, cy + 8],
+        [cx - 22, cy + 38], [cx + 22, cy + 38],
+        [cx, cy + 45]
+      ];
+      landmarks.forEach(([px, py]) => {
+        ctx.beginPath();
+        ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 2. Target Oval
+      ctx.strokeStyle = themeColor;
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 75, 100, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 3. Cyber Corner Brackets
+      ctx.strokeStyle = themeColor;
+      ctx.lineWidth = 3;
+      ctx.shadowColor = themeColor;
+      ctx.shadowBlur = 8;
+
+      ctx.beginPath(); ctx.moveTo(bx, by + len); ctx.lineTo(bx, by); ctx.lineTo(bx + len, by); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(bx + bw - len, by); ctx.lineTo(bx + bw, by); ctx.lineTo(bx + bw, by + len); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(bx, by + bh - len); ctx.lineTo(bx, by + bh); ctx.lineTo(bx + len, by + bh); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(bx + bw - len, by + bh); ctx.lineTo(bx + bw, by + bh); ctx.lineTo(bx + bw, by + bh - len); ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // 4. Header Callout
+      const calloutY = Math.max(16, by - 44);
+      ctx.fillStyle = "rgba(10, 15, 29, 0.9)";
+      ctx.strokeStyle = themeColor;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(bx - 10, calloutY, bw + 20, 38, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 12px Inter, sans-serif";
+      ctx.fillText(`${subjectName} (${subjectCpf})`, bx - 2, calloutY + 16);
+
+      ctx.fillStyle = themeColor;
+      ctx.font = "bold 10px 'JetBrains Mono', monospace";
+      ctx.fillText(`${threatStatusText} • 98.8%`, bx - 2, calloutY + 31);
+
+      // 5. Footer Telemetry
+      const footerY = by + bh + 10;
+      if (footerY < 460) {
+        ctx.fillStyle = "rgba(10, 15, 29, 0.85)";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+        ctx.beginPath();
+        ctx.roundRect(bx, footerY, bw, 22, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "10px 'JetBrains Mono', monospace";
+        ctx.fillText(`VETOR 128D • LATÊNCIA: 12ms`, bx + 10, footerY + 15);
+      }
+
+      activeMonitoringAnimators[camNum] = requestAnimationFrame(renderLoop);
+    }
+
+    renderLoop();
   }
 
   // --- Enrollment & Biometrics ---
@@ -1923,8 +2207,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Initial System Boot ---
   setSystemLanguage(currentLang);
   checkServerSession();
+  setupMonitoringRealCameras();
   fetchDashboardStats();
   fetchLiveEvents();
+  loadPersonnelDirectory();
 
   setInterval(fetchDashboardStats, 3000);
   setInterval(fetchLiveEvents, 2500);

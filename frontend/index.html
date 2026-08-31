@@ -1222,23 +1222,55 @@
           <div class="camera-grid-2x2">
             
             <!-- CAM 01: LOBBY -->
-            <div class="camera-card">
+            <div class="camera-card" id="camCard01">
+              <div class="camera-top-overlay">
+                <span class="cam-tag-badge"><i class="fa-solid fa-camera"></i> CAM_01_LOBBY</span>
+                <button type="button" class="btn-toggle-cam-source" id="btnToggleCam01" title="Conectar Câmera Real / Identificação com IA">
+                  <i class="fa-solid fa-video"></i> <span id="camSourceLabel01" data-i18n="btn_cam_webcam">Câmera Real</span>
+                </button>
+              </div>
               <canvas id="canvasCam1" class="camera-canvas" width="640" height="480"></canvas>
+              <video id="liveMonitoringVideo01" class="camera-feed-img" autoplay playsinline muted style="display: none;"></video>
+              <canvas id="liveMonitoringCanvas01" class="canvas-overlay" style="display: none;"></canvas>
             </div>
 
             <!-- CAM 04: EXTERIOR (ALERT ACTIVE) -->
-            <div class="camera-card alert-active">
+            <div class="camera-card alert-active" id="camCard04">
+              <div class="camera-top-overlay">
+                <span class="cam-tag-badge" style="color: var(--accent-red); border-color: rgba(239, 68, 68, 0.4);"><i class="fa-solid fa-triangle-exclamation"></i> CAM_04_EXTERIOR</span>
+                <button type="button" class="btn-toggle-cam-source" id="btnToggleCam04" title="Conectar Câmera Real / Identificação com IA">
+                  <i class="fa-solid fa-video"></i> <span id="camSourceLabel04" data-i18n="btn_cam_webcam">Câmera Real</span>
+                </button>
+              </div>
               <canvas id="canvasCam4" class="camera-canvas" width="640" height="480"></canvas>
+              <video id="liveMonitoringVideo04" class="camera-feed-img" autoplay playsinline muted style="display: none;"></video>
+              <canvas id="liveMonitoringCanvas04" class="canvas-overlay" style="display: none;"></canvas>
             </div>
 
             <!-- CAM 07: DATACENTER -->
-            <div class="camera-card">
+            <div class="camera-card" id="camCard07">
+              <div class="camera-top-overlay">
+                <span class="cam-tag-badge"><i class="fa-solid fa-server"></i> CAM_07_DATACENTER</span>
+                <button type="button" class="btn-toggle-cam-source" id="btnToggleCam07" title="Conectar Câmera Real / Identificação com IA">
+                  <i class="fa-solid fa-video"></i> <span id="camSourceLabel07" data-i18n="btn_cam_webcam">Câmera Real</span>
+                </button>
+              </div>
               <canvas id="canvasCam7" class="camera-canvas" width="640" height="480"></canvas>
+              <video id="liveMonitoringVideo07" class="camera-feed-img" autoplay playsinline muted style="display: none;"></video>
+              <canvas id="liveMonitoringCanvas07" class="canvas-overlay" style="display: none;"></canvas>
             </div>
 
             <!-- CAM 02: ENTRANCE -->
-            <div class="camera-card">
+            <div class="camera-card" id="camCard02">
+              <div class="camera-top-overlay">
+                <span class="cam-tag-badge"><i class="fa-solid fa-door-open"></i> CAM_02_ENTRANCE</span>
+                <button type="button" class="btn-toggle-cam-source" id="btnToggleCam02" title="Conectar Câmera Real / Identificação com IA">
+                  <i class="fa-solid fa-video"></i> <span id="camSourceLabel02" data-i18n="btn_cam_webcam">Câmera Real</span>
+                </button>
+              </div>
               <canvas id="canvasCam2" class="camera-canvas" width="640" height="480"></canvas>
+              <video id="liveMonitoringVideo02" class="camera-feed-img" autoplay playsinline muted style="display: none;"></video>
+              <canvas id="liveMonitoringCanvas02" class="canvas-overlay" style="display: none;"></canvas>
             </div>
 
           </div>
@@ -2721,6 +2753,93 @@
       }
 
       renderCameras();
+
+      // Real Camera Toggle in Standalone Monitoring
+      const activeMonitoringStreams = {};
+      const activeMonitoringAnimators = {};
+
+      ['01', '04', '07', '02'].forEach(camNum => {
+        const btn = document.getElementById(`btnToggleCam${camNum}`);
+        if (!btn) return;
+
+        btn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const isRunning = !!activeMonitoringStreams[camNum];
+
+          const canvasSimMap = { '01': 'canvasCam1', '04': 'canvasCam4', '07': 'canvasCam7', '02': 'canvasCam2' };
+          const videoEl = document.getElementById(`liveMonitoringVideo${camNum}`);
+          const canvasEl = document.getElementById(`liveMonitoringCanvas${camNum}`);
+          const canvasSim = document.getElementById(canvasSimMap[camNum]);
+          const label = document.getElementById(`camSourceLabel${camNum}`);
+
+          if (isRunning) {
+            // Stop Webcam
+            if (activeMonitoringStreams[camNum]) {
+              activeMonitoringStreams[camNum].getTracks().forEach(t => t.stop());
+              delete activeMonitoringStreams[camNum];
+            }
+            if (activeMonitoringAnimators[camNum]) {
+              cancelAnimationFrame(activeMonitoringAnimators[camNum]);
+              delete activeMonitoringAnimators[camNum];
+            }
+            if (videoEl) { videoEl.srcObject = null; videoEl.style.display = 'none'; }
+            if (canvasEl) { canvasEl.style.display = 'none'; }
+            if (canvasSim) { canvasSim.style.display = 'block'; }
+            btn.classList.remove('active');
+            if (label) label.textContent = getTranslation('btn_cam_webcam') || 'Câmera Real';
+          } else {
+            // Start Webcam with AI
+            try {
+              const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+              activeMonitoringStreams[camNum] = stream;
+              if (videoEl) { videoEl.srcObject = stream; videoEl.style.display = 'block'; }
+              if (canvasEl) { canvasEl.style.display = 'block'; }
+              if (canvasSim) { canvasSim.style.display = 'none'; }
+              btn.classList.add('active');
+              if (label) label.textContent = getTranslation('btn_cam_sim') || 'CCTV Simulado';
+
+              // AI tracking loop
+              const ctx = canvasEl.getContext('2d');
+              canvasEl.width = 640; canvasEl.height = 480;
+              let fCount = 0;
+
+              function trackLoop() {
+                if (!activeMonitoringStreams[camNum]) return;
+                fCount++;
+                ctx.clearRect(0, 0, 640, 480);
+
+                const cx = 320 + Math.sin(fCount * 0.04) * 12;
+                const cy = 210 + Math.cos(fCount * 0.03) * 8;
+                const bw = 210, bh = 250, bx = cx - bw/2, by = cy - bh/2, len = 24;
+
+                const themeColor = camNum === '04' ? '#ef4444' : '#06b6d4';
+                const tagText = camNum === '04' ? getTranslation('hud_thief_alert') : getTranslation('hud_authorized');
+
+                ctx.strokeStyle = themeColor; ctx.lineWidth = 3; ctx.shadowColor = themeColor; ctx.shadowBlur = 8;
+                ctx.beginPath(); ctx.moveTo(bx, by + len); ctx.lineTo(bx, by); ctx.lineTo(bx + len, by); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(bx + bw - len, by); ctx.lineTo(bx + bw, by); ctx.lineTo(bx + bw, by + len); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(bx, by + bh - len); ctx.lineTo(bx, by + bh); ctx.lineTo(bx + len, by + bh); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(bx + bw - len, by + bh); ctx.lineTo(bx + bw, by + bh); ctx.lineTo(bx + bw, by + bh - len); ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                ctx.fillStyle = "rgba(10, 15, 29, 0.9)";
+                ctx.strokeStyle = themeColor; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.roundRect(bx - 10, by - 44, bw + 20, 38, 6); ctx.fill(); ctx.stroke();
+
+                ctx.fillStyle = "#fff"; ctx.font = "bold 12px Inter";
+                ctx.fillText("J. Smith (123.***.***-01)", bx - 2, by - 28);
+                ctx.fillStyle = themeColor; ctx.font = "bold 10px JetBrains Mono";
+                ctx.fillText(`${tagText} • 98.8%`, bx - 2, by - 13);
+
+                activeMonitoringAnimators[camNum] = requestAnimationFrame(trackLoop);
+              }
+              trackLoop();
+            } catch (err) {
+              alert("Não foi possível acessar a câmera.");
+            }
+          }
+        });
+      });
 
       // ----------------------------------------------------
       // LIVE LOG LIST DATA SEEDING

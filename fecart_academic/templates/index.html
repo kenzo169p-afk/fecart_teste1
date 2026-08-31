@@ -254,24 +254,56 @@
         <div class="video-grid-wrapper">
           <div class="camera-grid-2x2">
             
-            <!-- CAM 01: LOBBY -->
-            <div class="camera-card">
-              <img src="/api/feed/cam_01" class="camera-feed-img" alt="CAM_01_LOBBY">
+            <!-- CAM 01: LOBBY (Webcam & AI Suspect Recognition Enabled) -->
+            <div class="camera-card" id="camCard01">
+              <div class="camera-top-overlay">
+                <span class="cam-tag-badge"><i class="fa-solid fa-camera"></i> CAM_01_LOBBY</span>
+                <button type="button" class="btn-toggle-cam-source" id="btnToggleCam01" title="Conectar Câmera Real / Identificação com IA">
+                  <i class="fa-solid fa-video"></i> <span id="camSourceLabel01" data-i18n="btn_cam_webcam">Câmera Real</span>
+                </button>
+              </div>
+              <img src="/api/feed/cam_01" class="camera-feed-img" id="camFeedImg01" alt="CAM_01_LOBBY">
+              <video id="liveMonitoringVideo01" class="camera-feed-img" autoplay playsinline muted style="display: none;"></video>
+              <canvas id="liveMonitoringCanvas01" class="canvas-overlay" style="display: none;"></canvas>
             </div>
 
             <!-- CAM 04: EXTERIOR (ALERT ACTIVE) -->
-            <div class="camera-card alert-active">
-              <img src="/api/feed/cam_04" class="camera-feed-img" alt="CAM_04_EXTERIOR">
+            <div class="camera-card alert-active" id="camCard04">
+              <div class="camera-top-overlay">
+                <span class="cam-tag-badge" style="color: var(--accent-red); border-color: rgba(239, 68, 68, 0.4);"><i class="fa-solid fa-triangle-exclamation"></i> CAM_04_EXTERIOR</span>
+                <button type="button" class="btn-toggle-cam-source" id="btnToggleCam04" title="Conectar Câmera Real / Identificação com IA">
+                  <i class="fa-solid fa-video"></i> <span id="camSourceLabel04" data-i18n="btn_cam_webcam">Câmera Real</span>
+                </button>
+              </div>
+              <img src="/api/feed/cam_04" class="camera-feed-img" id="camFeedImg04" alt="CAM_04_EXTERIOR">
+              <video id="liveMonitoringVideo04" class="camera-feed-img" autoplay playsinline muted style="display: none;"></video>
+              <canvas id="liveMonitoringCanvas04" class="canvas-overlay" style="display: none;"></canvas>
             </div>
 
-            <!-- CAM 07: DATACENTER -->
-            <div class="camera-card">
-              <img src="/api/feed/cam_07" class="camera-feed-img" alt="CAM_07_DATACENTER">
+            <!-- CAM 07: DATACENTER (Real Camera & Suspect Recognition Enabled) -->
+            <div class="camera-card" id="camCard07">
+              <div class="camera-top-overlay">
+                <span class="cam-tag-badge"><i class="fa-solid fa-server"></i> CAM_07_DATACENTER</span>
+                <button type="button" class="btn-toggle-cam-source" id="btnToggleCam07" title="Conectar Câmera Real / Identificação com IA">
+                  <i class="fa-solid fa-video"></i> <span id="camSourceLabel07" data-i18n="btn_cam_webcam">Câmera Real</span>
+                </button>
+              </div>
+              <img src="/api/feed/cam_07" class="camera-feed-img" id="camFeedImg07" alt="CAM_07_DATACENTER">
+              <video id="liveMonitoringVideo07" class="camera-feed-img" autoplay playsinline muted style="display: none;"></video>
+              <canvas id="liveMonitoringCanvas07" class="canvas-overlay" style="display: none;"></canvas>
             </div>
 
-            <!-- CAM 02: ENTRANCE -->
-            <div class="camera-card">
-              <img src="/api/feed/cam_02" class="camera-feed-img" alt="CAM_02_ENTRANCE">
+            <!-- CAM 02: ENTRANCE (Real Camera & Suspect Recognition Enabled) -->
+            <div class="camera-card" id="camCard02">
+              <div class="camera-top-overlay">
+                <span class="cam-tag-badge"><i class="fa-solid fa-door-open"></i> CAM_02_ENTRANCE</span>
+                <button type="button" class="btn-toggle-cam-source" id="btnToggleCam02" title="Conectar Câmera Real / Identificação com IA">
+                  <i class="fa-solid fa-video"></i> <span id="camSourceLabel02" data-i18n="btn_cam_webcam">Câmera Real</span>
+                </button>
+              </div>
+              <img src="/api/feed/cam_02" class="camera-feed-img" id="camFeedImg02" alt="CAM_02_ENTRANCE">
+              <video id="liveMonitoringVideo02" class="camera-feed-img" autoplay playsinline muted style="display: none;"></video>
+              <canvas id="liveMonitoringCanvas02" class="canvas-overlay" style="display: none;"></canvas>
             </div>
 
           </div>

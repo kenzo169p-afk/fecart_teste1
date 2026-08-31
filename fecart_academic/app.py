@@ -232,8 +232,15 @@ async def list_subjects():
 async def enroll_subject(payload: SubjectEnrollSchema):
     """
     Cadastra nova identidade biométrica:
-    Calcula embedding 128D, hash de CPF blind index e registra consentimento LGPD.
+    Valida obrigatoriedade de captura/foto, calcula embedding 128D e registra no banco.
     """
+    # Validação estrita: foto do indivíduo é OBRIGATÓRIA para rastreamento biométrico
+    if not payload.photo_base64 or not payload.photo_base64.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Foto do indivíduo é estritamente obrigatória para viabilizar o rastreamento biométrico na câmera."
+        )
+
     embedding = None
     if payload.photo_base64 and "," in payload.photo_base64:
         try:
@@ -261,6 +268,7 @@ async def enroll_subject(payload: SubjectEnrollSchema):
             criminal_record=payload.criminal_record,
             incident_details=payload.incident_details or "",
             embedding=embedding,
+            photo_url=payload.photo_base64,
             lgpd_consent=payload.lgpd_consent,
             created_by="admin"
         )

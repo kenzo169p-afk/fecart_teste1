@@ -46,8 +46,14 @@ class SubjectEnrollSchema(BaseModel):
     age: int = Field(default=30, ge=0, le=120)
     criminal_record: str = Field(default="CLEARED", description="Classificação criminal / antecedentes")
     incident_details: Optional[str] = Field(default="", description="Descrição de delitos ou ocorrências")
-    photo_base64: Optional[str] = None
+    photo_base64: str = Field(..., min_length=10, description="Foto capturada do indivíduo (Obrigatória para rastreamento biométrico)")
     lgpd_consent: bool = Field(default=True)
+
+    @field_validator("photo_base64")
+    def validate_photo(cls, v: str) -> str:
+        if not v or not v.strip() or len(v.strip()) < 20:
+            raise ValueError("A foto do indivíduo é estritamente obrigatória para permitir o rastreamento biométrico na câmera.")
+        return v.strip()
 
     @field_validator("national_id")
     def validate_cpf(cls, v: str) -> str:

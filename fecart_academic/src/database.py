@@ -364,7 +364,7 @@ def get_audit_logs(limit=50) -> List[Dict[str, Any]]:
 
 # --- Sujeitos Biométricos & Reconhecimento ---
 
-def register_biometric_subject(full_name: str, national_id_clean: str, birthdate: str = "1990-01-01", department="Engineering", clearance="Level 1 (Basic)", age=30, criminal_record="CLEARED", incident_details="", embedding=None, lgpd_consent=True, created_by="admin") -> str:
+def register_biometric_subject(full_name: str, national_id_clean: str, birthdate: str = "1990-01-01", department="Engineering", clearance="Level 1 (Basic)", age=30, criminal_record="CLEARED", incident_details="", embedding=None, photo_url=None, lgpd_consent=True, created_by="admin") -> str:
     """Cadastra um novo sujeito com blind index SHA-256, histórico criminal, incidentes e embedding facial 128D."""
     conn = get_connection()
     cursor = conn.cursor()
@@ -377,9 +377,9 @@ def register_biometric_subject(full_name: str, national_id_clean: str, birthdate
 
     try:
         cursor.execute("""
-        INSERT INTO biometric_subjects (id, full_name, national_id_hash, national_id_masked, birthdate, department, clearance_level, age, criminal_record, incident_details, is_threat, status, lgpd_consent_granted, created_by)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-        """, (subject_id, full_name, cpf_hash, masked_cpf, birthdate, department, clearance, age, criminal_record, incident_details, is_threat, status_val, 1 if lgpd_consent else 0, created_by))
+        INSERT INTO biometric_subjects (id, full_name, national_id_hash, national_id_masked, birthdate, department, clearance_level, age, criminal_record, incident_details, is_threat, photo_url, status, lgpd_consent_granted, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        """, (subject_id, full_name, cpf_hash, masked_cpf, birthdate, department, clearance, age, criminal_record, incident_details, is_threat, photo_url, status_val, 1 if lgpd_consent else 0, created_by))
 
         if embedding is not None:
             emb_id = str(uuid.uuid4())

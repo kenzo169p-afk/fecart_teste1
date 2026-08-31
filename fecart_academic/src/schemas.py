@@ -40,9 +40,12 @@ class RegisterOperatorSchema(BaseModel):
 class SubjectEnrollSchema(BaseModel):
     full_name: str = Field(..., min_length=3, max_length=150)
     national_id: str = Field(..., min_length=11, max_length=14, description="CPF da pessoa")
+    birthdate: Optional[date] = Field(default=None, description="Data de nascimento do titular")
     department: str = Field(default="Engineering")
     clearance_level: str = Field(default="Level 1 (Basic)")
     age: int = Field(default=30, ge=0, le=120)
+    criminal_record: str = Field(default="CLEARED", description="Classificação criminal / antecedentes")
+    incident_details: Optional[str] = Field(default="", description="Descrição de delitos ou ocorrências")
     photo_base64: Optional[str] = None
     lgpd_consent: bool = Field(default=True)
 

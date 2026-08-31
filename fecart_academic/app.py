@@ -28,7 +28,7 @@ from database import (
     init_db, authenticate_operator, register_operator,
     get_dashboard_stats, get_cameras_list, get_recent_events,
     get_all_biometric_subjects, register_biometric_subject, delete_biometric_subject,
-    toggle_emergency_lockdown, get_audit_logs, add_audit_entry
+    delete_all_biometric_subjects, toggle_emergency_lockdown, get_audit_logs, add_audit_entry
 )
 from camera_config import CameraConfigManager
 from search import FeatureExtractor
@@ -250,12 +250,16 @@ async def enroll_subject(payload: SubjectEnrollSchema):
         embedding = (raw_v / np.linalg.norm(raw_v)).tolist()
 
     try:
+        bdate = str(payload.birthdate) if payload.birthdate else "1990-01-01"
         subject_id = register_biometric_subject(
             full_name=payload.full_name,
             national_id_clean=payload.national_id,
+            birthdate=bdate,
             department=payload.department,
             clearance=payload.clearance_level,
             age=payload.age,
+            criminal_record=payload.criminal_record,
+            incident_details=payload.incident_details or "",
             embedding=embedding,
             lgpd_consent=payload.lgpd_consent,
             created_by="admin"
@@ -268,9 +272,15 @@ async def enroll_subject(payload: SubjectEnrollSchema):
     except ValueError as ve:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
 
+@app.delete("/api/v1/subjects")
+async def delete_all_subjects():
+    """Remove todas as identidades biométricas do banco (Expurgo Geral)."""
+    count = delete_all_biometric_subjects(operator_username="admin")
+    return {"success": True, "count_deleted": count, "message": f"{count} registros removidos com sucesso."}
+
 @app.delete("/api/v1/subjects/{subject_id}")
 async def delete_subject(subject_id: str):
-    """Remove uma identidade biométrica do banco."""
+    """Remove uma identidade biométrica individual do banco."""
     delete_biometric_subject(subject_id, operator_username="admin")
     return {"success": True, "deleted_id": subject_id}
 

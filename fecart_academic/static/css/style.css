@@ -100,44 +100,140 @@ body {
   z-index: 50;
 }
 
+.sidebar-brand,
 .sidebar-header {
-  padding: 20px 24px;
+  padding: 20px 18px;
   border-bottom: 1px solid var(--border-color);
-}
-
-.brand-title {
-  font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.7) 0%, rgba(10, 15, 30, 0.4) 100%);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 14px;
+  position: relative;
+  overflow: hidden;
 }
 
-.brand-title .shield-icon {
-  color: var(--accent-blue);
+.sidebar-brand::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(6, 182, 212, 0.5) 50%, transparent 100%);
 }
 
-.vigilance-badge {
-  display: inline-flex;
+.brand-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(59, 130, 246, 0.25) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  color: var(--accent-cyan);
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.35), inset 0 0 10px rgba(59, 130, 246, 0.25);
+  flex-shrink: 0;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.brand-icon-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 24px rgba(6, 182, 212, 0.6), inset 0 0 12px rgba(6, 182, 212, 0.4);
+}
+
+.brand-icon-box i {
+  filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.8));
+}
+
+.brand-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.brand-title-row {
+  display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-top: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
-.vigilance-badge .status-dot {
-  width: 6px;
-  height: 6px;
+.brand-title-text {
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffffff 40%, #bae6fd 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+  font-family: 'Inter', sans-serif;
+}
+
+.brand-ai-badge {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(59, 130, 246, 0.25));
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+  line-height: 1.1;
+}
+
+.vigilance-hud-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 20px;
+  padding: 2px 8px;
+  width: fit-content;
+}
+
+.radar-beacon {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.radar-beacon-dot {
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background-color: var(--accent-green);
-  box-shadow: 0 0 8px var(--accent-green);
-  animation: pulse-dot 2s infinite;
+  background-color: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.radar-beacon-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(16, 185, 129, 0.6);
+  animation: radar-beacon-anim 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes radar-beacon-anim {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  75%, 100% { transform: scale(2.8); opacity: 0; }
+}
+
+.vigilance-hud-text {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #34d399;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 .sidebar-nav {

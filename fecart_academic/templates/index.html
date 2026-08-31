@@ -3,184 +3,168 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SecureVision AI — NPU Surveillance & Biometric Control</title>
-  <!-- FontAwesome Icons & Google Fonts -->
+  <title>SecureVision AI — Zero-Trust Surveillance Platform</title>
+
+  <!-- Typography: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome Pro Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Modular CSS Design System -->
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 
-  <!-- Fullscreen Emergency Lockdown Flash Overlay -->
-  <div id="lockdownOverlay" class="lockdown-fullscreen-overlay"></div>
-
-  <!-- Operator Authentication Portal (Restricted Login Screen) -->
+  <!-- ZERO-TRUST AUTHENTICATION PORTAL (MODAL / OVERLAY) -->
   <div id="authPortalOverlay" class="auth-portal-overlay">
-    <div class="auth-card-box">
-      
-      <div class="auth-header">
-        <div class="auth-shield-logo">
-          <i class="fa-solid fa-shield-halved"></i>
+    <div class="auth-modal-card">
+      <div class="auth-brand-header">
+        <div class="auth-logo-symbol"><i class="fa-solid fa-shield-halved"></i></div>
+        <h2 style="font-size: 1.35rem; font-weight: 800;" data-i18n="auth_portal_title">SecureVision AI — Portal de Acesso</h2>
+        <p style="font-size: 0.78rem; color: var(--text-muted);" data-i18n="auth_portal_sub">Autenticação Zero-Trust • Criptografia Argon2id & Sessão JWT</p>
+      </div>
+
+      <div class="auth-mode-tabs">
+        <button id="tabBtnLogin" class="auth-mode-tab active" type="button">
+          <i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="tab_login">Entrar no Sistema</span>
+        </button>
+        <button id="tabBtnRegister" class="auth-mode-tab" type="button">
+          <i class="fa-solid fa-user-plus"></i> <span data-i18n="tab_register">Criar Conta de Operador</span>
+        </button>
+      </div>
+
+      <!-- Form Login -->
+      <form id="formLogin" class="auth-form-layout" style="display: flex;">
+        <div class="auth-field">
+          <label><i class="fa-solid fa-user-shield" style="color: var(--accent-cyan);"></i> <span data-i18n="label_username">Usuário / Login</span></label>
+          <input type="text" id="loginUsername" placeholder="Ex: admin ou seu_login" required autocomplete="username">
         </div>
-        <div class="auth-title">SecureVision AI</div>
-        <div class="auth-subtitle">Restricted Access Protocol • NPU Lvl 5</div>
-      </div>
 
-      <div class="auth-tabs">
-        <button id="tabBtnLogin" class="auth-tab-btn active" type="button">Autenticação (Login)</button>
-        <button id="tabBtnRegister" class="auth-tab-btn" type="button">Novo Acesso (Cadastro)</button>
-      </div>
-
-      <div class="auth-body">
-        
-        <div id="authErrorBox" class="auth-error-box">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          <span id="authErrorMsg">Credenciais incorretas</span>
+        <div class="auth-field">
+          <label><i class="fa-solid fa-cake-candles" style="color: var(--accent-blue);"></i> <span data-i18n="label_birthdate">Data de Nascimento</span></label>
+          <input type="date" id="loginBirthdate" required>
         </div>
 
-        <!-- FORM LOGIN -->
-        <form id="formLogin" style="display: flex; flex-direction: column; gap: 14px;">
-          <div class="form-group">
-            <label class="form-label">
-              <span>Nome do Usuário ou Login</span>
-              <span class="badge-aes">Identificador Único</span>
-            </label>
-            <input type="text" id="loginUsername" class="form-input" placeholder="Ex: admin ou S. Carter" required autocomplete="username">
+        <div class="auth-field">
+          <label><i class="fa-solid fa-key" style="color: var(--accent-purple);"></i> <span data-i18n="label_password">Senha de Operador</span></label>
+          <input type="password" id="loginPassword" placeholder="••••••••••••" required autocomplete="current-password">
+        </div>
+
+        <button id="btnSubmitLogin" type="submit" class="btn-enroll-submit" style="margin-top: 10px;">
+          <i class="fa-solid fa-lock"></i> <span data-i18n="login_btn">Autenticar e Acessar Sistema</span>
+        </button>
+      </form>
+
+      <!-- Form Register -->
+      <form id="formRegister" class="auth-form-layout" style="display: none;">
+        <div class="auth-field">
+          <label><i class="fa-solid fa-id-card" style="color: var(--accent-cyan);"></i> <span data-i18n="label_fullname">Nome Completo do Operador</span></label>
+          <input type="text" id="regNome" placeholder="Ex: Samantha Carter" required>
+        </div>
+
+        <div class="auth-field">
+          <label><i class="fa-solid fa-user" style="color: var(--accent-blue);"></i> <span data-i18n="label_login_user">Login de Usuário (Único)</span></label>
+          <input type="text" id="regUsername" placeholder="Ex: scarter" required autocomplete="username">
+        </div>
+
+        <div class="auth-field">
+          <label><i class="fa-solid fa-cake-candles" style="color: var(--accent-purple);"></i> <span data-i18n="label_birthdate">Data de Nascimento</span></label>
+          <input type="date" id="regBirthdate" required>
+        </div>
+
+        <div class="auth-field">
+          <label><i class="fa-solid fa-lock" style="color: var(--accent-green);"></i> <span data-i18n="label_password">Senha Forte (Argon2)</span></label>
+          <input type="password" id="regPassword" placeholder="••••••••••••" required minlength="6" autocomplete="new-password">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="auth-field">
+            <label><span data-i18n="label_dept">Departamento</span></label>
+            <select id="regDept" class="form-select">
+              <option value="Security Management" data-i18n="dept_sec_mgmt">Security Management</option>
+              <option value="IT Infrastructure" data-i18n="dept_it">IT Infrastructure</option>
+              <option value="Operations" data-i18n="dept_ops">Operations</option>
+              <option value="Administration" data-i18n="dept_adm">Administration</option>
+            </select>
           </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              <span>Data de Nascimento</span>
-              <span class="badge-aes">Validação de Identidade</span>
-            </label>
-            <input type="date" id="loginBirthdate" class="form-input" required>
+          <div class="auth-field">
+            <label><span data-i18n="label_clearance">Nível de Acesso</span></label>
+            <select id="regClearance" class="form-select">
+              <option value="Level 2 (Staff)">Level 2 (Staff)</option>
+              <option value="Level 3 (Senior)">Level 3 (Senior)</option>
+              <option value="Level 4 (Executive)">Level 4 (Executive)</option>
+              <option value="AUTII: Lvl 5 (Admin)">AUTII: Lvl 5 (Admin)</option>
+            </select>
           </div>
+        </div>
 
-          <div class="form-group">
-            <label class="form-label">
-              <span>Senha de Acesso</span>
-              <span class="badge-aes">SHA-256</span>
-            </label>
-            <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required autocomplete="current-password">
-          </div>
+        <button id="btnSubmitRegister" type="submit" class="btn-enroll-submit" style="margin-top: 10px; background: linear-gradient(135deg, #10b981, #059669);">
+          <i class="fa-solid fa-user-shield"></i> <span data-i18n="register_btn">Criar Conta de Operador</span>
+        </button>
+      </form>
 
-          <div class="auth-hint-box">
-            <i class="fa-solid fa-circle-info" style="color: var(--accent-cyan);"></i>
-            Acesso Padrão: Login: <strong>admin</strong> | Nascimento: <strong>1985-05-12</strong> | Senha: <strong>admin123</strong>
-          </div>
-
-          <button type="submit" id="btnSubmitLogin" class="btn-enroll-submit" style="width: 100%; margin-top: 4px;">
-            <i class="fa-solid fa-lock"></i> Autenticar e Acessar Sistema
-          </button>
-        </form>
-
-        <!-- FORM CADASTRO DE NOVO OPERADOR -->
-        <form id="formRegister" style="display: none; flex-direction: column; gap: 14px;">
-          <div class="form-group">
-            <label class="form-label">
-              <span>Nome Completo</span>
-              <span class="badge-aes">1 Nome por Conta</span>
-            </label>
-            <input type="text" id="regNome" class="form-input" placeholder="Ex: Dr. Roberto Santos" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              <span>Nome de Usuário / Login</span>
-              <span class="badge-aes">Login Único</span>
-            </label>
-            <input type="text" id="regUsername" class="form-input" placeholder="Ex: rsantos" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              <span>Data de Nascimento</span>
-              <span class="badge-aes">Obrigatório</span>
-            </label>
-            <input type="date" id="regBirthdate" class="form-input" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              <span>Definir Senha</span>
-              <span class="badge-aes">Mínimo 4 caracteres</span>
-            </label>
-            <input type="password" id="regPassword" class="form-input" placeholder="••••••••" required>
-          </div>
-
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Departamento</label>
-              <select id="regDept" class="form-select">
-                <option value="Engineering">Engineering</option>
-                <option value="Security">Security</option>
-                <option value="IT Infrastructure">IT Infrastructure</option>
-                <option value="Administration">Administration</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Nível de Acesso</label>
-              <select id="regClearance" class="form-select">
-                <option value="AUTII: Lvl 5">AUTII: Lvl 5 (Admin)</option>
-                <option value="Level 4 (Executive)">Level 4 (Executive)</option>
-                <option value="Level 3 (Senior)">Level 3 (Senior)</option>
-                <option value="Level 2 (Staff)">Level 2 (Staff)</option>
-              </select>
-            </div>
-          </div>
-
-          <button type="submit" id="btnSubmitRegister" class="btn-enroll-submit" style="width: 100%; margin-top: 4px; background: var(--accent-green);">
-            <i class="fa-solid fa-user-shield"></i> Criar Conta de Operador
-          </button>
-        </form>
-
+      <div id="authErrorBox" class="auth-error-alert" style="display: none;">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span id="authErrorMsg">Credenciais inválidas.</span>
       </div>
-
     </div>
   </div>
 
-  <!-- Sidebar Navigation (Exact Match to Visual References) -->
+  <!-- Primary Sidebar Navigation (Matches Image 1 & 2) -->
   <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="brand-title">
-        <i class="fa-solid fa-shield-halved shield-icon"></i> SecureVision AI
+    <div class="sidebar-brand">
+      <div class="brand-icon-box">
+        <i class="fa-solid fa-shield-halved"></i>
       </div>
-      <div class="vigilance-badge">
-        <span class="status-dot"></span> Vigilance Level: High
+      <div class="brand-info-col">
+        <div class="brand-title-row">
+          <span class="brand-title-text" data-i18n="brand_title">SecureVision</span>
+          <span class="brand-ai-badge">AI</span>
+        </div>
+        <div class="vigilance-hud-pill">
+          <div class="radar-beacon">
+            <span class="radar-beacon-ring"></span>
+            <span class="radar-beacon-dot"></span>
+          </div>
+          <span class="vigilance-hud-text" data-i18n="vigilance_high">Nível de Vigilância: Alto</span>
+        </div>
       </div>
     </div>
 
     <nav class="sidebar-nav">
       <div class="nav-item" data-tab="status">
         <i class="fa-solid fa-chart-line"></i>
-        <span>System Status</span>
+        <span data-i18n="nav_status">Status do Sistema</span>
       </div>
       <div class="nav-item active" data-tab="monitoring">
         <i class="fa-solid fa-video"></i>
-        <span>Monitoring</span>
+        <span data-i18n="nav_monitoring">Monitoramento</span>
       </div>
       <div class="nav-item" data-tab="enrollment">
         <i class="fa-solid fa-user-plus"></i>
-        <span>Enrollment</span>
+        <span data-i18n="nav_enrollment">Cadastro</span>
+      </div>
+      <div class="nav-item" data-tab="personnel">
+        <i class="fa-solid fa-address-book"></i>
+        <span data-i18n="nav_personnel">Pessoas Registradas</span>
       </div>
       <div class="nav-item" data-tab="logs">
         <i class="fa-solid fa-clock-rotate-left"></i>
-        <span>Logs</span>
+        <span data-i18n="nav_logs">Logs</span>
       </div>
     </nav>
 
     <div class="sidebar-footer">
-      <button id="lockdownBtn" class="btn-lockdown">
-        <i class="fa-solid fa-triangle-exclamation"></i> Emergency Lockdown
-      </button>
-
       <div class="nav-item" style="padding: 6px 12px; margin: 0;">
         <i class="fa-solid fa-gear"></i>
-        <span>Settings</span>
+        <span data-i18n="nav_settings">Configurações</span>
       </div>
       <div class="nav-item" style="padding: 6px 12px; margin: 0;">
         <i class="fa-solid fa-circle-question"></i>
-        <span>Support</span>
+        <span data-i18n="nav_support">Suporte</span>
       </div>
 
       <div class="user-profile-badge" style="justify-content: space-between;">
@@ -205,15 +189,15 @@
     <header class="topbar">
       <div class="topbar-stats">
         <div class="stat-item">
-          <span class="stat-label">FPS (Avg)</span>
+          <span class="stat-label" data-i18n="stat_fps">FPS (Médio)</span>
           <span class="stat-val highlight" id="statFps">59.8</span>
         </div>
         <div class="stat-item">
-          <span class="stat-label">Edge GPU</span>
+          <span class="stat-label" data-i18n="stat_gpu">GPU Edge</span>
           <span class="stat-val highlight" id="statGpu">82%</span>
         </div>
         <div class="stat-item">
-          <span class="stat-label">Active Streams</span>
+          <span class="stat-label" data-i18n="stat_streams">Streams Ativos</span>
           <span class="stat-val" id="statStreams">4 / 4</span>
         </div>
       </div>
@@ -221,22 +205,42 @@
       <div class="topbar-actions">
         <div class="search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" placeholder="Search camera feeds, logs, personnel...">
+          <input type="text" id="globalSearchInput" placeholder="Buscar câmeras, logs, pessoas...">
         </div>
 
-        <button id="themeToggleBtn" class="action-icon-btn" title="Toggle Theme">
+        <!-- Language Switcher Dropdown (PT, EN, ZH) -->
+        <div class="lang-switcher-dropdown" style="position: relative;">
+          <button id="langSwitcherBtn" class="action-icon-btn" title="Change Language / Trocar Idioma / 切换语言" style="width: auto; padding: 0 10px; gap: 6px; font-weight: 700; font-size: 0.8rem;">
+            <i class="fa-solid fa-globe"></i>
+            <span id="currentLangLabel">PT</span>
+            <i class="fa-solid fa-chevron-down" style="font-size: 0.65rem; opacity: 0.7;"></i>
+          </button>
+          <div id="langDropdownMenu" class="lang-menu" style="display: none; position: absolute; top: calc(100% + 6px); right: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); z-index: 999; min-width: 140px; overflow: hidden;">
+            <div class="lang-opt" data-lang="pt" style="padding: 9px 14px; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-primary); transition: background 0.15s ease;">
+              <span>🇧🇷</span> Português
+            </div>
+            <div class="lang-opt" data-lang="en" style="padding: 9px 14px; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-primary); transition: background 0.15s ease;">
+              <span>🇺🇸</span> English
+            </div>
+            <div class="lang-opt" data-lang="zh" style="padding: 9px 14px; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-primary); transition: background 0.15s ease;">
+              <span>🇨🇳</span> 简体中文
+            </div>
+          </div>
+        </div>
+
+        <button id="themeToggleBtn" class="action-icon-btn" title="Alternar Tema">
           <i class="fa-solid fa-sun"></i>
         </button>
-        <button class="action-icon-btn" title="Notifications">
+        <button class="action-icon-btn" title="Notificações">
           <i class="fa-solid fa-bell"></i>
         </button>
-        <button class="action-icon-btn" title="Security Protocols">
+        <button class="action-icon-btn" title="Protocolos de Segurança">
           <i class="fa-solid fa-shield"></i>
         </button>
       </div>
     </header>
 
-    <!-- TAB 1: MONITORING VIEW (Matches Image 1 & 2) -->
+    <!-- TAB 1: MONITORING VIEW -->
     <main id="monitoring-view" class="view-panel active-view">
       <div class="monitoring-container">
         
@@ -266,35 +270,35 @@
 
           </div>
 
-          <!-- Bottom: System Integrity Monitor (Matches Image 1) -->
+          <!-- Bottom: System Integrity Monitor -->
           <div class="integrity-banner-card">
             <div class="integrity-info">
-              <h4><i class="fa-solid fa-server" style="color: var(--accent-cyan);"></i> System Integrity Monitor</h4>
-              <p>NODE_CLUSTER_ALPHA • Last Check: 0.2s ago</p>
+              <h4><i class="fa-solid fa-server" style="color: var(--accent-cyan);"></i> <span data-i18n="integrity_title">Monitor de Integridade do Sistema</span></h4>
+              <p data-i18n="integrity_cluster">CLUSTER_NÓ_ALFA • Última Verificação: 0.2s atrás</p>
             </div>
             
             <div class="integrity-metrics">
               <div class="metric-group">
-                <span class="metric-label">Files Scanned</span>
+                <span class="metric-label" data-i18n="files_scanned_label">Arquivos Verificados</span>
                 <span class="metric-val">1,482</span>
               </div>
               <div class="metric-group">
-                <span class="metric-label">Core Modules</span>
+                <span class="metric-label" data-i18n="core_modules_label">Módulos Principais</span>
                 <span class="metric-status-ok"><i class="fa-solid fa-check"></i> kernel_sys.dll OK</span>
                 <span class="metric-status-ok"><i class="fa-solid fa-check"></i> auth_module.so OK</span>
               </div>
-              <div class="badge-secure">
-                <i class="fa-solid fa-shield-check"></i> SECURE
+              <div class="badge-secure" data-i18n="badge_secure">
+                <i class="fa-solid fa-shield-check"></i> SEGURO
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Right: Live Security Log (Matches Image 1 & 2) -->
+        <!-- Right: Live Security Log -->
         <aside class="live-log-container">
           <div class="log-header">
-            <h3><i class="fa-solid fa-list-check" style="color: var(--accent-blue);"></i> Live Security Log</h3>
-            <span style="font-size: 0.72rem; color: var(--accent-blue); cursor: pointer;" onclick="document.querySelector('[data-tab=logs]').click()">Filter</span>
+            <h3><i class="fa-solid fa-list-check" style="color: var(--accent-blue);"></i> <span data-i18n="live_log_title">Registro de Segurança ao Vivo</span></h3>
+            <span style="font-size: 0.72rem; color: var(--accent-blue); cursor: pointer;" onclick="document.querySelector('[data-tab=logs]').click()" data-i18n="filter_link">Filtrar</span>
           </div>
 
           <div class="log-list" id="liveLogList">
@@ -305,15 +309,15 @@
       </div>
     </main>
 
-    <!-- TAB 2: ENROLLMENT VIEW (Matches Image 3 & 4) -->
+    <!-- TAB 2: ENROLLMENT VIEW -->
     <main id="enrollment-view" class="view-panel">
       <div class="enrollment-container">
         
         <!-- Left Column: Identity Capture -->
         <div class="card-enroll">
           <div>
-            <h3 class="enroll-section-title"><i class="fa-solid fa-camera" style="color: var(--accent-cyan);"></i> Identity Capture</h3>
-            <p class="enroll-section-sub">Extract local 128D facial mathematical vector in zero-trust isolation.</p>
+            <h3 class="enroll-section-title"><i class="fa-solid fa-camera" style="color: var(--accent-cyan);"></i> <span data-i18n="capture_title">Captura de Identidade</span></h3>
+            <p class="enroll-section-sub" data-i18n="capture_desc">Extração de vetor matemático facial 128D em isolamento Zero-Trust.</p>
           </div>
 
           <div class="capture-frame-box">
@@ -321,7 +325,7 @@
             <canvas id="enrollCanvas" class="canvas-overlay"></canvas>
 
             <div class="capture-hud-badge">
-              <span class="status-dot"></span> Sensor Active • Zero-Trust NPU
+              <span class="status-dot"></span> <span data-i18n="sensor_active">Sensor Ativo • NPU Zero-Trust</span>
             </div>
 
             <div class="capture-stats-badge">
@@ -336,41 +340,41 @@
           <!-- Hidden Upload alternative -->
           <input type="file" id="photoUploadInput" accept="image/*" style="display: none;">
           <button id="btnTriggerUpload" type="button" class="btn-lockdown" style="background: var(--bg-input); border-color: var(--border-color); color: var(--text-secondary); box-shadow: none;">
-            <i class="fa-solid fa-upload"></i> Upload Image from File
+            <i class="fa-solid fa-upload"></i> <span data-i18n="upload_btn">Carregar Imagem de Arquivo</span>
           </button>
 
-          <!-- 128D Embedding Generated Banner (Matches Image 4) -->
+          <!-- 128D Embedding Generated Banner -->
           <div id="generatedHashBox" class="embedding-generated-banner" style="display: none;">
             <div>
               <div style="font-weight: 700; color: var(--accent-green); font-size: 0.88rem;">
-                <i class="fa-solid fa-circle-check"></i> 128D Embedding Generated
+                <i class="fa-solid fa-circle-check"></i> <span data-i18n="emb_generated_title">Embedding 128D Gerado</span>
               </div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">Vector normalized to unit sphere (L2)</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);" data-i18n="emb_generated_desc">Vetor normalizado na hiperesfera unitária (L2)</div>
             </div>
             <div id="hashDisplay" class="emb-hash-code">HASH: 9a2f_4c1b</div>
           </div>
         </div>
 
-        <!-- Right Column: Subject Details & LGPD (Matches Image 3 & 4) -->
+        <!-- Right Column: Subject Details & LGPD -->
         <div class="card-enroll">
           <div>
-            <h3 class="enroll-section-title"><i class="fa-solid fa-id-card" style="color: var(--accent-blue);"></i> Subject Identity</h3>
-            <p class="enroll-section-sub">Link mathematical biometric vector to legal subject profile.</p>
+            <h3 class="enroll-section-title"><i class="fa-solid fa-id-card" style="color: var(--accent-blue);"></i> <span data-i18n="subject_id_title">Identidade do Titular</span></h3>
+            <p class="enroll-section-sub" data-i18n="subject_id_desc">Vincula o vetor biométrico ao perfil cadastral do titular.</p>
           </div>
 
           <form id="enrollSubjectForm" style="display: flex; flex-direction: column; gap: 16px;">
             
             <div class="form-group">
               <label class="form-label">
-                <span>Full Legal Name</span>
+                <span data-i18n="label_full_name">Nome Completo Legal</span>
                 <span class="badge-aes">AES-256</span>
               </label>
-              <input type="text" id="inputName" class="form-input" placeholder="Enter legal name" required>
+              <input type="text" id="inputName" class="form-input" placeholder="Digite o nome completo legal" required>
             </div>
 
             <div class="form-group">
               <label class="form-label">
-                <span>National ID (CPF)</span>
+                <span data-i18n="label_national_id">Documento Nacional (CPF)</span>
                 <span class="badge-aes">AES-256 Encrypted</span>
               </label>
               <input type="text" id="inputCpf" class="form-input" placeholder="000.000.000-00" maxlength="14" required>
@@ -378,47 +382,80 @@
 
             <div class="form-row-2">
               <div class="form-group">
-                <label class="form-label">Department</label>
+                <label class="form-label" data-i18n="label_dept">Departamento</label>
                 <select id="selectDept" class="form-select">
-                  <option value="Engineering">Engineering</option>
-                  <option value="IT Infrastructure">IT Infrastructure</option>
-                  <option value="Security">Security</option>
-                  <option value="Administration">Administration</option>
-                  <option value="Visitor">Visitor</option>
+                  <option value="Engineering" data-i18n="dept_eng">Engenharia</option>
+                  <option value="IT Infrastructure" data-i18n="dept_it">Infraestrutura de TI</option>
+                  <option value="Security" data-i18n="dept_sec">Segurança Patrimonial</option>
+                  <option value="Administration" data-i18n="dept_adm">Administração</option>
+                  <option value="Visitor" data-i18n="dept_vis">Visitante</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label class="form-label">Clearance Level</label>
+                <label class="form-label" data-i18n="label_clearance">Nível de Acesso (Clearance)</label>
                 <select id="selectClearance" class="form-select">
-                  <option value="Level 1 (Basic)">Level 1 (Basic)</option>
-                  <option value="Level 2 (Staff)">Level 2 (Staff)</option>
-                  <option value="Level 3 (Senior)">Level 3 (Senior)</option>
-                  <option value="Level 4 (Executive)">Level 4 (Executive)</option>
+                  <option value="Level 1 (Basic)" data-i18n="clearance_1">Nível 1 (Básico)</option>
+                  <option value="Level 2 (Staff)" data-i18n="clearance_2">Nível 2 (Funcionário)</option>
+                  <option value="Level 3 (Senior)" data-i18n="clearance_3">Nível 3 (Sênior)</option>
+                  <option value="Level 4 (Executive)" data-i18n="clearance_4">Nível 4 (Executivo)</option>
                 </select>
               </div>
             </div>
 
-            <input type="hidden" id="inputIdade" value="30">
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">
+                  <span data-i18n="label_birthdate">Data de Nascimento</span>
+                  <span class="badge-aes">Identity Check</span>
+                </label>
+                <input type="date" id="inputBirthdate" class="form-input" value="1995-01-01" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" data-i18n="label_est_age">Idade Estimada</label>
+                <input type="number" id="inputIdade" class="form-input" value="30" min="0" max="120">
+              </div>
+            </div>
 
-            <!-- LGPD Compliance Notice (Exact Match) -->
+            <!-- Criminal Profile & Incident Log -->
+            <div class="form-group">
+              <label class="form-label">
+                <span data-i18n="label_crim_record">Ficha de Segurança / Antecedentes</span>
+                <span class="badge-aes" style="color: var(--accent-red); border-color: rgba(239, 68, 68, 0.4);">Threat Matrix</span>
+              </label>
+              <select id="selectCriminalRecord" class="form-select" style="border-color: rgba(59, 130, 246, 0.5);">
+                <option value="CLEARED" data-i18n="opt_crim_cleared">🟢 Autorizado / Sem Antecedentes (Ficha Limpa)</option>
+                <option value="SUSPECT" data-i18n="opt_crim_suspect">🟡 Suspeito / Em Investigação (Monitorar)</option>
+                <option value="THEFT_OFFENSE" data-i18n="opt_crim_theft">🔴 Ladrão / Histórico de Furto ou Roubo (Bloquear)</option>
+                <option value="WANTED_CRIMINAL" data-i18n="opt_crim_wanted">🚨 Mandado de Prisão / Procurado (Alerta Máximo)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <span data-i18n="label_incident_desc">Descrição do que a pessoa fez (Delito ou Histórico)</span>
+              </label>
+              <input type="text" id="inputIncidentDetails" class="form-input" placeholder="Ex: Furto de equipamentos no servidor, invasão de perímetro, sem ocorrências...">
+            </div>
+
+            <!-- LGPD Compliance Notice -->
             <div class="lgpd-card-notice">
-              <h5><i class="fa-solid fa-scale-balanced" style="color: var(--accent-cyan);"></i> LGPD Compliance Notice</h5>
+              <h5><i class="fa-solid fa-scale-balanced" style="color: var(--accent-cyan);"></i> <span data-i18n="lgpd_title">Aviso de Conformidade LGPD</span></h5>
               <p>
-                Biometric data collection requires explicit subject consent in accordance with the General Data Protection Law (Lei nº 13.709/2018 - LGPD). This data is stored locally as an irreversible 128D mathematical vector.<br>
-                <strong>Data Controller:</strong> SecureVision AI Systems Inc. / FECAP
+                <span data-i18n="lgpd_text">A coleta de dados biométricos requer consentimento expresso conforme a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 - LGPD). Este dado é armazenado localmente como um vetor matemático 128D irreversível.</span><br>
+                <strong data-i18n="lgpd_controller">Controlador de Dados: SecureVision AI Systems Inc. / FECAP</strong>
               </p>
               
               <label class="consent-checkbox-row">
                 <input type="checkbox" id="consentCheckbox">
-                <span class="consent-text">
-                  I confirm the subject has reviewed and signed the Biometric Data Processing Agreement pursuant to LGPD regulations.
+                <span class="consent-text" data-i18n="lgpd_consent_check">
+                  Confirmo que o titular assinou o Termo de Consentimento Biométrico nos termos da LGPD.
                 </span>
               </label>
             </div>
 
             <button id="btnSubmitEnroll" type="submit" class="btn-enroll-submit" disabled>
-              <i class="fa-solid fa-lock"></i> Enroll Identity
+              <i class="fa-solid fa-lock"></i> <span data-i18n="btn_enroll_submit">Cadastrar Identidade</span>
             </button>
           </form>
         </div>
@@ -427,58 +464,58 @@
 
       <!-- Enrolled Entities List -->
       <div style="max-width: 1280px; margin: 0 auto; width: 100%; margin-top: 24px;">
-        <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 12px;">Active Enrolled Entities</h4>
+        <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 12px;" data-i18n="active_enrolled_title">Identidades Cadastradas Ativas</h4>
         <div id="enrolledSubjectsList" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;"></div>
       </div>
     </main>
 
-    <!-- TAB 3: SYSTEM STATUS VIEW (Matches Image 2 Analytics) -->
+    <!-- TAB 3: SYSTEM STATUS VIEW -->
     <main id="status-view" class="view-panel">
       <div style="max-width: 1280px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 24px;">
         
         <div>
-          <h2 style="font-size: 1.4rem; font-weight: 800;">System Integrity & Performance Overview</h2>
-          <p style="color: var(--text-muted); font-size: 0.85rem;">Continuous NPU edge node monitoring and camera health telemetry.</p>
+          <h2 style="font-size: 1.4rem; font-weight: 800;" data-i18n="status_title">Visão Geral de Integridade e Desempenho do Sistema</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;" data-i18n="status_sub">Monitoramento contínuo de nós de borda NPU e telemetria de integridade das câmeras.</p>
         </div>
 
         <!-- 4 KPI Cards -->
         <div class="stats-cards-grid">
           <div class="stat-kpi-card">
-            <span class="kpi-title">AI Processing Load</span>
+            <span class="kpi-title" data-i18n="kpi_load_title">Carga de Processamento NPU</span>
             <span class="kpi-number" id="statusProcessingLoad">42%</span>
-            <span class="kpi-sub"><i class="fa-solid fa-check"></i> Stable</span>
+            <span class="kpi-sub"><i class="fa-solid fa-check"></i> <span data-i18n="kpi_load_sub">Estável</span></span>
           </div>
           <div class="stat-kpi-card" style="border-color: rgba(239, 68, 68, 0.4);">
-            <span class="kpi-title" style="color: var(--accent-red);">Active Anomalies</span>
+            <span class="kpi-title" style="color: var(--accent-red);" data-i18n="kpi_anom_title">Anomalias Ativas</span>
             <span class="kpi-number" id="statusAnomalies" style="color: var(--accent-red);">1</span>
-            <span class="kpi-sub" style="color: var(--accent-red);"><i class="fa-solid fa-triangle-exclamation"></i> Requires Attention</span>
+            <span class="kpi-sub" style="color: var(--accent-red);"><i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="kpi_anom_sub">Requer Atenção</span></span>
           </div>
           <div class="stat-kpi-card">
-            <span class="kpi-title">Frame Latency</span>
+            <span class="kpi-title" data-i18n="kpi_lat_title">Latência de Frame</span>
             <span class="kpi-number" id="statusLatency">12ms</span>
-            <span class="kpi-sub"><i class="fa-solid fa-gauge-high"></i> Optimal</span>
+            <span class="kpi-sub"><i class="fa-solid fa-gauge-high"></i> <span data-i18n="kpi_lat_sub">Ótima</span></span>
           </div>
           <div class="stat-kpi-card">
-            <span class="kpi-title">System Uptime</span>
+            <span class="kpi-title" data-i18n="kpi_uptime_title">Tempo de Atividade</span>
             <span class="kpi-number" id="statusUptime">99.9%</span>
-            <span class="kpi-sub"><i class="fa-solid fa-circle-nodes"></i> Edge Nodes Online</span>
+            <span class="kpi-sub"><i class="fa-solid fa-circle-nodes"></i> <span data-i18n="kpi_uptime_sub">Nós de Borda Online</span></span>
           </div>
         </div>
 
         <!-- Stream Node Diagnostics Table -->
         <div class="data-table-card">
-          <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-weight: 700;">
-            Camera Stream Nodes Diagnostic Matrix
+          <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-weight: 700;" data-i18n="diag_table_title">
+            Matriz de Diagnóstico de Nós de Câmera
           </div>
           <table class="data-table">
             <thead>
               <tr>
-                <th>Code</th>
-                <th>Location</th>
-                <th>Type</th>
-                <th>Resolution</th>
-                <th>Target FPS</th>
-                <th>Status</th>
+                <th data-i18n="th_code">Código</th>
+                <th data-i18n="th_location">Localização</th>
+                <th data-i18n="th_type">Tipo</th>
+                <th data-i18n="th_resolution">Resolução</th>
+                <th data-i18n="th_fps">FPS Alvo</th>
+                <th data-i18n="th_status">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -488,7 +525,7 @@
                 <td>NPU Synthetic / RTSP</td>
                 <td>1080p</td>
                 <td>60 FPS</td>
-                <td><span class="badge-secure">ONLINE</span></td>
+                <td><span class="badge-secure" data-i18n="badge_online">ONLINE</span></td>
               </tr>
               <tr>
                 <td><strong>CAM_04_EXTERIOR</strong></td>
@@ -496,7 +533,7 @@
                 <td>NPU Synthetic / RTSP</td>
                 <td>1080p</td>
                 <td>60 FPS</td>
-                <td><span class="badge-secure" style="background: rgba(239,68,68,0.15); color: var(--accent-red); border-color: var(--accent-red);">ALERT</span></td>
+                <td><span class="badge-secure" style="background: rgba(239,68,68,0.15); color: var(--accent-red); border-color: var(--accent-red);" data-i18n="badge_alert">ALERTA</span></td>
               </tr>
               <tr>
                 <td><strong>CAM_07_DATACENTER</strong></td>
@@ -504,7 +541,7 @@
                 <td>NPU Synthetic / RTSP</td>
                 <td>4K</td>
                 <td>60 FPS</td>
-                <td><span class="badge-secure">ONLINE</span></td>
+                <td><span class="badge-secure" data-i18n="badge_online">ONLINE</span></td>
               </tr>
               <tr>
                 <td><strong>CAM_02_ENTRANCE</strong></td>
@@ -512,7 +549,7 @@
                 <td>NPU Synthetic / RTSP</td>
                 <td>1080p</td>
                 <td>60 FPS</td>
-                <td><span class="badge-secure">ONLINE</span></td>
+                <td><span class="badge-secure" data-i18n="badge_online">ONLINE</span></td>
               </tr>
             </tbody>
           </table>
@@ -521,23 +558,78 @@
       </div>
     </main>
 
-    <!-- TAB 4: AUDIT & SOURCE INTEGRITY LOGS -->
+    <!-- TAB 4: REGISTERED PERSONNEL DIRECTORY -->
+    <main id="personnel-view" class="view-panel">
+      <div style="max-width: 1280px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h2 style="font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+              <i class="fa-solid fa-address-book" style="color: var(--accent-cyan);"></i> <span data-i18n="personnel_title">Diretório de Pessoas Registradas</span>
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem;" data-i18n="personnel_sub">
+              Base biométrica cadastral com Nome Completo, CPF mascarado, Data de Nascimento e Histórico de Antecedentes (LGPD Compliant).
+            </p>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="search-box" style="width: 260px;">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="searchPersonnelInput" placeholder="Filtrar por nome, CPF, depto ou histórico...">
+            </div>
+            <button id="btnRefreshPersonnel" class="action-icon-btn" title="Recarregar Diretório">
+              <i class="fa-solid fa-rotate"></i>
+            </button>
+            <button id="btnDeleteAllPersonnel" class="btn-lockdown" style="width: auto; padding: 7px 14px; font-size: 0.76rem; background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); box-shadow: none;" title="Remover todos os registros biométricos">
+              <i class="fa-solid fa-trash-can"></i> <span data-i18n="purge_all_btn">Remover Geral (Todos)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Badges Banner -->
+        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+          <div class="stat-kpi-card" style="flex: 1; min-width: 220px; padding: 14px 18px;">
+            <span class="kpi-title" data-i18n="kpi_total_entities">Total de Pessoas Registradas</span>
+            <span class="kpi-number" id="personnelTotalCount">4</span>
+            <span class="kpi-sub"><i class="fa-solid fa-shield-check"></i> <span data-i18n="kpi_active_128d">Biometria Ativa (128D)</span></span>
+          </div>
+          <div class="stat-kpi-card" style="flex: 1; min-width: 220px; padding: 14px 18px;">
+            <span class="kpi-title" data-i18n="kpi_sec_clearance">Níveis de Acesso</span>
+            <span class="kpi-number" style="font-size: 1.3rem; color: var(--accent-cyan);">Level 1 — Level 4</span>
+            <span class="kpi-sub" style="color: var(--text-secondary);"><i class="fa-solid fa-lock"></i> <span data-i18n="kpi_rbac_sub">Segmentado por RBAC</span></span>
+          </div>
+          <div class="stat-kpi-card" style="flex: 1; min-width: 220px; padding: 14px 18px;">
+            <span class="kpi-title" data-i18n="kpi_std_title">Padrão de Proteção</span>
+            <span class="kpi-number" style="font-size: 1.3rem; color: var(--accent-green);">LGPD 100% OK</span>
+            <span class="kpi-sub"><i class="fa-solid fa-file-shield"></i> <span data-i18n="kpi_consent_chained">Consentimento Encadeado</span></span>
+          </div>
+        </div>
+
+        <!-- Grid de Cards das Pessoas Registradas -->
+        <div id="personnelGridCards" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px;">
+          <!-- Loaded dynamically via JavaScript -->
+        </div>
+
+      </div>
+    </main>
+
+    <!-- TAB 5: AUDIT & SOURCE INTEGRITY LOGS -->
     <main id="logs-view" class="view-panel">
       <div style="max-width: 1280px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px;">
         <div>
-          <h2 style="font-size: 1.4rem; font-weight: 800;">Audit & Source Integrity Logs</h2>
-          <p style="color: var(--text-muted); font-size: 0.85rem;">Immutable activity trail of all biometric operations, logins, and system changes (LGPD Art. 6º VII).</p>
+          <h2 style="font-size: 1.4rem; font-weight: 800;" data-i18n="logs_title">Logs de Integridade e Auditoria</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;" data-i18n="logs_sub">Trilha imutável de todas as operações biométricas, logins e alterações no sistema (LGPD Art. 6º VII).</p>
         </div>
 
         <div class="data-table-card">
           <table class="data-table">
             <thead>
               <tr>
-                <th>Timestamp</th>
-                <th>Operator</th>
-                <th>Action</th>
-                <th>Target Entity</th>
-                <th>Details</th>
+                <th data-i18n="th_timestamp">Carimbo de Data/Hora</th>
+                <th data-i18n="th_operator">Operador</th>
+                <th data-i18n="th_action">Ação</th>
+                <th data-i18n="th_target">Entidade Alvo</th>
+                <th data-i18n="th_details">Detalhes</th>
               </tr>
             </thead>
             <tbody id="auditLogsTableBody">
@@ -550,6 +642,7 @@
 
   </div>
 
+  <!-- Application Controller -->
   <script src="/static/js/app.js"></script>
 </body>
 </html>

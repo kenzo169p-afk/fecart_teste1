@@ -58,9 +58,13 @@ def init_db(force_recreate=False):
         full_name TEXT NOT NULL,
         national_id_hash TEXT UNIQUE NOT NULL, -- SHA-256 Blind Index do CPF
         national_id_masked TEXT NOT NULL,     -- 123.***.***-00
+        birthdate TEXT NOT NULL DEFAULT '1990-01-01',
         department TEXT DEFAULT 'Engineering',
         clearance_level TEXT DEFAULT 'Level 1 (Basic)',
         age INTEGER DEFAULT 30,
+        criminal_record TEXT CHECK(criminal_record IN ('CLEARED', 'SUSPECT', 'THEFT_OFFENSE', 'WANTED_CRIMINAL')) DEFAULT 'CLEARED',
+        incident_details TEXT DEFAULT '',
+        is_threat INTEGER DEFAULT 0,
         photo_url TEXT,
         status TEXT CHECK(status IN ('ACTIVE', 'BLOCKED', 'FLAGGED', 'INACTIVE')) DEFAULT 'ACTIVE',
         lgpd_consent_granted INTEGER DEFAULT 1,
@@ -177,7 +181,6 @@ def seed_enterprise_data(cursor):
     cursor.execute("SELECT COUNT(*) FROM operators;")
     if cursor.fetchone()[0] == 0:
         admin_id = str(uuid.uuid4())
-        # Senha padrão: admin123 hashed com Argon2id
         argon2_hash = hash_password("admin123")
         cursor.execute("""
         INSERT INTO operators (id, username, full_name, birthdate, password_hash, role, clearance_level, department)
@@ -219,14 +222,14 @@ def seed_enterprise_data(cursor):
         hash4 = hashlib.sha256(b"00000000000").hexdigest()
 
         subjects = [
-            (p1_id, "J. Smith", hash1, "123.***.***-01", "Engineering", "Level 3 (Senior)", 34, "ACTIVE", 1, "S. Carter (Admin)"),
-            (p2_id, "A. Chan", hash2, "987.***.***-00", "IT Infrastructure", "Level 4 (Executive)", 29, "ACTIVE", 1, "S. Carter (Admin)"),
-            (p3_id, "G. Rodriguez", hash3, "456.***.***-00", "Security", "Level 2 (Staff)", 41, "ACTIVE", 1, "S. Carter (Admin)"),
-            (p4_id, "Unknown #4", hash4, "000.***.***-00", "Visitor", "Level 1 (Basic)", 0, "BLOCKED", 0, "Security System (Auto-flag)")
+            (p1_id, "J. Smith", hash1, "123.***.***-01", "1990-04-12", "Engineering", "Level 3 (Senior)", 34, "CLEARED", "Ficha limpa. Funcionário registrado sem ocorrências.", 0, "ACTIVE", 1, "S. Carter (Admin)", "2026-08-10 09:15:00"),
+            (p2_id, "A. Chan", hash2, "987.***.***-00", "1995-11-23", "IT Infrastructure", "Level 4 (Executive)", 29, "CLEARED", "Ficha limpa. Acesso irrestrito a servidores.", 0, "ACTIVE", 1, "S. Carter (Admin)", "2026-08-15 14:30:00"),
+            (p3_id, "G. Rodriguez", hash3, "456.***.***-00", "1983-07-08", "Security", "Level 2 (Staff)", 41, "SUSPECT", "Tentativa de acesso sem crachá em área restrita de geradores.", 0, "ACTIVE", 1, "S. Carter (Admin)", "2026-08-18 11:20:00"),
+            (p4_id, "Unknown #4", hash4, "000.***.***-00", "1999-02-14", "Visitor", "Level 1 (Basic)", 25, "THEFT_OFFENSE", "FLAGRANTE DE FURTO: Tentativa de furto de cabos e placas de servidor no Rack 4.", 1, "BLOCKED", 0, "Security System (Auto-flag)", "2026-08-22 16:45:00")
         ]
         cursor.executemany("""
-        INSERT INTO biometric_subjects (id, full_name, national_id_hash, national_id_masked, department, clearance_level, age, status, lgpd_consent_granted, created_by)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        INSERT INTO biometric_subjects (id, full_name, national_id_hash, national_id_masked, birthdate, department, clearance_level, age, criminal_record, incident_details, is_threat, status, lgpd_consent_granted, created_by, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """, subjects)
 
         embs = [
@@ -361,20 +364,22 @@ def get_audit_logs(limit=50) -> List[Dict[str, Any]]:
 
 # --- Sujeitos Biométricos & Reconhecimento ---
 
-def register_biometric_subject(full_name: str, national_id_clean: str, department="Engineering", clearance="Level 1 (Basic)", age=30, embedding=None, lgpd_consent=True, created_by="admin") -> str:
-    """Cadastra um novo sujeito com blind index SHA-256 e embedding facial 128D."""
+def register_biometric_subject(full_name: str, national_id_clean: str, birthdate: str = "1990-01-01", department="Engineering", clearance="Level 1 (Basic)", age=30, criminal_record="CLEARED", incident_details="", embedding=None, lgpd_consent=True, created_by="admin") -> str:
+    """Cadastra um novo sujeito com blind index SHA-256, histórico criminal, incidentes e embedding facial 128D."""
     conn = get_connection()
     cursor = conn.cursor()
 
     masked_cpf = f"{national_id_clean[:3]}.***.***-{national_id_clean[-2:]}"
     cpf_hash = hashlib.sha256(national_id_clean.encode("utf-8")).hexdigest()
     subject_id = f"p_{uuid.uuid4().hex[:6]}"
+    is_threat = 1 if criminal_record in ('THEFT_OFFENSE', 'WANTED_CRIMINAL') else 0
+    status_val = "BLOCKED" if is_threat else ("FLAGGED" if criminal_record == 'SUSPECT' else "ACTIVE")
 
     try:
         cursor.execute("""
-        INSERT INTO biometric_subjects (id, full_name, national_id_hash, national_id_masked, department, clearance_level, age, lgpd_consent_granted, created_by)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-        """, (subject_id, full_name, cpf_hash, masked_cpf, department, clearance, age, 1 if lgpd_consent else 0, created_by))
+        INSERT INTO biometric_subjects (id, full_name, national_id_hash, national_id_masked, birthdate, department, clearance_level, age, criminal_record, incident_details, is_threat, status, lgpd_consent_granted, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        """, (subject_id, full_name, cpf_hash, masked_cpf, birthdate, department, clearance, age, criminal_record, incident_details, is_threat, status_val, 1 if lgpd_consent else 0, created_by))
 
         if embedding is not None:
             emb_id = str(uuid.uuid4())
@@ -405,6 +410,20 @@ def delete_biometric_subject(subject_id: str, operator_username="admin"):
     conn.commit()
     conn.close()
     add_audit_entry(operator_username, "DELETE_SUBJECT", "biometric_subjects", subject_id, {"full_name": name})
+
+def delete_all_biometric_subjects(operator_username="admin") -> int:
+    """Remove todas as identidades cadastradas e registra o expurgo na trilha de auditoria."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM biometric_subjects;")
+    total = cursor.fetchone()[0]
+
+    cursor.execute("DELETE FROM biometric_subjects;")
+    conn.commit()
+    conn.close()
+
+    add_audit_entry(operator_username, "PURGE_ALL_SUBJECTS", "biometric_subjects", "ALL", {"count_deleted": total})
+    return total
 
 def get_all_biometric_subjects() -> List[Dict[str, Any]]:
     """Retorna a lista de todos os colaboradores/entidades cadastradas."""

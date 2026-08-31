@@ -87,42 +87,141 @@
       z-index: 50;
     }
 
+    .sidebar-brand,
     .sidebar-header {
-      padding: 20px 24px;
+      padding: 20px 18px;
       border-bottom: 1px solid var(--border-color);
-    }
-
-    .brand-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.7) 0%, rgba(10, 15, 30, 0.4) 100%);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .brand-title .shield-icon { color: var(--accent-blue); }
+    .sidebar-brand::after,
+    .sidebar-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(6, 182, 212, 0.5) 50%, transparent 100%);
+    }
 
-    .vigilance-badge {
-      display: inline-flex;
+    .brand-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(59, 130, 246, 0.25) 100%);
+      border: 1px solid rgba(6, 182, 212, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      color: var(--accent-cyan);
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.35), inset 0 0 10px rgba(59, 130, 246, 0.25);
+      flex-shrink: 0;
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .brand-icon-box:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 24px rgba(6, 182, 212, 0.6), inset 0 0 12px rgba(6, 182, 212, 0.4);
+    }
+
+    .brand-icon-box i {
+      filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.8));
+    }
+
+    .brand-info-col {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .brand-title-row {
+      display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-top: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
     }
 
-    .status-dot {
-      width: 6px;
-      height: 6px;
+    .brand-title-text {
+      font-size: 1.12rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 40%, #bae6fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .brand-ai-badge {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(59, 130, 246, 0.25));
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+      line-height: 1.1;
+    }
+
+    .vigilance-hud-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 20px;
+      padding: 2px 8px;
+      width: fit-content;
+    }
+
+    .radar-beacon {
+      position: relative;
+      width: 7px;
+      height: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .radar-beacon-dot {
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
-      background-color: var(--accent-green);
-      box-shadow: 0 0 8px var(--accent-green);
-      animation: pulse-dot 2s infinite;
+      background-color: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    .radar-beacon-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: rgba(16, 185, 129, 0.6);
+      animation: radar-beacon-anim 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes radar-beacon-anim {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      75%, 100% { transform: scale(2.8); opacity: 0; }
+    }
+
+    .vigilance-hud-text {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #34d399;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
     }
 
     .sidebar-nav {
@@ -933,46 +1032,56 @@
 
   <!-- Sidebar Navigation -->
   <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="brand-title">
-        <i class="fa-solid fa-shield-halved shield-icon"></i> SecureVision AI
+    <div class="sidebar-brand">
+      <div class="brand-icon-box">
+        <i class="fa-solid fa-shield-halved"></i>
       </div>
-      <div class="vigilance-badge">
-        <span class="status-dot"></span> Vigilance Level: High
+      <div class="brand-info-col">
+        <div class="brand-title-row">
+          <span class="brand-title-text" data-i18n="brand_title">SecureVision</span>
+          <span class="brand-ai-badge">AI</span>
+        </div>
+        <div class="vigilance-hud-pill">
+          <div class="radar-beacon">
+            <span class="radar-beacon-ring"></span>
+            <span class="radar-beacon-dot"></span>
+          </div>
+          <span class="vigilance-hud-text" data-i18n="vigilance_high">Nível de Vigilância: Alto</span>
+        </div>
       </div>
     </div>
 
     <nav class="sidebar-nav">
       <div class="nav-item" data-tab="status">
         <i class="fa-solid fa-chart-line"></i>
-        <span>System Status</span>
+        <span data-i18n="nav_status">System Status</span>
       </div>
       <div class="nav-item active" data-tab="monitoring">
         <i class="fa-solid fa-video"></i>
-        <span>Monitoring</span>
+        <span data-i18n="nav_monitoring">Monitoring</span>
       </div>
       <div class="nav-item" data-tab="enrollment">
         <i class="fa-solid fa-user-plus"></i>
-        <span>Enrollment</span>
+        <span data-i18n="nav_enrollment">Enrollment</span>
+      </div>
+      <div class="nav-item" data-tab="personnel">
+        <i class="fa-solid fa-address-book"></i>
+        <span data-i18n="nav_personnel">Personnel</span>
       </div>
       <div class="nav-item" data-tab="logs">
         <i class="fa-solid fa-clock-rotate-left"></i>
-        <span>Logs</span>
+        <span data-i18n="nav_logs">Logs</span>
       </div>
     </nav>
 
     <div class="sidebar-footer">
-      <button id="lockdownBtn" class="btn-lockdown">
-        <i class="fa-solid fa-triangle-exclamation"></i> Emergency Lockdown
-      </button>
-
       <div class="nav-item" style="padding: 6px 12px; margin: 0;">
         <i class="fa-solid fa-gear"></i>
-        <span>Settings</span>
+        <span data-i18n="nav_settings">Settings</span>
       </div>
       <div class="nav-item" style="padding: 6px 12px; margin: 0;">
         <i class="fa-solid fa-circle-question"></i>
-        <span>Support</span>
+        <span data-i18n="nav_support">Support</span>
       </div>
 
       <div class="user-profile-badge">
@@ -1009,6 +1118,26 @@
         <div class="search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
           <input type="text" placeholder="Search camera feeds, logs, personnel...">
+        </div>
+
+        <!-- Language Switcher Dropdown (PT, EN, ZH) -->
+        <div class="lang-switcher-dropdown" style="position: relative;">
+          <button id="langSwitcherBtn" class="action-icon-btn" title="Change Language / Trocar Idioma / 切换语言" style="width: auto; padding: 0 10px; gap: 6px; font-weight: 700; font-size: 0.8rem;">
+            <i class="fa-solid fa-globe"></i>
+            <span id="currentLangLabel">PT</span>
+            <i class="fa-solid fa-chevron-down" style="font-size: 0.65rem; opacity: 0.7;"></i>
+          </button>
+          <div id="langDropdownMenu" class="lang-menu" style="display: none; position: absolute; top: calc(100% + 6px); right: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); z-index: 999; min-width: 140px; overflow: hidden;">
+            <div class="lang-opt" data-lang="pt" style="padding: 9px 14px; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-primary); transition: background 0.15s ease;">
+              <span>🇧🇷</span> Português
+            </div>
+            <div class="lang-opt" data-lang="en" style="padding: 9px 14px; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-primary); transition: background 0.15s ease;">
+              <span>🇺🇸</span> English
+            </div>
+            <div class="lang-opt" data-lang="zh" style="padding: 9px 14px; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-primary); transition: background 0.15s ease;">
+              <span>🇨🇳</span> 简体中文
+            </div>
+          </div>
         </div>
 
         <button id="themeToggleBtn" class="action-icon-btn" title="Toggle Theme">
@@ -1184,6 +1313,39 @@
                   <option value="Level 4 (Executive)">Level 4 (Executive)</option>
                 </select>
               </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">
+                  <span>Date of Birth</span>
+                  <span class="badge-aes">Identity Check</span>
+                </label>
+                <input type="date" id="inputBirthdate" class="form-input" value="1995-01-01" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Estimated Age</label>
+                <input type="number" id="inputIdade" class="form-input" value="30" min="0" max="120">
+              </div>
+            </div>
+
+            <!-- Criminal Profile & Incident Log (Novo Campo) -->
+            <div class="form-group">
+              <label class="form-label">
+                <span>Criminal Background / Ficha de Segurança</span>
+                <span class="badge-aes" style="color: var(--accent-red); border-color: rgba(239, 68, 68, 0.4);">Threat Matrix</span>
+              </label>
+              <select id="selectCriminalRecord" class="form-select" style="border-color: rgba(59, 130, 246, 0.5);">
+                <option value="CLEARED">🟢 Autorizado / Sem Antecedentes (Ficha Limpa)</option>
+                <option value="SUSPECT">🟡 Suspeito / Em Investigação (Monitorar)</option>
+                <option value="THEFT_OFFENSE">🔴 Ladrão / Histórico de Furto ou Roubo (Bloquear)</option>
+                <option value="WANTED_CRIMINAL">🚨 Mandado de Prisão / Procurado (Alerta Máximo)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <span>Incident Description / O que a pessoa fez (Delito ou Ocorrência)</span>
+              </label>
+              <input type="text" id="inputIncidentDetails" class="form-input" placeholder="Ex: Furto de equipamentos no servidor, invasão de perímetro, sem ocorrências...">
             </div>
 
             <!-- LGPD Compliance Notice -->
@@ -1304,7 +1466,62 @@
       </div>
     </main>
 
-    <!-- TAB 4: LOGS -->
+    <!-- TAB 4: REGISTERED PERSONNEL DIRECTORY (NOVA ABA) -->
+    <main id="personnel-view" class="view-panel">
+      <div style="max-width: 1280px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h2 style="font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+              <i class="fa-solid fa-address-book" style="color: var(--accent-cyan);"></i> Registered Entities & Personnel Directory
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">
+              Base biométrica cadastral com Nome Completo, CPF mascarado, Data de Nascimento e Data de Registro no sistema (LGPD Compliant).
+            </p>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="search-box" style="width: 260px;">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="searchPersonnelInput" placeholder="Filtrar por nome, CPF ou depto...">
+            </div>
+            <button id="btnRefreshPersonnel" class="action-icon-btn" title="Recarregar Diretório">
+              <i class="fa-solid fa-rotate"></i>
+            </button>
+            <button id="btnDeleteAllPersonnel" class="btn-lockdown" style="width: auto; padding: 7px 14px; font-size: 0.76rem; background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); box-shadow: none;" title="Remover todos os registros biométricos">
+              <i class="fa-solid fa-trash-can"></i> Remover Geral (Todos)
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Badges Banner -->
+        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+          <div class="stat-kpi-card" style="flex: 1; min-width: 220px; padding: 14px 18px;">
+            <span class="kpi-title">Total Registered Entities</span>
+            <span class="kpi-number" id="personnelTotalCount">4</span>
+            <span class="kpi-sub"><i class="fa-solid fa-shield-check"></i> Biometrics Active (128D)</span>
+          </div>
+          <div class="stat-kpi-card" style="flex: 1; min-width: 220px; padding: 14px 18px;">
+            <span class="kpi-title">Security Clearance</span>
+            <span class="kpi-number" style="font-size: 1.3rem; color: var(--accent-cyan);">Level 1 — Level 4</span>
+            <span class="kpi-sub" style="color: var(--text-secondary);"><i class="fa-solid fa-lock"></i> RBAC Segmented</span>
+          </div>
+          <div class="stat-kpi-card" style="flex: 1; min-width: 220px; padding: 14px 18px;">
+            <span class="kpi-title">Data Protection Standard</span>
+            <span class="kpi-number" style="font-size: 1.3rem; color: var(--accent-green);">LGPD 100% OK</span>
+            <span class="kpi-sub"><i class="fa-solid fa-file-shield"></i> Consent Chained</span>
+          </div>
+        </div>
+
+        <!-- Grid de Cards das Pessoas Registradas -->
+        <div id="personnelGridCards" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px;">
+          <!-- Loaded dynamically via JavaScript -->
+        </div>
+
+      </div>
+    </main>
+
+    <!-- TAB 5: LOGS -->
     <main id="logs-view" class="view-panel">
       <div style="max-width: 1280px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px;">
         <div>
@@ -1335,37 +1552,418 @@
 
   <!-- Realtime Standalone Application Logic -->
   <script>
+    // --- Comprehensive 3-Language Master Translation Dictionary ---
+    const translations = {
+      pt: {
+        brand_title: "SecureVision",
+        vigilance_high: "Nível de Vigilância: Alto",
+        nav_status: "Status do Sistema",
+        nav_monitoring: "Monitoramento",
+        nav_enrollment: "Cadastro",
+        nav_personnel: "Pessoas Registradas",
+        nav_logs: "Logs de Auditoria",
+        nav_settings: "Configurações",
+        nav_support: "Suporte",
+        stat_fps: "FPS (Médio)",
+        stat_gpu: "GPU Edge",
+        stat_streams: "Streams Ativos",
+        search_placeholder: "Buscar câmeras, logs, pessoas...",
+        integrity_title: "Monitor de Integridade do Sistema",
+        integrity_cluster: "CLUSTER_NÓ_ALFA • Última Verificação: 0.2s atrás",
+        files_scanned_label: "Arquivos Verificados",
+        core_modules_label: "Módulos Principais",
+        badge_secure: "SEGURO",
+        live_log_title: "Registro de Segurança ao Vivo",
+        filter_link: "Filtrar",
+        capture_title: "Captura de Identidade",
+        capture_desc: "Extração de vetor matemático facial 128D em isolamento Zero-Trust.",
+        sensor_active: "Sensor Ativo • NPU Zero-Trust",
+        upload_btn: "Carregar Imagem de Arquivo",
+        emb_generated_title: "Embedding 128D Gerado",
+        emb_generated_desc: "Vetor normalizado na hiperesfera unitária (L2)",
+        subject_id_title: "Identidade do Titular",
+        subject_id_desc: "Vincula o vetor biométrico ao perfil cadastral do titular.",
+        label_full_name: "Nome Completo Legal",
+        ph_full_name: "Digite o nome completo legal",
+        label_national_id: "Documento Nacional (CPF)",
+        label_dept: "Departamento",
+        dept_eng: "Engenharia",
+        dept_it: "Infraestrutura de TI",
+        dept_sec: "Segurança Patrimonial",
+        dept_adm: "Administração",
+        dept_vis: "Visitante",
+        label_clearance: "Nível de Acesso (Clearance)",
+        clearance_1: "Nível 1 (Básico)",
+        clearance_2: "Nível 2 (Funcionário)",
+        clearance_3: "Nível 3 (Sênior)",
+        clearance_4: "Nível 4 (Executivo)",
+        label_birthdate: "Data de Nascimento",
+        label_est_age: "Idade Estimada",
+        label_crim_record: "Ficha de Segurança / Antecedentes",
+        opt_crim_cleared: "🟢 Autorizado / Sem Antecedentes (Ficha Limpa)",
+        opt_crim_suspect: "🟡 Suspeito / Em Investigação (Monitorar)",
+        opt_crim_theft: "🔴 Ladrão / Histórico de Furto ou Roubo (Bloquear)",
+        opt_crim_wanted: "🚨 Mandado de Prisão / Procurado (Alerta Máximo)",
+        label_incident_desc: "Descrição do que a pessoa fez (Delito ou Histórico)",
+        ph_incident_desc: "Ex: Furto de equipamentos no servidor, invasão de perímetro, sem ocorrências...",
+        lgpd_title: "Aviso de Conformidade LGPD",
+        lgpd_text: "A coleta de dados biométricos requer consentimento expresso conforme a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 - LGPD). Este dado é armazenado localmente como um vetor matemático 128D irreversível.",
+        lgpd_controller: "Controlador de Dados: SecureVision AI Systems Inc. / FECAP",
+        lgpd_consent_check: "Confirmo que o titular assinou o Termo de Consentimento Biométrico nos termos da LGPD.",
+        btn_enroll_submit: "Cadastrar Identidade",
+        active_enrolled_title: "Identidades Cadastradas Ativas",
+        status_title: "Visão Geral de Integridade e Desempenho do Sistema",
+        status_sub: "Monitoramento contínuo de nós de borda NPU e telemetria de integridade das câmeras.",
+        kpi_load_title: "Carga de Processamento NPU",
+        kpi_load_sub: "Estável",
+        kpi_anom_title: "Anomalias Ativas",
+        kpi_anom_sub: "Requer Atenção",
+        kpi_lat_title: "Latência de Frame",
+        kpi_lat_sub: "Ótima",
+        kpi_uptime_title: "Tempo de Atividade",
+        kpi_uptime_sub: "Nós de Borda Online",
+        diag_table_title: "Matriz de Diagnóstico de Nós de Câmera",
+        th_code: "Código",
+        th_location: "Localização",
+        th_type: "Tipo",
+        th_resolution: "Resolução",
+        th_fps: "FPS Alvo",
+        th_status: "Status",
+        badge_online: "ONLINE",
+        badge_alert: "ALERTA",
+        personnel_title: "Diretório de Pessoas Registradas",
+        personnel_sub: "Base biométrica cadastral com Nome Completo, CPF mascarado, Data de Nascimento e Histórico de Antecedentes (LGPD Compliant).",
+        filter_personnel_ph: "Filtrar por nome, CPF, depto ou histórico...",
+        purge_all_btn: "Remover Geral (Todos)",
+        kpi_total_entities: "Total de Pessoas Registradas",
+        kpi_active_128d: "Biometria Ativa (128D)",
+        kpi_sec_clearance: "Níveis de Acesso",
+        kpi_rbac_sub: "Segmentado por RBAC",
+        kpi_std_title: "Padrão de Proteção",
+        kpi_consent_chained: "Consentimento Encadeado",
+        card_cpf: "CPF (Documento)",
+        card_birth: "Data de Nascimento",
+        card_reg: "Data de Registro no Sistema",
+        card_hash: "Hash 128D:",
+        card_del_title: "Remover apenas esta pessoa",
+        crim_cleared: "🟢 FICHA LIMPA / AUTORIZADO",
+        crim_suspect: "🟡 SUSPEITO / EM OBSERVAÇÃO",
+        crim_theft: "🔴 LADRÃO / HISTÓRICO DE FURTO",
+        crim_wanted: "🚨 PROCURADO / MANDADO ATIVO",
+        card_incident_label: "Ocorrência / Histórico do Delito:",
+        empty_personnel: "Nenhuma pessoa encontrada com o termo pesquisado.",
+        logs_title: "Logs de Integridade e Auditoria",
+        logs_sub: "Trilha imutável de todas as operações biométricas, logins e alterações no sistema (LGPD Art. 6º VII).",
+        th_timestamp: "Carimbo de Data/Hora",
+        th_operator: "Operador",
+        th_action: "Ação",
+        th_target: "Entidade Alvo",
+        th_details: "Detalhes",
+        confirm_del_single: "Deseja realmente remover '{name}' da base biométrica?",
+        confirm_del_all_1: "ATENÇÃO CRÍTICA (Expurgo Geral):\nDeseja realmente remover TODAS as {count} pessoas da base biométrica?",
+        purge_done: "Expurgo geral concluído: todas as entidades foram removidas.",
+        del_done: "Entidade '{name}' removida com sucesso.",
+        kiosk_f12: "Acesso Bloqueado: Ferramentas de desenvolvedor restritas por política NPU.",
+        kiosk_devtools: "Acesso Bloqueado: Atalho de inspeção restrito por protocolo NPU.",
+        kiosk_source: "Acesso Bloqueado: Exibição de código-fonte desativada.",
+        kiosk_context: "Menu de contexto bloqueado por política de segurança."
+      },
+      en: {
+        brand_title: "SecureVision",
+        vigilance_high: "Vigilance Level: High",
+        nav_status: "System Status",
+        nav_monitoring: "Monitoring",
+        nav_enrollment: "Enrollment",
+        nav_personnel: "Personnel",
+        nav_logs: "Logs",
+        nav_settings: "Settings",
+        nav_support: "Support",
+        stat_fps: "FPS (Avg)",
+        stat_gpu: "Edge GPU",
+        stat_streams: "Active Streams",
+        search_placeholder: "Search camera feeds, logs, personnel...",
+        integrity_title: "System Integrity Monitor",
+        integrity_cluster: "NODE_CLUSTER_ALPHA • Last Check: 0.2s ago",
+        files_scanned_label: "Files Scanned",
+        core_modules_label: "Core Modules",
+        badge_secure: "SECURE",
+        live_log_title: "Live Security Log",
+        filter_link: "Filter",
+        capture_title: "Identity Capture",
+        capture_desc: "Extract local 128D facial mathematical vector in zero-trust isolation.",
+        sensor_active: "Sensor Active • Zero-Trust NPU",
+        upload_btn: "Upload Image from File",
+        emb_generated_title: "128D Embedding Generated",
+        emb_generated_desc: "Vector normalized to unit sphere (L2)",
+        subject_id_title: "Subject Identity",
+        subject_id_desc: "Link mathematical biometric vector to legal subject profile.",
+        label_full_name: "Full Legal Name",
+        ph_full_name: "Enter full legal name",
+        label_national_id: "National ID (CPF)",
+        label_dept: "Department",
+        dept_eng: "Engineering",
+        dept_it: "IT Infrastructure",
+        dept_sec: "Corporate Security",
+        dept_adm: "Administration",
+        dept_vis: "Visitor",
+        label_clearance: "Clearance Level",
+        clearance_1: "Level 1 (Basic)",
+        clearance_2: "Level 2 (Staff)",
+        clearance_3: "Level 3 (Senior)",
+        clearance_4: "Level 4 (Executive)",
+        label_birthdate: "Date of Birth",
+        label_est_age: "Estimated Age",
+        label_crim_record: "Security Profile & Background Record",
+        opt_crim_cleared: "🟢 Authorized / Clean Record (Cleared)",
+        opt_crim_suspect: "🟡 Suspect / Under Investigation (Watch)",
+        opt_crim_theft: "🔴 Convicted Thief / Theft History (Block)",
+        opt_crim_wanted: "🚨 Active Arrest Warrant / Wanted (Critical)",
+        label_incident_desc: "Incident Log / Offense History Description",
+        ph_incident_desc: "E.g. Server room hardware theft, perimeter breach, clean record...",
+        lgpd_title: "Data Privacy & LGPD Notice",
+        lgpd_text: "Biometric data collection requires explicit subject consent pursuant to Data Protection Laws (Lei nº 13.709/2018 - LGPD). Data is stored locally as an irreversible 128D mathematical vector.",
+        lgpd_controller: "Data Controller: SecureVision AI Systems Inc. / FECAP",
+        lgpd_consent_check: "I confirm the subject has reviewed and signed the Biometric Data Processing Agreement.",
+        btn_enroll_submit: "Enroll Identity",
+        active_enrolled_title: "Active Enrolled Entities",
+        status_title: "System Integrity & Performance Overview",
+        status_sub: "Continuous NPU edge node monitoring and camera health telemetry.",
+        kpi_load_title: "AI Processing Load",
+        kpi_load_sub: "Stable",
+        kpi_anom_title: "Active Anomalies",
+        kpi_anom_sub: "Requires Attention",
+        kpi_lat_title: "Frame Latency",
+        kpi_lat_sub: "Optimal",
+        kpi_uptime_title: "System Uptime",
+        kpi_uptime_sub: "Edge Nodes Online",
+        diag_table_title: "Camera Stream Nodes Diagnostic Matrix",
+        th_code: "Code",
+        th_location: "Location",
+        th_type: "Type",
+        th_resolution: "Resolution",
+        th_fps: "Target FPS",
+        th_status: "Status",
+        badge_online: "ONLINE",
+        badge_alert: "ALERT",
+        personnel_title: "Registered Entities & Personnel Directory",
+        personnel_sub: "Corporate biometric database with demographic data, masked ID, Date of Birth, and Security Background Records (LGPD Compliant).",
+        filter_personnel_ph: "Filter by name, ID, department or background...",
+        purge_all_btn: "Purge All (Delete All)",
+        kpi_total_entities: "Total Registered Entities",
+        kpi_active_128d: "Active Biometrics (128D)",
+        kpi_sec_clearance: "Security Clearance",
+        kpi_rbac_sub: "RBAC Segmented",
+        kpi_std_title: "Compliance Standard",
+        kpi_consent_chained: "Consent Chained",
+        card_cpf: "National ID (CPF)",
+        card_birth: "Date of Birth",
+        card_reg: "System Registration Date",
+        card_hash: "128D Hash:",
+        card_del_title: "Remove this person only",
+        crim_cleared: "🟢 CLEARED / AUTHORIZED",
+        crim_suspect: "🟡 SUSPECT / UNDER WATCH",
+        crim_theft: "🔴 THEFT / CONVICTED THIEF",
+        crim_wanted: "🚨 WANTED / ACTIVE WARRANT",
+        card_incident_label: "Incident / Crime History Details:",
+        empty_personnel: "No entities found matching the search query.",
+        logs_title: "Audit & Source Integrity Logs",
+        logs_sub: "Immutable activity trail of all biometric operations, logins, and system changes (LGPD Art. 6º VII).",
+        th_timestamp: "Timestamp",
+        th_operator: "Operator",
+        th_action: "Action",
+        th_target: "Target Entity",
+        th_details: "Details",
+        confirm_del_single: "Are you sure you want to remove '{name}' from the biometric database?",
+        confirm_del_all_1: "CRITICAL WARNING (Bulk Purge):\nAre you sure you want to remove ALL {count} registered entities?",
+        purge_done: "Bulk purge completed: all entities removed.",
+        del_done: "Entity '{name}' successfully removed.",
+        kiosk_f12: "Access Blocked: Developer tools restricted by NPU policy.",
+        kiosk_devtools: "Access Blocked: Inspection shortcut restricted.",
+        kiosk_source: "Access Blocked: Source view disabled.",
+        kiosk_context: "Context menu disabled by security protocol."
+      },
+      zh: {
+        brand_title: "SecureVision",
+        vigilance_high: "警戒级别：高危防范",
+        nav_status: "系统状态",
+        nav_monitoring: "实时监控",
+        nav_enrollment: "特征注册",
+        nav_personnel: "人员名录",
+        nav_logs: "审计日志",
+        nav_settings: "系统设置",
+        nav_support: "技术支持",
+        stat_fps: "平均帧率 (FPS)",
+        stat_gpu: "边缘计算 GPU",
+        stat_streams: "活跃视频流",
+        search_placeholder: "搜索摄像头、日志、人员...",
+        integrity_title: "系统完整性实时监控",
+        integrity_cluster: "节点集群 ALPHA • 上次校验: 0.2秒前",
+        files_scanned_label: "已校验核心文件",
+        core_modules_label: "核心系统模块",
+        badge_secure: "安全正常",
+        live_log_title: "实时安全事件日志",
+        filter_link: "快速筛选",
+        capture_title: "人脸生物特征采集",
+        capture_desc: "在零信任隔离环境中提取本地 128 维人脸数学特征向量。",
+        sensor_active: "传感器运行中 • 零信任 NPU",
+        upload_btn: "上传本地照片文件",
+        emb_generated_title: "128D 特征向量已生成",
+        emb_generated_desc: "特征向量已完成 L2 空间单位球归一化",
+        subject_id_title: "登记主体法定身份",
+        subject_id_desc: "将生物识别数学特征与主体法定档案深度绑定。",
+        label_full_name: "登记人法定全名",
+        ph_full_name: "请输入法定全名",
+        label_national_id: "身份证件号码 (CPF)",
+        label_dept: "所属部门",
+        dept_eng: "研发工程部",
+        dept_it: "IT 基础架构部",
+        dept_sec: "安保防护部",
+        dept_adm: "综合行政部",
+        dept_vis: "临时访客",
+        label_clearance: "安全访问权限等级",
+        clearance_1: "1级 (基础权限)",
+        clearance_2: "2级 (普通职员)",
+        clearance_3: "3级 (高级人员)",
+        clearance_4: "4级 (执行高管)",
+        label_birthdate: "出生日期",
+        label_est_age: "预估年龄",
+        label_crim_record: "安全风险背景审查 / 前科分类",
+        opt_crim_cleared: "🟢 审查合格 / 无犯罪前科 (白名单)",
+        opt_crim_suspect: "🟡 重点怀疑对象 / 持续侦查中 (黄色预警)",
+        opt_crim_theft: "🔴 盗窃惯犯 / 盗窃前科黑名单 (立即阻截)",
+        opt_crim_wanted: "🚨 在逃通缉重犯 / 最高红色预警 (直接报警)",
+        label_incident_desc: "违法犯罪事实说明 / 历史处分记录",
+        ph_incident_desc: "例如：机房服务器设备盗窃、非法闯入限制区、背景清白无记录...",
+        lgpd_title: "个人信息保护合规告知 (LGPD)",
+        lgpd_text: "依据《通用个人数据保护法》(LGPD 第13.709/2018号法律)，采集人脸生物特征需取得主体明确授权。数据以不可逆的 128 维数学向量形式本地加密存储。",
+        lgpd_controller: "数据控制方：SecureVision AI Systems Inc. / FECAP",
+        lgpd_consent_check: "我确认登记主体已阅读并正式签署符合 LGPD 法规的生物识别数据处理与授权协议。",
+        btn_enroll_submit: "确认登记生物特征身份",
+        active_enrolled_title: "当前已注册生效的主体列表",
+        status_title: "系统完整性与运行性能概览",
+        status_sub: "持续监控边缘 NPU 神经网络节点状态与摄像头数据流健康度。",
+        kpi_load_title: "NPU 人工智能处理负载",
+        kpi_load_sub: "运行稳定",
+        kpi_anom_title: "当前活跃异常警报",
+        kpi_anom_sub: "需要立即处理",
+        kpi_lat_title: "视频帧处理延迟",
+        kpi_lat_sub: "极佳",
+        kpi_uptime_title: "系统持续运行率",
+        kpi_uptime_sub: "边缘计算节点全部在线",
+        diag_table_title: "摄像头视频流节点诊断矩阵",
+        th_code: "节点代号",
+        th_location: "部署物理位置",
+        th_type: "流协议类型",
+        th_resolution: "视频分辨率",
+        th_fps: "目标帧率",
+        th_status: "运行状态",
+        badge_online: "正常在线",
+        badge_alert: "异常告警",
+        personnel_title: "已注册人员与生物特征名录",
+        personnel_sub: "企业级生物识别特征库，包含主体全名、掩码身份证号、出生日期及安全风险审查记录 (符合 LGPD 法规)。",
+        filter_personnel_ph: "按姓名、证件号、部门或前科搜索...",
+        purge_all_btn: "清除全部人员 (一键清空)",
+        kpi_total_entities: "已登记人员总数",
+        kpi_active_128d: "128D 特征向量已激活",
+        kpi_sec_clearance: "安全权限分级体系",
+        kpi_rbac_sub: "基于 RBAC 严格隔离",
+        kpi_std_title: "数据保护合规标准",
+        kpi_consent_chained: "授权链条已固化",
+        card_cpf: "身份证件 (CPF)",
+        card_birth: "出生日期",
+        card_reg: "系统入库时间",
+        card_hash: "128D 特征哈希:",
+        card_del_title: "仅删除此人员",
+        crim_cleared: "🟢 审查合格 / 无犯罪记录",
+        crim_suspect: "🟡 重点怀疑对象 / 侦查中",
+        crim_theft: "🔴 盗窃惯犯 / 盗窃前科黑名单",
+        crim_wanted: "🚨 在逃通缉重犯 / 红色预警",
+        card_incident_label: "违法事实与案件记录详情:",
+        empty_personnel: "未找到与搜索条件匹配的人员记录。",
+        logs_title: "系统完整性与操作审计日志",
+        logs_sub: "记录所有生物识别操作、登录验证及系统配置变更的不可篡改审计追踪链 (LGPD 第6条第VII款)。",
+        th_timestamp: "操作时间戳",
+        th_operator: "操作人员",
+        th_action: "执行动作",
+        th_target: "目标对象",
+        th_details: "操作详细数据",
+        confirm_del_single: "确定要从生物识别库中删除“{name}”吗？",
+        confirm_del_all_1: "严重警告（全局清空）：\n确定要清空全部 {count} 名已注册人员吗？此操作将永久删除特征向量。",
+        confirm_del_all_2: "最终确认：确定要执行全体人员清空操作吗？",
+        purge_done: "清空完成：已删除 {count} 条人员记录。",
+        del_done: "人员“{name}”已成功删除。",
+        kiosk_f12: "访问受限：开发者工具已按 NPU 安全策略禁用。",
+        kiosk_devtools: "访问受限：元素检查快捷键已被安全策略拦截。",
+        kiosk_source: "访问受限：源代码查看功能已关闭。",
+        kiosk_context: "右键快捷菜单已被安全系统禁用。"
+      }
+    };
+
+    let currentLang = localStorage.getItem('securevision_lang') || 'pt';
+
+    function getTranslation(key, params = {}) {
+      const dict = translations[currentLang] || translations.pt;
+      let str = dict[key] || translations.pt[key] || key;
+      for (const [k, v] of Object.entries(params)) {
+        str = str.replace(`{${k}}`, v);
+      }
+      return str;
+    }
+
+    function setSystemLanguage(lang) {
+      if (!translations[lang]) return;
+      currentLang = lang;
+      localStorage.setItem('securevision_lang', lang);
+
+      const labelEl = document.getElementById('currentLangLabel');
+      if (labelEl) labelEl.textContent = lang.toUpperCase();
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (key && (translations[lang][key] || translations.pt[key])) {
+          el.textContent = getTranslation(key);
+        }
+      });
+
+      const searchGlobal = document.querySelector('.topbar-actions .search-box input');
+      if (searchGlobal) searchGlobal.placeholder = getTranslation('search_placeholder');
+
+      const searchPers = document.getElementById('searchPersonnelInput');
+      if (searchPers) searchPers.placeholder = getTranslation('filter_personnel_ph');
+
+      const btnPurge = document.getElementById('btnDeleteAllPersonnel');
+      if (btnPurge) btnPurge.innerHTML = `<i class="fa-solid fa-trash-can"></i> ${getTranslation('purge_all_btn')}`;
+
+      if (typeof renderPersonnelDirectory === 'function') {
+        renderPersonnelDirectory(searchPers?.value || '');
+      }
+    }
+
     // --- Security Protocol: Anti-Tamper & DevTools Inspection Block (F12 Block) ---
     document.addEventListener('keydown', (e) => {
-      // Bloquear F12
       if (e.key === 'F12' || e.keyCode === 123) {
         e.preventDefault();
         e.stopPropagation();
-        showSecurityWarning("Acesso Bloqueado: As ferramentas de desenvolvedor (F12) estão restritas pela política de segurança do sistema.");
+        showSecurityWarning(getTranslation('kiosk_f12'));
         return false;
       }
-
-      // Bloquear Ctrl+Shift+I (Inspecionar), Ctrl+Shift+J (Console), Ctrl+Shift+C (Element Selector)
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c'].includes(e.key)) {
         e.preventDefault();
         e.stopPropagation();
-        showSecurityWarning("Acesso Bloqueado: Atalho de inspeção restrito por protocolo NPU.");
+        showSecurityWarning(getTranslation('kiosk_devtools'));
         return false;
       }
-
-      // Bloquear Ctrl+U (Ver Código-Fonte)
       if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) {
         e.preventDefault();
         e.stopPropagation();
-        showSecurityWarning("Acesso Bloqueado: Exibição de código-fonte desativada.");
+        showSecurityWarning(getTranslation('kiosk_source'));
         return false;
       }
     });
 
-    // Bloquear botão direito do mouse (Menu de Contexto / Inspecionar)
     document.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      showSecurityWarning("Menu de contexto bloqueado por política de integridade.");
+      showSecurityWarning(getTranslation('kiosk_context'));
       return false;
     });
 
@@ -1535,6 +2133,35 @@
         });
       }
 
+      // Language switcher elements
+      const langSwitcherBtn = document.getElementById('langSwitcherBtn');
+      const langDropdownMenu = document.getElementById('langDropdownMenu');
+      const langOptions = document.querySelectorAll('.lang-opt');
+
+      if (langSwitcherBtn && langDropdownMenu) {
+        langSwitcherBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isVisible = langDropdownMenu.style.display === 'block';
+          langDropdownMenu.style.display = isVisible ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', () => {
+          langDropdownMenu.style.display = 'none';
+        });
+
+        langOptions.forEach(opt => {
+          opt.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const selected = opt.getAttribute('data-lang');
+            if (selected) {
+              setSystemLanguage(selected);
+              langDropdownMenu.style.display = 'none';
+            }
+          });
+        });
+      }
+
+      setSystemLanguage(currentLang);
       checkAuth();
 
       // Navigation
@@ -1557,6 +2184,10 @@
           initEnrollmentCamera();
         } else {
           stopEnrollmentCamera();
+        }
+
+        if (tabId === 'personnel') {
+          renderPersonnelDirectory();
         }
       }
 
@@ -1920,12 +2551,190 @@
         });
       }
 
-      // Enrolled storage simulation
+      // Enrolled storage simulation with Birthdate and Registered Date
       const enrolledDb = [
-        { id: "p_0492", nome: "J. Smith", dept: "Engineering", clearance: "Level 3 (Senior)", cpf: "123.***.***-01", status: "ATIVO" },
-        { id: "p_9102", nome: "A. Chan", dept: "IT Infrastructure", clearance: "Level 4 (Executive)", cpf: "987.***.***-00", status: "ATIVO" },
-        { id: "p_9942", nome: "G. Rodriguez", dept: "Security", clearance: "Level 2 (Staff)", cpf: "456.***.***-00", status: "ATIVO" }
+        { id: "p_0492", nome: "J. Smith", dept: "Engineering", clearance: "Level 3 (Senior)", cpf: "123.***.***-01", birthdate: "1990-04-12", registered: "2026-08-10 09:15:00", status: "ACTIVE", hash: "9a2f_4c1b" },
+        { id: "p_9102", nome: "A. Chan", dept: "IT Infrastructure", clearance: "Level 4 (Executive)", cpf: "987.***.***-00", birthdate: "1995-11-23", registered: "2026-08-15 14:30:00", status: "ACTIVE", hash: "3d8e_91fa" },
+        { id: "p_9942", nome: "G. Rodriguez", dept: "Security", clearance: "Level 2 (Staff)", cpf: "456.***.***-00", birthdate: "1983-07-08", registered: "2026-08-18 11:20:00", status: "ACTIVE", hash: "7f1c_20ba" },
+        { id: "p_unk4", nome: "Unknown #4", dept: "Visitor", clearance: "Level 1 (Basic)", cpf: "000.***.***-00", birthdate: "1999-02-14", registered: "2026-08-22 16:45:00", status: "BLOCKED", hash: "ee41_a902" }
       ];
+
+      function renderPersonnelDirectory(filterQuery = '') {
+        const container = document.getElementById('personnelGridCards');
+        const countBadge = document.getElementById('personnelTotalCount');
+        if (!container) return;
+
+        let filtered = enrolledDb;
+        if (filterQuery.trim()) {
+          const q = filterQuery.toLowerCase().trim();
+          filtered = enrolledDb.filter(p => 
+            p.nome.toLowerCase().includes(q) ||
+            p.cpf.toLowerCase().includes(q) ||
+            p.dept.toLowerCase().includes(q)
+          );
+        }
+
+        if (countBadge) countBadge.textContent = filtered.length;
+        container.innerHTML = '';
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted); background: var(--bg-card); border-radius: 12px; border: 1px dashed var(--border-color);">
+              <i class="fa-solid fa-users-slash" style="font-size: 2rem; margin-bottom: 12px; opacity: 0.5;"></i>
+              <p>Nenhuma pessoa encontrada com o termo pesquisado.</p>
+            </div>
+          `;
+          return;
+        }
+
+        filtered.forEach(person => {
+          const card = document.createElement('div');
+          card.className = 'card-enroll';
+          card.style.cssText = `
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: rgba(21, 29, 48, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+          `;
+          card.onmouseenter = () => { card.style.borderColor = 'var(--accent-blue)'; card.style.transform = 'translateY(-2px)'; };
+          card.onmouseleave = () => { card.style.borderColor = 'var(--border-color)'; card.style.transform = 'translateY(0)'; };
+
+          let birthFormatted = person.birthdate || '1990-01-01';
+          if (birthFormatted.includes('-')) {
+            const parts = birthFormatted.split('-');
+            if (parts.length === 3) birthFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+          }
+
+          let regFormatted = person.registered || '2026-08-25 12:00:00';
+          if (regFormatted.includes('-') && regFormatted.includes(' ')) {
+            const [dPart, tPart] = regFormatted.split(' ');
+            const dParts = dPart.split('-');
+            if (dParts.length === 3) regFormatted = `${dParts[2]}/${dParts[1]}/${dParts[0]} às ${tPart}`;
+          }
+
+          const initials = person.nome.substring(0, 2).toUpperCase();
+          const statusBadgeColor = person.status === 'BLOCKED' ? 'var(--accent-red)' : 'var(--accent-green)';
+
+          card.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="user-avatar" style="width: 44px; height: 44px; font-size: 1.1rem; border-color: var(--accent-cyan); background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.2)); color: var(--accent-cyan);">
+                  ${initials}
+                </div>
+                <div>
+                  <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
+                    ${person.nome}
+                  </h3>
+                  <span class="badge-aes" style="font-size: 0.72rem;">${person.dept}</span>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge-secure" style="font-size: 0.72rem; color: ${statusBadgeColor}; border-color: ${statusBadgeColor}; background: rgba(16, 185, 129, 0.08);">
+                  ${person.status}
+                </span>
+                <button class="action-icon-btn btn-delete-single-card" data-id="${person.id}" data-name="${person.nome}" title="Remover apenas esta pessoa" style="color: var(--accent-red); border-color: rgba(239, 68, 68, 0.4); width: 32px; height: 32px;">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--bg-input); padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.82rem;">
+              
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">
+                  <i class="fa-solid fa-id-card" style="color: var(--accent-blue);"></i> CPF (Documento)
+                </span>
+                <strong style="font-family: 'JetBrains Mono', monospace; color: var(--text-primary); font-size: 0.88rem;">
+                  ${person.cpf}
+                </strong>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">
+                  <i class="fa-solid fa-cake-candles" style="color: var(--accent-cyan);"></i> Data de Nascimento
+                </span>
+                <strong style="color: var(--accent-cyan); font-size: 0.88rem;">
+                  ${birthFormatted}
+                </strong>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 3px; grid-column: 1 / -1; border-top: 1px dashed var(--border-color); padding-top: 8px; margin-top: 2px;">
+                <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">
+                  <i class="fa-solid fa-calendar-check" style="color: var(--accent-green);"></i> Data de Registro no Sistema
+                </span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--text-secondary);">
+                  ${regFormatted}
+                </span>
+              </div>
+
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.76rem; color: var(--text-muted); padding-top: 4px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-fingerprint" style="color: var(--accent-cyan);"></i>
+                <span>Hash 128D: <strong>${person.hash || '9a2f_4c1b'}</strong></span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-shield-halved" style="color: var(--accent-blue);"></i>
+                <span>${person.clearance}</span>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+
+        // Event listeners para exclusão individual
+        document.querySelectorAll('.btn-delete-single-card').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name') || 'esta pessoa';
+            if (confirm(`Deseja realmente remover '${name}' da base biométrica?`)) {
+              const idx = enrolledDb.findIndex(p => p.id === id);
+              if (idx !== -1) {
+                enrolledDb.splice(idx, 1);
+                showSecurityWarning(`Entidade '${name}' removida com sucesso.`);
+                renderPersonnelDirectory(searchPersonnelInput?.value || '');
+                renderEnrolledList();
+              }
+            }
+          });
+        });
+      }
+
+      const searchPersonnelInput = document.getElementById('searchPersonnelInput');
+      if (searchPersonnelInput) {
+        searchPersonnelInput.addEventListener('input', (e) => {
+          renderPersonnelDirectory(e.target.value);
+        });
+      }
+
+      const btnRefreshPersonnel = document.getElementById('btnRefreshPersonnel');
+      if (btnRefreshPersonnel) {
+        btnRefreshPersonnel.addEventListener('click', () => {
+          renderPersonnelDirectory(searchPersonnelInput?.value || '');
+        });
+      }
+
+      const btnDeleteAllPersonnel = document.getElementById('btnDeleteAllPersonnel');
+      if (btnDeleteAllPersonnel) {
+        btnDeleteAllPersonnel.addEventListener('click', () => {
+          if (enrolledDb.length === 0) {
+            alert("A base de dados já está vazia.");
+            return;
+          }
+          if (confirm(`ATENÇÃO: Deseja realmente remover TODAS as ${enrolledDb.length} pessoas da base biométrica?\nEsta ação é irreversível.`)) {
+            enrolledDb.length = 0;
+            showSecurityWarning("Expurgo geral concluído: todas as entidades foram removidas.");
+            renderPersonnelDirectory();
+            renderEnrolledList();
+          }
+        });
+      }
 
       function renderEnrolledList() {
         const listEl = document.getElementById('enrolledSubjectsList');
@@ -1956,9 +2765,11 @@
       window.deleteEnrolled = (idx) => {
         enrolledDb.splice(idx, 1);
         renderEnrolledList();
+        renderPersonnelDirectory();
       };
 
       renderEnrolledList();
+      renderPersonnelDirectory();
 
       if (enrollForm) {
         enrollForm.addEventListener('submit', (e) => {
@@ -1967,6 +2778,7 @@
           const cpf = document.getElementById('inputCpf').value.trim();
           const dept = document.getElementById('selectDept').value;
           const clearance = document.getElementById('selectClearance').value;
+          const bdate = document.getElementById('inputBirthdate')?.value || '1995-01-01';
 
           btnSubmitEnroll.disabled = true;
           btnSubmitEnroll.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing 128D Vector...';
@@ -1974,13 +2786,19 @@
           setTimeout(() => {
             const cleanCpf = cpf.replace(/\D/g, '');
             const masked = `${cleanCpf.substring(0,3)}.***.***-${cleanCpf.substring(cleanCpf.length-2)}`;
+            const now = new Date();
+            const nowStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+            
             enrolledDb.unshift({
               id: "p_" + Math.random().toString(16).substring(2, 6),
               nome: nome,
               dept: dept,
               clearance: clearance,
               cpf: masked,
-              status: "ATIVO"
+              birthdate: bdate,
+              registered: nowStr,
+              status: "ACTIVE",
+              hash: Math.random().toString(16).substring(2,6) + "_" + Math.random().toString(16).substring(2,6)
             });
 
             alert(`Identidade '${nome}' cadastrada com sucesso!\nVetor biométrico 128D criptografado e registrado no banco.`);
@@ -1990,6 +2808,7 @@
             btnSubmitEnroll.disabled = true;
             btnSubmitEnroll.innerHTML = '<i class="fa-solid fa-lock"></i> Enroll Identity';
             renderEnrolledList();
+            renderPersonnelDirectory();
           }, 600);
         });
       }

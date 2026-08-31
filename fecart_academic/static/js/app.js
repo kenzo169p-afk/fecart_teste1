@@ -111,6 +111,10 @@ const translations = {
     capture_title: "Captura de Identidade",
     capture_desc: "Extração de vetor matemático facial 128D em isolamento Zero-Trust.",
     sensor_active: "Sensor Ativo • NPU Zero-Trust",
+    btn_capture_photo: "Tirar Foto / Capturar Biometria",
+    photo_captured_badge: "Foto Capturada com Sucesso",
+    btn_retake_photo: "Tirar Outra Foto",
+    toast_photo_captured: "Foto capturada com sucesso! Embedding 128D gerado.",
     upload_btn: "Carregar Imagem de Arquivo",
     emb_generated_title: "Embedding 128D Gerado",
     emb_generated_desc: "Vetor normalizado na hiperesfera unitária (L2)",
@@ -265,6 +269,10 @@ const translations = {
     capture_title: "Identity Capture",
     capture_desc: "Extract local 128D facial mathematical vector in zero-trust isolation.",
     sensor_active: "Sensor Active • Zero-Trust NPU",
+    btn_capture_photo: "Take Photo / Capture Biometrics",
+    photo_captured_badge: "Photo Captured Successfully",
+    btn_retake_photo: "Retake Photo",
+    toast_photo_captured: "Photo captured! 128D Embedding generated.",
     upload_btn: "Upload Image from File",
     emb_generated_title: "128D Embedding Generated",
     emb_generated_desc: "Vector normalized to unit sphere (L2)",
@@ -419,6 +427,10 @@ const translations = {
     capture_title: "人脸生物特征采集",
     capture_desc: "在零信任隔离环境中提取本地 128 维人脸数学特征向量。",
     sensor_active: "传感器运行中 • 零信任 NPU",
+    btn_capture_photo: "拍摄照片 / 采集人脸特征",
+    photo_captured_badge: "照片拍摄成功",
+    btn_retake_photo: "重新拍摄",
+    toast_photo_captured: "照片拍摄成功！已生成 128D 特征向量。",
     upload_btn: "上传本地照片文件",
     emb_generated_title: "128D 特征向量已生成",
     emb_generated_desc: "特征向量已完成 L2 空间单位球归一化",
@@ -517,6 +529,322 @@ const translations = {
     kiosk_devtools: "访问受限：元素检查快捷键已被安全策略拦截。",
     kiosk_source: "访问受限：源代码查看功能已关闭。",
     kiosk_context: "右键快捷菜单已被安全系统禁用。"
+  },
+
+  es: {
+    // Auth Portal
+    auth_portal_title: "SecureVision AI — Portal de Acceso",
+    auth_portal_sub: "Autenticación Zero-Trust • Criptografía Argon2id y Sesión JWT",
+    tab_login: "Iniciar Sesión",
+    tab_register: "Registrar Operador",
+    label_username: "Usuario / Acceso",
+    ph_login_user: "Ej: admin o su_usuario",
+    label_birthdate: "Fecha de Nacimiento",
+    label_password: "Contraseña de Operador",
+    ph_password: "••••••••••••",
+    login_btn: "Autenticar y Entrar al Sistema",
+    label_fullname: "Nombre Legal Completo",
+    ph_fullname: "Ej: Samantha Carter",
+    label_login_user: "Nombre de Usuario (Único)",
+    ph_reg_user: "Ej: scarter",
+    register_btn: "Crear Cuenta de Operador",
+    dept_sec_mgmt: "Gestión de Seguridad",
+    dept_ops: "Operaciones",
+
+    // Sidebar & Brand
+    brand_title: "SecureVision",
+    vigilance_high: "Nivel de Vigilancia: Alto",
+    nav_status: "Estado del Sistema",
+    nav_monitoring: "Monitoreo",
+    nav_enrollment: "Registro Biométrico",
+    nav_personnel: "Personal Registrado",
+    nav_logs: "Registros de Auditoría",
+    nav_settings: "Configuración",
+    nav_support: "Soporte",
+
+    // Topbar
+    stat_fps: "FPS (Promedio)",
+    stat_gpu: "GPU Edge",
+    stat_streams: "Transmisiones Activas",
+    search_placeholder: "Buscar cámaras, registros, personal...",
+
+    // Tab 1: Monitoring
+    integrity_title: "Monitor de Integridad del Sistema",
+    integrity_cluster: "GRUPO_NODO_ALFA • Última Verificación: hace 0.2s",
+    files_scanned_label: "Archivos Escaneados",
+    core_modules_label: "Módulos Principales",
+    badge_secure: "SEGURO",
+    live_log_title: "Registro de Seguridad en Vivo",
+    filter_link: "Filtrar",
+    evt_routine: "Escaneo de Rutina",
+    evt_match: "Identificación Positiva",
+    evt_model: "Modelo Actualizado",
+    evt_unauthorized: "Presencia No Autorizada",
+
+    // Tab 2: Enrollment
+    capture_title: "Captura de Identidad",
+    capture_desc: "Extracción de vector matemático facial 128D en aislamiento Zero-Trust.",
+    sensor_active: "Sensor Activo • NPU Zero-Trust",
+    btn_capture_photo: "Tomar Foto / Capturar Biometría",
+    photo_captured_badge: "Foto Capturada con Éxito",
+    btn_retake_photo: "Tomar Otra Foto",
+    toast_photo_captured: "¡Foto capturada con éxito! Embedding 128D generado.",
+    upload_btn: "Cargar Imagen desde Archivo",
+    emb_generated_title: "Embedding 128D Generado",
+    emb_generated_desc: "Vector normalizado en la hiperesfera unitaria (L2)",
+    hash_display: "HASH DEL EMBEDDING: ",
+    subject_id_title: "Identidad del Titular",
+    subject_id_desc: "Vincula el vector biométrico al perfil legal del titular.",
+    label_full_name: "Nombre Legal Completo",
+    ph_full_name: "Ingrese el nombre completo legal",
+    label_national_id: "Documento de Identidad (CPF)",
+    label_dept: "Departamento",
+    dept_eng: "Ingeniería",
+    dept_it: "Infraestructura de TI",
+    dept_sec: "Seguridad Patrimonial",
+    dept_adm: "Administración",
+    dept_vis: "Visitante",
+    label_clearance: "Nivel de Acceso (Clearance)",
+    clearance_1: "Nivel 1 (Básico)",
+    clearance_2: "Nivel 2 (Personal)",
+    clearance_3: "Nivel 3 (Senior)",
+    clearance_4: "Nivel 4 (Ejecutivo)",
+    label_est_age: "Edad Estimada",
+    label_crim_record: "Perfil de Seguridad / Antecedentes",
+    opt_crim_cleared: "🟢 Autorizado / Sin Antecedentes (Historial Limpio)",
+    opt_crim_suspect: "🟡 Sospechoso / En Investigación (Bajo Vigilancia)",
+    opt_crim_theft: "🔴 Ladrón / Historial de Robo o Hurto (Bloquear)",
+    opt_crim_wanted: "🚨 Orden de Captura / Buscado (Alerta Máxima)",
+    label_incident_desc: "Descripción del delito o incidente cometido",
+    ph_incident_desc: "Ej: Robo de equipos en el servidor, invasión de perímetro, sin incidentes...",
+    lgpd_title: "Aviso de Conformidad LGPD y Privacidad",
+    lgpd_text: "La recopilación de datos biométricos requiere consentimiento expreso según la Ley de Protección de Datos (Ley nº 13.709/2018 - LGPD). Se almacena como un vector matemático 128D irreversible.",
+    lgpd_controller: "Controlador de Datos: SecureVision AI Systems Inc. / FECAP",
+    lgpd_consent_check: "Confirmo que el titular ha firmado el Acuerdo de Tratamiento de Datos Biométricos según la LGPD.",
+    btn_enroll_submit: "Registrar Identidad",
+    active_enrolled_title: "Identidades Registradas Activas",
+
+    // Tab 3: System Status
+    status_title: "Visión General de Integridad y Rendimiento del Sistema",
+    status_sub: "Monitoreo continuo de nodos de borde NPU y telemetría de salud de cámaras.",
+    kpi_load_title: "Carga de Procesamiento NPU",
+    kpi_load_sub: "Estable",
+    kpi_anom_title: "Anomalías Activas",
+    kpi_anom_sub: "Requiere Atención",
+    kpi_lat_title: "Latencia de Cuadro",
+    kpi_lat_sub: "Óptima",
+    kpi_uptime_title: "Tiempo de Actividad",
+    kpi_uptime_sub: "Nodos de Borde en Línea",
+    diag_table_title: "Matriz de Diagnóstico de Nodos de Cámara",
+    th_code: "Código",
+    th_location: "Ubicación",
+    th_type: "Tipo",
+    th_resolution: "Resolución",
+    th_fps: "FPS Objetivo",
+    th_status: "Estado",
+    badge_online: "EN LÍNEA",
+    badge_alert: "ALERTA",
+
+    // Tab 4: Personnel
+    personnel_title: "Directorio de Personas Registradas",
+    personnel_sub: "Base biométrica corporativa con nombre completo, documento enmascarado, fecha de nacimiento y antecedentes de seguridad (LGPD).",
+    filter_personnel_ph: "Filtrar por nombre, documento, depto o antecedentes...",
+    purge_all_btn: "Eliminar Todo (Purgar)",
+    kpi_total_entities: "Total de Personas Registradas",
+    kpi_active_128d: "Biometría Activa (128D)",
+    kpi_sec_clearance: "Niveles de Acceso",
+    kpi_rbac_sub: "Segmentado por RBAC",
+    kpi_std_title: "Estándar de Protección",
+    kpi_consent_chained: "Consentimiento Encadenado",
+    card_cpf: "Documento Nacional (CPF)",
+    card_birth: "Fecha de Nacimiento",
+    card_reg: "Fecha de Registro en el Sistema",
+    card_hash: "Hash 128D:",
+    card_del_title: "Eliminar solo a esta persona",
+    crim_cleared: "🟢 HISTORIAL LIMPIO / AUTORIZADO",
+    crim_suspect: "🟡 SOSPECHOSO / BAJO VIGILANCIA",
+    crim_theft: "🔴 LADRÓN / ANTECEDENTES DE ROBO",
+    crim_wanted: "🚨 BUSCADO / ORDEN DE CAPTURA",
+    card_incident_label: "Detalle del Delito o Incidente:",
+    empty_personnel: "No se encontraron personas con el término de búsqueda.",
+
+    // Tab 5: Logs
+    logs_title: "Registros de Integridad y Auditoría",
+    logs_sub: "Registro inmutable de todas las operaciones biométricas, accesos y cambios del sistema (LGPD Art. 6º VII).",
+    th_timestamp: "Marca de Tiempo",
+    th_operator: "Operador",
+    th_action: "Acción",
+    th_target: "Entidad Destino",
+    th_details: "Detalles",
+
+    // System Prompts & Confirmations
+    confirm_del_single: "¿Realmente desea eliminar a '{name}' de la base biométrica?",
+    confirm_del_all_1: "ATENCIÓN CRÍTICA (Purga General):\n¿Realmente desea eliminar a TODAS las {count} personas de la base de datos?\n\nEsta acción borrará permanentemente todos los vectores faciales.",
+    confirm_del_all_2: "Confirmación Final: ¿Desea proceder con la eliminación total de todos los registros biométricos?",
+    purge_done: "Purga completada: {count} registros eliminados.",
+    del_done: "Entidad '{name}' eliminada con éxito.",
+    kiosk_f12: "Acceso Bloqueado: Herramientas de desarrollador restringidas por política NPU.",
+    kiosk_devtools: "Acceso Bloqueado: Atajo de inspección restringido por protocolo.",
+    kiosk_source: "Acceso Bloqueado: Visualización de código fuente deshabilitada.",
+    kiosk_context: "Menú contextual bloqueado por política de seguridad."
+  },
+
+  ja: {
+    // Auth Portal
+    auth_portal_title: "SecureVision AI — ログイン・認証ポータル",
+    auth_portal_sub: "ゼロトラスト認証基盤 • Argon2id暗号化 & JWTセッション",
+    tab_login: "システムにログイン",
+    tab_register: "オペレーター新規登録",
+    label_username: "ユーザーID / ログイン名",
+    ph_login_user: "例: admin または登録ユーザー名",
+    label_birthdate: "生年月日",
+    label_password: "オペレーターパスワード",
+    ph_password: "••••••••••••",
+    login_btn: "認証してシステムにアクセス",
+    label_fullname: "オペレーター正式氏名",
+    ph_fullname: "例: Samantha Carter",
+    label_login_user: "固有ユーザーID",
+    ph_reg_user: "例: scarter",
+    register_btn: "オペレーターアカウントを作成",
+    dept_sec_mgmt: "セキュリティ管理部",
+    dept_ops: "運用管理部",
+
+    // Sidebar & Brand
+    brand_title: "SecureVision",
+    vigilance_high: "警戒レベル: 高度警戒",
+    nav_status: "システムステータス",
+    nav_monitoring: "リアルタイム監視",
+    nav_enrollment: "生体認証登録",
+    nav_personnel: "登録者名簿",
+    nav_logs: "監査ログ",
+    nav_settings: "システム設定",
+    nav_support: "サポート",
+
+    // Topbar
+    stat_fps: "平均FPS",
+    stat_gpu: "エッジGPU",
+    stat_streams: "アクティブ配信",
+    search_placeholder: "カメラ、ログ、登録者を検索...",
+
+    // Tab 1: Monitoring
+    integrity_title: "システム整合性リアルタイム監視",
+    integrity_cluster: "ノードクラスタALPHA • 最終確認: 0.2秒前",
+    files_scanned_label: "スキャン済ファイル",
+    core_modules_label: "コアモジュール",
+    badge_secure: "安全正常",
+    live_log_title: "リアルタイムセキュリティログ",
+    filter_link: "フィルター",
+    evt_routine: "定期パトロールスキャン",
+    evt_match: "生体認証一致",
+    evt_model: "AI推論モデル更新",
+    evt_unauthorized: "不正侵入警報",
+
+    // Tab 2: Enrollment
+    capture_title: "生体情報キャプチャ",
+    capture_desc: "ゼロトラスト分離環境でローカル128D顔数学ベクトルを抽出。",
+    sensor_active: "センサー稼働中 • ゼロトラストNPU",
+    btn_capture_photo: "写真を撮影 / 生体情報キャプチャ",
+    photo_captured_badge: "写真の撮影に成功しました",
+    btn_retake_photo: "再撮影する",
+    toast_photo_captured: "撮影完了！128D特徴ベクトルを生成しました。",
+    upload_btn: "ファイルから画像をアップロード",
+    emb_generated_title: "128D 埋め込みベクトル生成完了",
+    emb_generated_desc: "単位超球面上に正規化済み (L2)",
+    hash_display: "特徴量ハッシュ: ",
+    subject_id_title: "登録者法的主体情報",
+    subject_id_desc: "生体特徴ベクトルを法的な登録者プロファイルと紐付けます。",
+    label_full_name: "氏名 (本名)",
+    ph_full_name: "正式な氏名を入力してください",
+    label_national_id: "身分証明番号 (CPF)",
+    label_dept: "所属部門",
+    dept_eng: "エンジニアリング部",
+    dept_it: "ITインフラ部",
+    dept_sec: "警備・セキュリティ部",
+    dept_adm: "総務・管理部",
+    dept_vis: "来訪者 / ゲスト",
+    label_clearance: "セキュリティクリアランス (権限レベル)",
+    clearance_1: "レベル 1 (基本権限)",
+    clearance_2: "レベル 2 (一般職員)",
+    clearance_3: "レベル 3 (シニア職員)",
+    clearance_4: "レベル 4 (役員・幹部)",
+    label_est_age: "推定年齢",
+    label_crim_record: "セキュリティ背景審査 / 前科区分",
+    opt_crim_cleared: "🟢 審査適合 / 前科なし (ホワイトリスト)",
+    opt_crim_suspect: "🟡 容疑者 / 捜査・監視対象 (イエロー警戒)",
+    opt_crim_theft: "🔴 窃盗犯 / 窃盗前歴者 (即時遮断)",
+    opt_crim_wanted: "🚨 指名手配犯 / 逮捕状発付 (最高レッド警戒)",
+    label_incident_desc: "事案内容 / 違反・犯歴詳細説明",
+    ph_incident_desc: "例：サーバー室機器窃盗、立入禁止区域侵入、違反歴なし...",
+    lgpd_title: "個人情報保護コンプライアンス通知 (LGPD)",
+    lgpd_text: "生体データの収集には個人情報保護法 (LGPD 第13.709/2018号法) に基づく明示的な同意が必要です。不可逆な128Dベクトルとしてローカルに暗号化保存されます。",
+    lgpd_controller: "データ管理者: SecureVision AI Systems Inc. / FECAP",
+    lgpd_consent_check: "本人がLGPDに基づく生体データ取扱同意書に署名したことを確認します。",
+    btn_enroll_submit: "生体情報を登録する",
+    active_enrolled_title: "有効な登録者一覧",
+
+    // Tab 3: System Status
+    status_title: "システム整合性およびパフォーマンス概要",
+    status_sub: "エッジNPUノードおよびカメラ配信ヘルスチェックの継続監視。",
+    kpi_load_title: "NPU処理負荷",
+    kpi_load_sub: "安定",
+    kpi_anom_title: "アクティブな異常検知",
+    kpi_anom_sub: "対応が必要",
+    kpi_lat_title: "フレーム遅延",
+    kpi_lat_sub: "最適",
+    kpi_uptime_title: "システム稼働率",
+    kpi_uptime_sub: "エッジノード全稼働中",
+    diag_table_title: "カメラ配信ノード診断マトリクス",
+    th_code: "コード",
+    th_location: "設置場所",
+    th_type: "タイプ",
+    th_resolution: "解像度",
+    th_fps: "目標FPS",
+    th_status: "ステータス",
+    badge_online: "オンライン",
+    badge_alert: "アラート",
+
+    // Tab 4: Personnel
+    personnel_title: "登録者・生体情報名簿",
+    personnel_sub: "氏名、マスク済身分証明番号、生年月日、セキュリティ背景審査記録を含む企業生体データベース (LGPD準拠)。",
+    filter_personnel_ph: "氏名、身分番号、部門、前科で検索...",
+    purge_all_btn: "全件削除 (初期化)",
+    kpi_total_entities: "登録者総数",
+    kpi_active_128d: "生体認証有効 (128D)",
+    kpi_sec_clearance: "アクセス権限階層",
+    kpi_rbac_sub: "RBAC厳格分離",
+    kpi_std_title: "データ保護基準",
+    kpi_consent_chained: "同意チェーン確立済",
+    card_cpf: "身分証明番号 (CPF)",
+    card_birth: "生年月日",
+    card_reg: "システム登録日時",
+    card_hash: "128D ハッシュ:",
+    card_del_title: "この登録者のみ削除",
+    crim_cleared: "🟢 審査適合 / 前科なし",
+    crim_suspect: "🟡 容疑者 / 監視対象",
+    crim_theft: "🔴 窃盗犯 / 窃盗前科あり",
+    crim_wanted: "🚨 指名手配 / 逮捕状あり",
+    card_incident_label: "事案・犯歴の詳細内容:",
+    empty_personnel: "検索条件に一致する登録者が見つかりません。",
+
+    // Tab 5: Logs
+    logs_title: "システム整合性および監査ログ",
+    logs_sub: "すべての生体認証操作、ログイン、システム変更の改ざん不可能な追跡ログ (LGPD 第6条第VII項)。",
+    th_timestamp: "タイムスタンプ",
+    th_operator: "オペレーター",
+    th_action: "アクション",
+    th_target: "対象エンティティ",
+    th_details: "詳細",
+
+    // System Prompts & Confirmations
+    confirm_del_single: "「{name}」を生体認証データベースから削除しますか？",
+    confirm_del_all_1: "【重大警告・全件削除】\n登録されている全 {count} 名のデータを削除してもよろしいですか？\nすべての生体認証ベクトルが完全に削除されます。",
+    confirm_del_all_2: "最終確認: 本当に全登録者のデータ一括削除を実行しますか？",
+    purge_done: "一括削除完了: {count} 件のレコードを削除しました。",
+    del_done: "「{name}」を正常に削除しました。",
+    kiosk_f12: "アクセス拒否: NPUセキュリティポリシーにより開発者ツールが無効化されています。",
+    kiosk_devtools: "アクセス拒否: 要素検査ショートカットが制限されています。",
+    kiosk_source: "アクセス拒否: ソースコードの表示が無効化されています。",
+    kiosk_context: "右クリックメニューはセキュリティポリシーにより無効化されています。"
   }
 };
 
@@ -557,7 +885,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!translations[lang]) return;
     currentLang = lang;
     localStorage.setItem('securevision_lang', lang);
-    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : (lang === 'en' ? 'en-US' : 'pt-BR');
+    const langMap = { pt: 'pt-BR', en: 'en-US', es: 'es-ES', ja: 'ja-JP', zh: 'zh-CN' };
+    document.documentElement.lang = langMap[lang] || 'pt-BR';
 
     const labelEl = document.getElementById('currentLangLabel');
     if (labelEl) labelEl.textContent = lang.toUpperCase();
@@ -1023,25 +1352,88 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 50);
   }
 
+  function playCameraShutterSound() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(900, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(160, ctx.currentTime + 0.07);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.07);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.07);
+    } catch (e) {}
+  }
+
+  function triggerCameraFlash() {
+    const flash = document.getElementById('cameraFlash');
+    if (flash) {
+      flash.classList.add('flash-active');
+      setTimeout(() => flash.classList.remove('flash-active'), 100);
+    }
+  }
+
+  const btnCapturePhotoMain = document.getElementById('btnCapturePhotoMain');
+  const capturedPreviewCard = document.getElementById('capturedPreviewCard');
+  const capturedThumbImg = document.getElementById('capturedThumbImg');
+  const previewHashText = document.getElementById('previewHashText');
+  const btnRetakePhoto = document.getElementById('btnRetakePhoto');
+
+  function executePhotoCapture() {
+    playCameraShutterSound();
+    triggerCameraFlash();
+
+    const snapCanvas = document.createElement('canvas');
+    snapCanvas.width = 640;
+    snapCanvas.height = 480;
+    const ctx = snapCanvas.getContext('2d');
+
+    if (enrollStream && enrollVideo) {
+      ctx.drawImage(enrollVideo, 0, 0, 640, 480);
+    } else {
+      ctx.fillStyle = "#1e293b";
+      ctx.fillRect(0, 0, 640, 480);
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "20px Inter";
+      ctx.fillText("Biometric Sensor Photo Captured", 170, 240);
+    }
+
+    capturedImageBase64 = snapCanvas.toDataURL('image/jpeg', 0.92);
+    
+    // Show Thumbnail Preview
+    if (capturedThumbImg) capturedThumbImg.src = capturedImageBase64;
+    if (capturedPreviewCard) capturedPreviewCard.style.display = 'flex';
+
+    displayGeneratedHash();
+    showToastNotification(window.getSystemTranslation('toast_photo_captured'));
+  }
+
   if (btnCapturePhoto) {
-    btnCapturePhoto.addEventListener('click', () => {
-      const snapCanvas = document.createElement('canvas');
-      snapCanvas.width = 640;
-      snapCanvas.height = 480;
-      const ctx = snapCanvas.getContext('2d');
+    btnCapturePhoto.addEventListener('click', (e) => {
+      e.preventDefault();
+      executePhotoCapture();
+    });
+  }
 
-      if (enrollStream) {
-        ctx.drawImage(enrollVideo, 0, 0, 640, 480);
-      } else {
-        ctx.fillStyle = "#1e293b";
-        ctx.fillRect(0, 0, 640, 480);
-        ctx.fillStyle = "#94a3b8";
-        ctx.font = "20px Inter";
-        ctx.fillText("Sensor Photo Captured", 220, 240);
-      }
+  if (btnCapturePhotoMain) {
+    btnCapturePhotoMain.addEventListener('click', (e) => {
+      e.preventDefault();
+      executePhotoCapture();
+    });
+  }
 
-      capturedImageBase64 = snapCanvas.toDataURL('image/jpeg', 0.9);
-      displayGeneratedHash();
+  if (btnRetakePhoto) {
+    btnRetakePhoto.addEventListener('click', (e) => {
+      e.preventDefault();
+      capturedImageBase64 = null;
+      if (capturedPreviewCard) capturedPreviewCard.style.display = 'none';
+      if (generatedHashBox) generatedHashBox.style.display = 'none';
     });
   }
 
@@ -1053,7 +1445,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const reader = new FileReader();
       reader.onload = (event) => {
         capturedImageBase64 = event.target.result;
+        if (capturedThumbImg) capturedThumbImg.src = capturedImageBase64;
+        if (capturedPreviewCard) capturedPreviewCard.style.display = 'flex';
         displayGeneratedHash();
+        showToastNotification(window.getSystemTranslation('toast_photo_captured'));
       };
       reader.readAsDataURL(file);
     });
@@ -1063,6 +1458,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pseudoHash = Array.from({length: 4}, () => Math.floor(Math.random()*16).toString(16)).join('') + '_' +
                        Array.from({length: 4}, () => Math.floor(Math.random()*16).toString(16)).join('');
     if (hashDisplay) hashDisplay.innerText = `${window.getSystemTranslation('hash_display')}${pseudoHash}`;
+    if (previewHashText) previewHashText.innerText = `HASH 128D: ${pseudoHash}`;
     if (generatedHashBox) generatedHashBox.style.display = 'flex';
   }
 
@@ -1236,7 +1632,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (birthFormatted.includes('-')) {
           const parts = birthFormatted.split('-');
           if (parts.length === 3) {
-            birthFormatted = currentLang === 'zh' ? `${parts[0]}年${parts[1]}月${parts[2]}日` : `${parts[2]}/${parts[1]}/${parts[0]}`;
+            if (currentLang === 'zh' || currentLang === 'ja') {
+              birthFormatted = `${parts[0]}年${parts[1]}月${parts[2]}日`;
+            } else {
+              birthFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
           }
         }
 
@@ -1245,7 +1645,15 @@ document.addEventListener('DOMContentLoaded', () => {
           const [dPart, tPart] = regFormatted.split(' ');
           const dParts = dPart.split('-');
           if (dParts.length === 3) {
-            regFormatted = currentLang === 'zh' ? `${dParts[0]}/${dParts[1]}/${dParts[2]} ${tPart}` : `${dParts[2]}/${dParts[1]}/${dParts[0]} às ${tPart}`;
+            if (currentLang === 'zh' || currentLang === 'ja') {
+              regFormatted = `${dParts[0]}/${dParts[1]}/${dParts[2]} ${tPart}`;
+            } else if (currentLang === 'es') {
+              regFormatted = `${dParts[2]}/${dParts[1]}/${dParts[0]} a las ${tPart}`;
+            } else if (currentLang === 'en') {
+              regFormatted = `${dParts[2]}/${dParts[1]}/${dParts[0]} at ${tPart}`;
+            } else {
+              regFormatted = `${dParts[2]}/${dParts[1]}/${dParts[0]} às ${tPart}`;
+            }
           }
         }
 
@@ -1442,7 +1850,12 @@ document.addEventListener('DOMContentLoaded', () => {
         row.className = 'user-profile-badge';
         row.style.justifyContent = 'space-between';
         
-        let crimTag = p.criminal_record === 'THEFT_OFFENSE' ? (currentLang === 'zh' ? ' [盗窃前科]' : (currentLang === 'en' ? ' [THEFT]' : ' [LADRÃO]')) : (p.criminal_record === 'WANTED_CRIMINAL' ? (currentLang === 'zh' ? ' [通缉要犯]' : (currentLang === 'en' ? ' [WANTED]' : ' [PROCURADO]')) : '');
+        let crimTag = '';
+        if (p.criminal_record === 'THEFT_OFFENSE') {
+          crimTag = currentLang === 'zh' ? ' [盗窃前科]' : (currentLang === 'ja' ? ' [窃盗前歴]' : (currentLang === 'es' ? ' [LADRÓN]' : (currentLang === 'en' ? ' [THEFT]' : ' [LADRÃO]')));
+        } else if (p.criminal_record === 'WANTED_CRIMINAL') {
+          crimTag = currentLang === 'zh' ? ' [通缉要犯]' : (currentLang === 'ja' ? ' [指名手配]' : (currentLang === 'es' ? ' [BUSCADO]' : (currentLang === 'en' ? ' [WANTED]' : ' [PROCURADO]')));
+        }
         let crimColor = (p.criminal_record === 'THEFT_OFFENSE' || p.criminal_record === 'WANTED_CRIMINAL') ? 'var(--accent-red)' : 'var(--text-secondary)';
 
         row.innerHTML = `

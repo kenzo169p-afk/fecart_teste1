@@ -222,6 +222,12 @@
             <div class="lang-opt" data-lang="en" style="padding: 9px 14px; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-primary); transition: background 0.15s ease;">
               <span>🇺🇸</span> English
             </div>
+            <div class="lang-opt" data-lang="es" style="padding: 9px 14px; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-primary); transition: background 0.15s ease;">
+              <span>🇪🇸</span> Español
+            </div>
+            <div class="lang-opt" data-lang="ja" style="padding: 9px 14px; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-primary); transition: background 0.15s ease;">
+              <span>🇯🇵</span> 日本語
+            </div>
             <div class="lang-opt" data-lang="zh" style="padding: 9px 14px; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-primary); transition: background 0.15s ease;">
               <span>🇨🇳</span> 简体中文
             </div>
@@ -323,6 +329,7 @@
           <div class="capture-frame-box">
             <video id="enrollVideo" class="capture-video" autoplay playsinline muted></video>
             <canvas id="enrollCanvas" class="canvas-overlay"></canvas>
+            <div id="cameraFlash" class="camera-flash-overlay"></div>
 
             <div class="capture-hud-badge">
               <span class="status-dot"></span> <span data-i18n="sensor_active">Sensor Ativo • NPU Zero-Trust</span>
@@ -332,14 +339,38 @@
               Yaw: -2.4° • Pitch: 0.8° • Quality: 98% • Latency: 12ms
             </div>
 
-            <button id="btnCapturePhoto" type="button" class="btn-capture-circle" title="Capturar Foto">
+            <button id="btnCapturePhoto" type="button" class="btn-capture-circle" title="Tirar Foto / Capturar Face">
               <i class="fa-solid fa-camera"></i>
+            </button>
+          </div>
+
+          <!-- Primary Capture Button (High-Impact CTA) -->
+          <button id="btnCapturePhotoMain" type="button" class="btn-capture-cta">
+            <i class="fa-solid fa-camera" style="font-size: 1.15rem;"></i>
+            <span data-i18n="btn_capture_photo">Tirar Foto / Capturar Biometria</span>
+          </button>
+
+          <!-- Captured Photo Preview Card (Shown after capture) -->
+          <div id="capturedPreviewCard" class="captured-preview-container" style="display: none;">
+            <div class="captured-thumb-frame">
+              <img id="capturedThumbImg" class="captured-thumb-img" alt="Captured Face Preview">
+            </div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-weight: 700; color: var(--accent-green); font-size: 0.84rem; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-circle-check"></i> <span data-i18n="photo_captured_badge">Foto Capturada com Sucesso</span>
+              </div>
+              <div id="previewHashText" style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">
+                HASH 128D: 9a2f_4c1b
+              </div>
+            </div>
+            <button id="btnRetakePhoto" type="button" class="action-icon-btn" title="Tirar Outra Foto" style="color: var(--accent-cyan); border-color: rgba(6, 182, 212, 0.4); width: 34px; height: 34px;">
+              <i class="fa-solid fa-arrows-rotate"></i>
             </button>
           </div>
 
           <!-- Hidden Upload alternative -->
           <input type="file" id="photoUploadInput" accept="image/*" style="display: none;">
-          <button id="btnTriggerUpload" type="button" class="btn-lockdown" style="background: var(--bg-input); border-color: var(--border-color); color: var(--text-secondary); box-shadow: none;">
+          <button id="btnTriggerUpload" type="button" class="btn-lockdown" style="background: var(--bg-input); border-color: var(--border-color); color: var(--text-secondary); box-shadow: none; font-size: 0.82rem; padding: 9px 14px;">
             <i class="fa-solid fa-upload"></i> <span data-i18n="upload_btn">Carregar Imagem de Arquivo</span>
           </button>
 

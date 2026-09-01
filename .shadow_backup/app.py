@@ -288,6 +288,41 @@ def handle_audit_logs():
                 print(f"[SUPABASE] Erro ao registrar log de auditoria: {e}")
         return jsonify({"success": True, "data": data, "fallback": True})
 
+@app.route('/api/analisar_qualidade', methods=['POST'])
+def analisar_qualidade():
+    """Analisa a nitidez, iluminação e enquadramento da foto antes do cadastro."""
+    data = request.get_json() or {}
+    img_b64 = data.get('image', '')
+    if not img_b64:
+        return jsonify({"success": False, "error": "Imagem não fornecida"}), 400
+
+    try:
+        if "," in img_b64:
+            img_b64 = img_b64.split(",")[1]
+        raw_bytes = base64.b64decode(img_b64)
+        nparr = np.frombuffer(raw_bytes, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        if img is None:
+            return jsonify({"success": False, "error": "Formato de imagem inválido"}), 400
+
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        brightness = float(np.mean(gray))
+        variance_laplacian = float(cv2.Laplacian(gray, cv2.CV_64F).var())
+
+        is_sharp = variance_laplacian > 60.0
+        is_well_lit = 40.0 <= brightness <= 225.0
+
+        return jsonify({
+            "success": True,
+            "sharp": is_sharp,
+            "well_lit": is_well_lit,
+            "blur_score": round(variance_laplacian, 1),
+            "brightness_score": round(brightness, 1),
+            "quality_ok": is_sharp and is_well_lit
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 if __name__ == '__main__':
     port = int(os.getenv("PORT", 5000))
     print(f"[APP] Iniciando servidor backend na porta {port}...")

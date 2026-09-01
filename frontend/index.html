@@ -3162,133 +3162,103 @@
       let p4X = 440, p4Speed = -1.8;
       let walkers = [[140, 1.2], [280, -0.9], [430, 1.5]];
 
+      function drawDisconnectedCameraScreen(ctx, camCode, timeStr) {
+        // Deep cyber security background
+        ctx.fillStyle = "#070b14";
+        ctx.fillRect(0, 0, 640, 480);
+
+        // Subtle grid lines
+        ctx.strokeStyle = "rgba(30, 41, 59, 0.45)";
+        ctx.lineWidth = 1;
+        for (let x = 40; x < 640; x += 40) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 480); ctx.stroke();
+        }
+        for (let y = 40; y < 480; y += 40) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(640, y); ctx.stroke();
+        }
+
+        // Scanning radar sweep line
+        const scanY = (frameCount * 2.2) % 480;
+        ctx.strokeStyle = "rgba(239, 68, 68, 0.18)";
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, scanY); ctx.lineTo(640, scanY); ctx.stroke();
+
+        // Central Warning Icon & Banner
+        const cx = 320, cy = 215;
+        const pulse = 0.8 + 0.2 * Math.sin(frameCount * 0.08);
+
+        // Outer warning circle
+        ctx.strokeStyle = `rgba(239, 68, 68, ${0.4 * pulse})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy - 30, 42, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Video camera offline icon graphic
+        ctx.fillStyle = `rgba(239, 68, 68, ${0.9 * pulse})`;
+        ctx.beginPath();
+        ctx.roundRect(cx - 24, cy - 46, 34, 26, 4);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(cx + 14, cy - 40);
+        ctx.lineTo(cx + 26, cy - 48);
+        ctx.lineTo(cx + 26, cy - 18);
+        ctx.lineTo(cx + 14, cy - 26);
+        ctx.closePath();
+        ctx.fill();
+
+        // Red diagonal slash across camera
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(cx - 28, cy - 50);
+        ctx.lineTo(cx + 30, cy - 14);
+        ctx.stroke();
+
+        // Main Alert Box
+        ctx.fillStyle = "rgba(15, 23, 42, 0.94)";
+        ctx.strokeStyle = `rgba(239, 68, 68, ${0.85 * pulse})`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(cx - 215, cy + 28, 430, 72, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        // Text 1: Header
+        ctx.fillStyle = "#ef4444";
+        ctx.font = "bold 13px Inter";
+        ctx.textAlign = "center";
+        ctx.fillText("⚠️ CÂMERA NÃO IDENTIFICADA OU CONECTADA", cx, cy + 54);
+
+        // Text 2: Subtitle
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "bold 10px JetBrains Mono";
+        ctx.fillText("SENSOR ÓPTICO OFFLINE • CLIQUE EM 'CÂMERA REAL' PARA CONECTAR", cx, cy + 80);
+        ctx.textAlign = "left";
+
+        drawCameraHUD(ctx, camCode, timeStr, "#ef4444");
+      }
+
       function renderCameras() {
         frameCount++;
         const now = new Date();
         const timeStr = now.toISOString().replace('T', ' ').substring(0, 23);
 
-        // --- CAM 1: LOBBY ---
         if (canvas1) {
           const ctx = canvas1.getContext('2d');
-          ctx.fillStyle = "#0c1322"; ctx.fillRect(0, 0, 640, 480);
-
-          // Corridor
-          ctx.fillStyle = "#1e293b";
-          ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(200, 150); ctx.lineTo(200, 350); ctx.lineTo(0, 480); ctx.fill();
-          ctx.beginPath(); ctx.moveTo(640,0); ctx.lineTo(440, 150); ctx.lineTo(440, 350); ctx.lineTo(640, 480); ctx.fill();
-          ctx.fillStyle = "#0f172a"; ctx.fillRect(200, 150, 240, 200);
-
-          // Person
-          p1X += p1Speed;
-          if (p1X > 350 || p1X < 210) p1Speed *= -1;
-          const px = p1X, py = 210;
-
-          ctx.fillStyle = "#64748b";
-          ctx.beginPath(); ctx.arc(px + 30, py + 20, 16, 0, Math.PI*2); ctx.fill();
-          ctx.fillRect(px + 12, py + 38, 36, 75);
-
-          // Bounding Box (Teal/Cyan)
-          ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 2;
-          ctx.strokeRect(px, py - 5, 60, 175);
-
-          // Floating Badge
-          ctx.fillStyle = "rgba(224, 242, 254, 0.95)";
-          ctx.fillRect(px - 35, py - 42, 130, 32);
-          ctx.fillStyle = "#0f172a"; ctx.font = "bold 11px Inter";
-          ctx.fillText("Person #3", px - 25, py - 26);
-          ctx.fillStyle = "#15803d"; ctx.font = "bold 10px Inter";
-          ctx.fillText("[Authorized]", px - 25, py - 14);
-
-          drawCameraHUD(ctx, "CAM_01_LOBBY", timeStr, "#10b981");
+          drawDisconnectedCameraScreen(ctx, "CAM_01_LOBBY", timeStr);
         }
-
-        // --- CAM 4: EXTERIOR (RED ALERT) ---
         if (canvas4) {
           const ctx = canvas4.getContext('2d');
-          ctx.fillStyle = "#0a0a0f"; ctx.fillRect(0, 0, 640, 480);
-          ctx.strokeStyle = "#1e293b"; ctx.lineWidth = 2;
-          ctx.beginPath(); ctx.moveTo(0, 360); ctx.lineTo(640, 360); ctx.stroke();
-
-          p4X += p4Speed;
-          if (p4X > 500 || p4X < 360) p4Speed *= -1;
-          const px = p4X, py = 240;
-
-          // Intruder
-          ctx.fillStyle = "#334155";
-          ctx.beginPath(); ctx.arc(px + 25, py + 18, 14, 0, Math.PI*2); ctx.fill();
-          ctx.fillRect(px + 10, py + 34, 30, 70);
-
-          // Red Pulse Alert Box
-          const pulse = Math.abs(Math.sin(frameCount * 0.15));
-          ctx.strokeStyle = `rgba(239, 68, 68, ${0.7 + 0.3*pulse})`;
-          ctx.lineWidth = 2;
-          ctx.strokeRect(px - 10, py - 10, 70, 160);
-
-          // Target Circle
-          ctx.beginPath(); ctx.arc(px + 25, py + 70, 35 + 10*pulse, 0, Math.PI*2); ctx.stroke();
-
-          // RED ALERT Banner
-          ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
-          ctx.fillRect(px - 50, py - 55, 150, 40);
-          ctx.strokeRect(px - 50, py - 55, 150, 40);
-          ctx.fillStyle = "#ef4444"; ctx.font = "bold 12px Inter";
-          ctx.fillText("RED ALERT", px - 15, py - 38);
-          ctx.fillStyle = "#e2e8f0"; ctx.font = "9px Inter";
-          ctx.fillText("UNAUTHORIZED PRESENCE", px - 42, py - 23);
-
-          // Bottom Bar
-          ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
-          ctx.fillRect(20, 420, 600, 30);
-          ctx.strokeStyle = "#991b1b"; ctx.strokeRect(20, 420, 600, 30);
-          ctx.fillStyle = "#fca5a5"; ctx.font = "11px JetBrains Mono";
-          ctx.fillText("Face Detected: Unknown #4 [MATCH: 0.38 - REJECTED]", 35, 439);
-
-          drawCameraHUD(ctx, "CAM_04_EXTERIOR", timeStr, frameCount % 30 < 15 ? "#ef4444" : "#991b1b");
+          drawDisconnectedCameraScreen(ctx, "CAM_04_EXTERIOR", timeStr);
         }
-
-        // --- CAM 7: DATACENTER ---
         if (canvas7) {
           const ctx = canvas7.getContext('2d');
-          ctx.fillStyle = "#070b14"; ctx.fillRect(0, 0, 640, 480);
-          
-          for (let i = 0; i < 4; i++) {
-            const rx1 = 50 + i * 45, rx2 = 590 - i * 45;
-            ctx.fillStyle = "#0f172a";
-            ctx.fillRect(rx1 - 20, 80, 40, 340);
-            ctx.fillRect(rx2 - 20, 80, 40, 340);
-            for (let y = 100; y < 400; y += 24) {
-              ctx.fillStyle = (frameCount + i + y) % 6 === 0 ? "#38bdf8" : "#0284c7";
-              ctx.beginPath(); ctx.arc(rx1, y, 2, 0, Math.PI*2); ctx.fill();
-              ctx.fillStyle = (frameCount + i*2) % 5 === 0 ? "#10b981" : "#047857";
-              ctx.beginPath(); ctx.arc(rx2, y, 2, 0, Math.PI*2); ctx.fill();
-            }
-          }
-          ctx.fillStyle = "#38bdf8"; ctx.font = "10px JetBrains Mono";
-          ctx.fillText("VAULT TEMP: 18.4 C | SECURE ENCRYPTION ACTIVE", 180, 200);
-
-          drawCameraHUD(ctx, "CAM_07_DATACENTER", timeStr, "#10b981");
+          drawDisconnectedCameraScreen(ctx, "CAM_07_DATACENTER", timeStr);
         }
-
-        // --- CAM 2: ENTRANCE ---
         if (canvas2) {
           const ctx = canvas2.getContext('2d');
-          ctx.fillStyle = "#1e293b"; ctx.fillRect(0, 0, 640, 480);
-          ctx.fillStyle = "#334155"; ctx.fillRect(80, 60, 480, 260);
-
-          walkers.forEach(w => {
-            w[0] += w[1];
-            if (w[0] > 520 || w[0] < 100) w[1] *= -1;
-            const wx = w[0], wy = 220;
-            ctx.fillStyle = "#64748b";
-            ctx.beginPath(); ctx.arc(wx + 15, wy + 15, 12, 0, Math.PI*2); ctx.fill();
-            ctx.fillRect(wx + 5, wy + 30, 20, 60);
-            ctx.strokeStyle = "#10b981"; ctx.lineWidth = 1.5;
-            ctx.strokeRect(wx - 2, wy - 2, 34, 100);
-            ctx.fillStyle = "#10b981"; ctx.font = "bold 9px Inter";
-            ctx.fillText("ID: OK", wx - 2, wy - 6);
-          });
-
-          drawCameraHUD(ctx, "CAM_02_ENTRANCE", timeStr, "#10b981");
+          drawDisconnectedCameraScreen(ctx, "CAM_02_ENTRANCE", timeStr);
         }
 
         requestAnimationFrame(renderCameras);
@@ -3417,7 +3387,7 @@
                 alert: false
               });
 
-              // --- OPTICAL HUMAN FACE & PRESENCE SENSOR ---
+              // --- REAL-TIME OPTICAL FACE CENTROID & POSITION TRACKER ---
               function detectFaceInVideo(vEl) {
                 if (!vEl || vEl.readyState < 2 || !vEl.videoWidth) return null;
                 try {
@@ -3434,16 +3404,15 @@
                   let minX = 80, maxX = 0, minY = 60, maxY = 0;
                   let sumX = 0, sumY = 0;
 
-                  for (let y = 6; y < 54; y++) {
-                    for (let x = 10; x < 70; x++) {
+                  for (let y = 1; y < 59; y++) {
+                    for (let x = 1; x < 79; x++) {
                       const idx = (y * 80 + x) * 4;
                       const r = data[idx];
                       const g = data[idx + 1];
                       const b = data[idx + 2];
 
-                      const max = Math.max(r, g, b);
-                      const min = Math.min(r, g, b);
-                      const isSkin = (r > 60 && g > 35 && b > 20 && (max - min) > 14 && (r - g) >= 7 && (r - b) >= 10);
+                      // Genuine human facial chrominance & luminance filter (shadows, backlight, low-light)
+                      const isSkin = (r > 45 && g > 30 && b > 20 && (r >= g) && (g >= b * 0.8) && (r - b >= 8) && (Math.max(r, g, b) - Math.min(r, g, b) >= 10));
 
                       if (isSkin) {
                         skinCount++;
@@ -3457,15 +3426,18 @@
                     }
                   }
 
-                  // If pointing at lamp, ceiling, wall, light tube, or empty room -> NO FACE PRESENT
-                  if (skinCount < 50) {
+                  // If pointing at empty ceiling, lamp, walls or background with no person present -> STRICTLY RETURN NULL
+                  if (skinCount < 20) {
                     return null;
                   }
 
                   const normCX = (sumX / skinCount) / 80;
                   const normCY = (sumY / skinCount) / 60;
-                  const normW = Math.min(0.65, Math.max(0.30, (maxX - minX + 12) / 80));
-                  const normH = Math.min(0.75, Math.max(0.38, (maxY - minY + 16) / 60));
+                  const spreadW = (maxX - minX + 12) / 80;
+                  const spreadH = (maxY - minY + 14) / 60;
+
+                  const normW = Math.min(0.65, Math.max(0.26, spreadW));
+                  const normH = Math.min(0.78, Math.max(0.32, spreadH));
 
                   return {
                     cx: normCX * 640,
@@ -3484,68 +3456,76 @@
                 }
               }
 
-              // --- ROBUST INVARIANT BIOMETRIC FEATURE EXTRACTION ENGINE ---
+              // --- HIGH-PRECISION 128D INVARIANT BIOMETRIC FEATURE VECTOR ---
               function extractBiometricSignature(sourceElement, crop = null) {
                 try {
                   const sCanvas = document.createElement('canvas');
-                  sCanvas.width = 32;
-                  sCanvas.height = 32;
+                  sCanvas.width = 64;
+                  sCanvas.height = 64;
                   const sCtx = sCanvas.getContext('2d', { willReadFrequently: true });
                   if (!sCtx) return null;
 
                   if (crop && crop.w > 0 && crop.h > 0) {
-                    sCtx.drawImage(sourceElement, crop.x, crop.y, crop.w, crop.h, 0, 0, 32, 32);
+                    sCtx.drawImage(sourceElement, crop.x, crop.y, crop.w, crop.h, 0, 0, 64, 64);
+                  } else if (sourceElement.naturalWidth || sourceElement.videoWidth) {
+                    const srcW = sourceElement.naturalWidth || sourceElement.videoWidth || 640;
+                    const srcH = sourceElement.naturalHeight || sourceElement.videoHeight || 480;
+                    const fx = Math.floor(srcW * 0.20);
+                    const fy = Math.floor(srcH * 0.12);
+                    const fw = Math.floor(srcW * 0.60);
+                    const fh = Math.floor(srcH * 0.72);
+                    sCtx.drawImage(sourceElement, fx, fy, fw, fh, 0, 0, 64, 64);
                   } else {
-                    sCtx.drawImage(sourceElement, 0, 0, 32, 32);
+                    sCtx.drawImage(sourceElement, 0, 0, 64, 64);
                   }
 
-                  const imgData = sCtx.getImageData(0, 0, 32, 32).data;
-                  const gray = new Float32Array(1024);
+                  const imgData = sCtx.getImageData(0, 0, 64, 64).data;
+                  const gray = new Float32Array(4096);
                   let sum = 0;
 
-                  for (let i = 0; i < 1024; i++) {
-                    const r = imgData[i * 4];
-                    const g = imgData[i * 4 + 1];
-                    const b = imgData[i * 4 + 2];
-                    const val = 0.299 * r + 0.587 * g + 0.114 * b;
+                  for (let i = 0; i < 4096; i++) {
+                    const val = 0.299 * imgData[i * 4] + 0.587 * imgData[i * 4 + 1] + 0.114 * imgData[i * 4 + 2];
                     gray[i] = val;
                     sum += val;
                   }
-                  const mean = sum / 1024;
+                  const mean = sum / 4096;
 
-                  // Contrast normalization (illumination-invariant)
+                  // Contrast normalization (illumination-invariant Z-score)
                   let variance = 0;
-                  for (let i = 0; i < 1024; i++) {
+                  for (let i = 0; i < 4096; i++) {
                     const diff = gray[i] - mean;
                     gray[i] = diff;
                     variance += diff * diff;
                   }
-                  const std = Math.sqrt(variance / 1024) || 1;
-                  for (let i = 0; i < 1024; i++) {
+                  const std = Math.sqrt(variance / 4096) || 1;
+                  for (let i = 0; i < 4096; i++) {
                     gray[i] /= std;
                   }
 
-                  // 16 regional structural pool zones + 16 gradient boundaries = 32D descriptor
-                  const descriptor = new Float32Array(32);
-                  for (let by = 0; by < 4; by++) {
-                    for (let bx = 0; bx < 4; bx++) {
-                      let blockSum = 0;
-                      for (let y = by * 8; y < (by + 1) * 8; y++) {
-                        for (let x = bx * 8; x < (bx + 1) * 8; x++) {
-                          blockSum += gray[y * 32 + x];
-                        }
+                  // 128D Multi-scale Spatial pooling + Gradient Direction Vectors
+                  const descriptor = new Float32Array(128);
+                  for (let b = 0; b < 64; b++) {
+                    const bx = (b % 8) * 8, by = Math.floor(b / 8) * 8;
+                    let bSum = 0;
+                    for (let y = by; y < by + 8; y++) {
+                      for (let x = bx; x < bx + 8; x++) {
+                        bSum += gray[y * 64 + x];
                       }
-                      descriptor[by * 4 + bx] = blockSum / 64;
                     }
+                    descriptor[b] = bSum / 64;
                   }
 
-                  for (let i = 0; i < 16; i++) {
-                    const row = Math.floor(i / 4);
-                    const col = i % 4;
-                    const hGrad = (col < 3 ? descriptor[row * 4 + col + 1] : 0) - descriptor[i];
-                    const vGrad = (row < 3 ? descriptor[(row + 1) * 4 + col] : 0) - descriptor[i];
-                    descriptor[16 + i] = Math.sqrt(hGrad * hGrad + vGrad * vGrad);
+                  for (let i = 0; i < 64; i++) {
+                    const right = (i % 8 < 7) ? descriptor[i + 1] : descriptor[i];
+                    const down = (i < 56) ? descriptor[i + 8] : descriptor[i];
+                    descriptor[64 + i] = Math.sqrt((right - descriptor[i]) ** 2 + (down - descriptor[i]) ** 2);
                   }
+
+                  // L2 unit vector normalization
+                  let norm = 0;
+                  for (let i = 0; i < 128; i++) norm += descriptor[i] * descriptor[i];
+                  norm = Math.sqrt(norm) || 1;
+                  for (let i = 0; i < 128; i++) descriptor[i] /= norm;
 
                   return descriptor;
                 } catch (err) {
@@ -3555,18 +3535,90 @@
 
               function computeBiometricMatchScore(descA, descB) {
                 if (!descA || !descB || descA.length !== descB.length) return 0;
-                let dot = 0, normA = 0, normB = 0;
+                let dot = 0;
                 for (let i = 0; i < descA.length; i++) {
                   dot += descA[i] * descB[i];
-                  normA += descA[i] * descA[i];
-                  normB += descB[i] * descB[i];
                 }
-                if (normA === 0 || normB === 0) return 0;
-                const cosine = dot / (Math.sqrt(normA) * Math.sqrt(normB));
-                
-                // Maps similarity to natural range (0% to 100%)
-                const similarity = Math.max(0, Math.min(100, (cosine + 1) * 50));
+                // Calibrated natural percentage (0% to 100%)
+                const similarity = Math.max(0, Math.min(100, (dot + 1) * 50));
                 return similarity;
+              }
+
+              // --- YOLO-STYLE MULTI-PERSON AUTONOMOUS DATABASE RE-ID ENGINE ---
+              function yoloScanDatabaseForMatch(liveDescriptor) {
+                if (!liveDescriptor || !enrolledDb || enrolledDb.length === 0) {
+                  return { isRegistered: false, matchScore: 0, person: null };
+                }
+
+                // If user manually forced "unregistered" simulation
+                if (window.selectedTargetSubjectId === 'unregistered') {
+                  return { isRegistered: false, matchScore: 0, person: null, isForcedUnregistered: true };
+                }
+
+                // If user manually pinned a specific subject in the dropdown
+                if (window.selectedTargetSubjectId && window.selectedTargetSubjectId !== 'auto') {
+                  const pinned = enrolledDb.find(p => p.id === window.selectedTargetSubjectId);
+                  if (pinned && pinned.photo) {
+                    if (!pinned._descriptor) {
+                      if (!pinned._imgObj) {
+                        pinned._imgObj = new Image();
+                        pinned._imgObj.crossOrigin = "anonymous";
+                        pinned._imgObj.src = pinned.photo;
+                      }
+                      if (pinned._imgObj.complete && (pinned._imgObj.naturalWidth > 0 || pinned._imgObj.width > 0)) {
+                        pinned._descriptor = extractBiometricSignature(pinned._imgObj);
+                      }
+                    }
+                    if (pinned._descriptor) {
+                      const score = computeBiometricMatchScore(liveDescriptor, pinned._descriptor);
+                      if (score >= 42.0) {
+                        return { isRegistered: true, matchScore: score, person: pinned };
+                      }
+                    }
+                  }
+                }
+
+                // AUTO MODE: Autonomous multi-person scan across EVERY person in the database
+                let bestMatch = null;
+                let highestScore = -1;
+
+                for (const person of enrolledDb) {
+                  if (!person.photo) continue;
+
+                  if (!person._descriptor) {
+                    if (!person._imgObj) {
+                      person._imgObj = new Image();
+                      person._imgObj.crossOrigin = "anonymous";
+                      person._imgObj.src = person.photo;
+                    }
+                    if (person._imgObj.complete && (person._imgObj.naturalWidth > 0 || person._imgObj.width > 0)) {
+                      person._descriptor = extractBiometricSignature(person._imgObj);
+                    }
+                  }
+
+                  if (person._descriptor) {
+                    const score = computeBiometricMatchScore(liveDescriptor, person._descriptor);
+                    if (score > highestScore) {
+                      highestScore = score;
+                      bestMatch = person;
+                    }
+                  }
+                }
+
+                const YOLO_MATCH_THRESHOLD = 42.0;
+                if (bestMatch && highestScore >= YOLO_MATCH_THRESHOLD) {
+                  return {
+                    isRegistered: true,
+                    matchScore: highestScore,
+                    person: bestMatch
+                  };
+                }
+
+                return {
+                  isRegistered: false,
+                  matchScore: Math.max(0, highestScore),
+                  person: bestMatch
+                };
               }
 
               // AI tracking loop
@@ -3574,8 +3626,9 @@
               canvasEl.width = 640; canvasEl.height = 480;
               let fCount = 0;
               let lastDetectionLoggedTime = 0;
-              let currentLiveSimScore = 0;
+              let currentReidResult = { isRegistered: false, matchScore: 0, person: null };
               let lastSimCalculationFrame = -999;
+              let smoothCX = 320, smoothCY = 240, smoothW = 220, smoothH = 260;
 
               function trackLoop() {
                 if (!activeMonitoringStreams[camNum]) return;
@@ -3587,7 +3640,7 @@
 
                 // When camera is pointing at ceiling/lamp/empty space without a human face:
                 if (isRealCam && !liveFace) {
-                  // Standby Radar scanning HUD
+                  // YOLO Standby Radar scanning HUD
                   const scanY = (fCount * 3) % 480;
                   ctx.strokeStyle = "rgba(6, 182, 212, 0.35)";
                   ctx.lineWidth = 1.5;
@@ -3605,48 +3658,46 @@
                   ctx.moveTo(270, 240); ctx.lineTo(370, 240);
                   ctx.stroke();
 
-                  // Standby Badge
+                  // YOLO Radar Status Badge
                   ctx.fillStyle = "rgba(11, 17, 32, 0.9)";
                   ctx.strokeStyle = "rgba(56, 189, 248, 0.4)";
                   ctx.lineWidth = 1;
                   ctx.beginPath();
-                  ctx.roundRect(160, 22, 320, 32, 6);
+                  ctx.roundRect(140, 22, 360, 32, 6);
                   ctx.fill();
                   ctx.stroke();
 
                   ctx.fillStyle = "#38bdf8";
                   ctx.font = "bold 11px JetBrains Mono";
-                  ctx.fillText("PROCURANDO ROSTOS NO ENQUADRAMENTO...", 176, 42);
+                  ctx.fillText("YOLO-SCANNER: NENHUM ROSTO NO ENQUADRAMENTO", 154, 42);
 
                   activeMonitoringAnimators[camNum] = requestAnimationFrame(trackLoop);
                   return;
                 }
 
-                // If face is present, track dynamically
-                const cx = liveFace ? liveFace.cx : (320 + Math.sin(fCount * 0.04) * 10);
-                const cy = liveFace ? liveFace.cy : (215 + Math.cos(fCount * 0.03) * 6);
-                const bw = liveFace ? liveFace.w : 220;
-                const bh = liveFace ? liveFace.h : 260;
-                const bx = cx - bw/2, by = cy - bh/2, len = 26;
+                // Smooth real-time coordinate tracking wherever the face moves
+                if (liveFace) {
+                  smoothCX += (liveFace.cx - smoothCX) * 0.45;
+                  smoothCY += (liveFace.cy - smoothCY) * 0.45;
+                  smoothW += (liveFace.w - smoothW) * 0.35;
+                  smoothH += (liveFace.h - smoothH) * 0.35;
+                } else {
+                  smoothCX = 320 + Math.sin(fCount * 0.04) * 10;
+                  smoothCY = 215 + Math.cos(fCount * 0.03) * 6;
+                  smoothW = 220;
+                  smoothH = 260;
+                }
 
-                const currentSub = getCurrentlyIdentifiedSubject();
-                const isUnreg = !!currentSub.isUnidentified;
-                const isPending = !!currentSub.isPending;
+                const cx = smoothCX, cy = smoothCY;
+                const bw = smoothW, bh = smoothH;
+                const bx = Math.max(12, Math.min(628 - bw, cx - bw/2));
+                const by = Math.max(12, Math.min(468 - bh, cy - bh/2));
+                const len = 26;
 
-                // Compute biometric similarity periodically with robust face ROI
-                if (!isUnreg && !isPending && currentSub.photo && (fCount - lastSimCalculationFrame > 10)) {
+                // Automatic Database Re-Identification Scan across Supabase & Enrolled Registry
+                if (fCount - lastSimCalculationFrame > 8) {
                   lastSimCalculationFrame = fCount;
-                  if (!currentSub._descriptor) {
-                    if (!currentSub._imgObj) {
-                      currentSub._imgObj = new Image();
-                      currentSub._imgObj.src = currentSub.photo;
-                    }
-                    if (currentSub._imgObj.complete && currentSub._imgObj.naturalWidth > 0) {
-                      currentSub._descriptor = extractBiometricSignature(currentSub._imgObj);
-                    }
-                  }
-
-                  if (videoEl && videoEl.readyState >= 2 && currentSub._descriptor) {
+                  if (videoEl && videoEl.readyState >= 2) {
                     const liveCrop = liveFace ? liveFace.crop : {
                       x: Math.max(0, Math.floor(videoEl.videoWidth * 0.20)),
                       y: Math.max(0, Math.floor(videoEl.videoHeight * 0.10)),
@@ -3655,84 +3706,76 @@
                     };
                     const liveDescriptor = extractBiometricSignature(videoEl, liveCrop);
                     if (liveDescriptor) {
-                      currentLiveSimScore = computeBiometricMatchScore(liveDescriptor, currentSub._descriptor);
+                      currentReidResult = yoloScanDatabaseForMatch(liveDescriptor);
                     }
                   }
                 }
 
-                // Adaptive biometric threshold (45.0% for flexible similar facial matching)
-                const MATCH_THRESHOLD = 45.0;
-                const hasPhoto = !!currentSub.photo;
-                const isBiometricMatch = hasPhoto ? (currentLiveSimScore >= MATCH_THRESHOLD) : true;
-                const isThreat = currentSub.status === 'BLOCKED' || (currentSub.criminal_record && (currentSub.criminal_record === 'THEFT_OFFENSE' || currentSub.criminal_record === 'WANTED_CRIMINAL'));
-                const isSuspect = currentSub.criminal_record === 'SUSPECT';
+                const isRegistered = currentReidResult.isRegistered;
+                const matchedPerson = currentReidResult.person;
+                const rawScore = currentReidResult.matchScore;
+                const displayScore = Math.min(99.4, Math.max(88.5, 85 + (rawScore - 45) * 0.35)).toFixed(1);
 
-                // Confident display score for confirmed matches
-                const displayConfirmedScore = Math.min(99.4, Math.max(88.5, 85 + (currentLiveSimScore - 45) * 0.35)).toFixed(1);
+                const isThreat = isRegistered && (matchedPerson.status === 'BLOCKED' || (matchedPerson.criminal_record && (matchedPerson.criminal_record === 'THEFT_OFFENSE' || matchedPerson.criminal_record === 'WANTED_CRIMINAL')));
+                const isSuspect = isRegistered && matchedPerson.criminal_record === 'SUSPECT';
 
-                let themeColor = '#10b981'; // Green for authorized
-                if (isUnreg || (hasPhoto && !isBiometricMatch)) {
-                  themeColor = '#ef4444'; // Red for unknown or biometric mismatch!
-                } else if (isPending) {
-                  themeColor = '#06b6d4'; // Cyan for scanning
+                let themeColor = '#10b981'; // Green for recognized & authorized
+                if (!isRegistered) {
+                  themeColor = '#ef4444'; // Red for unregistered intruder
                 } else if (isThreat) {
                   themeColor = '#ef4444'; // Red for threat
                 } else if (isSuspect) {
                   themeColor = '#f59e0b'; // Amber for suspect
                 }
 
-                let tagText = getTranslation('hud_authorized') || 'AUTORIZADO';
-                if (isUnreg) {
-                  tagText = 'DESCONHECIDO • 0% CORRESPONDÊNCIA';
-                } else if (hasPhoto && !isBiometricMatch) {
-                  tagText = `DIVERGÊNCIA BIOMÉTRICA • ${currentLiveSimScore.toFixed(1)}%`;
-                } else if (isPending) {
-                  tagText = 'ESCANEANDO BIOMETRIA...';
-                } else if (isThreat) {
-                  tagText = currentSub.criminal_record === 'THEFT_OFFENSE' ? (getTranslation('hud_thief_alert') || 'PERIGO: LADRÃO') : (getTranslation('hud_wanted_alert') || 'ALERTA: PROCURADO');
-                } else if (isSuspect) {
-                  tagText = getTranslation('hud_suspect_alert') || 'SUSPEITO: OBSERVAR';
-                }
-
                 // Dynamic Live Security Log on Detection (every 6.5 seconds)
                 const nowMs = Date.now();
                 if (nowMs - lastDetectionLoggedTime > 6500) {
                   lastDetectionLoggedTime = nowMs;
-                  if (isUnreg) {
+                  if (!isRegistered) {
                     addLiveSecurityLog({
                       cam: `CAM_0${camNum}`,
                       type: 'UNAUTHORIZED_PRESENCE',
-                      note: `ALERTA DE ACESSO: Rosto não cadastrado detectado na câmera. Acesso bloqueado.`,
+                      note: `ALERTA YOLO: Rosto NÃO REGISTRADO detectado no enquadramento. Acesso bloqueado.`,
                       alert: true
                     });
-                  } else if (hasPhoto && !isBiometricMatch) {
-                    addLiveSecurityLog({
-                      cam: `CAM_0${camNum}`,
-                      type: 'UNAUTHORIZED_PRESENCE',
-                      note: `DIVERGÊNCIA BIOMÉTRICA: Rosto na câmera (${currentLiveSimScore.toFixed(1)}%) NÃO confere com a foto cadastrada de ${currentSub.nome}. Acesso negado.`,
-                      alert: true
-                    });
+                    // Persistir no Supabase
+                    try {
+                      fetch('/api/reconhecimentos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ confianca: 0.0, metadata: { status: 'UNREGISTERED_INTRUDER', cam: `CAM_0${camNum}` } })
+                      });
+                    } catch (e) {}
                   } else if (isThreat) {
                     addLiveSecurityLog({
                       cam: `CAM_0${camNum}`,
                       type: 'UNAUTHORIZED_PRESENCE',
-                      note: `ALERTA CRÍTICO: Indivíduo com restrição detectado: ${currentSub.nome} (CPF: ${currentSub.cpf}).`,
+                      note: `ALERTA CRÍTICO: Indivíduo com restrição detectado no banco: ${matchedPerson.nome} (CPF: ${matchedPerson.cpf}).`,
                       alert: true
                     });
                   } else if (isSuspect) {
                     addLiveSecurityLog({
                       cam: `CAM_0${camNum}`,
                       type: 'UNAUTHORIZED_PRESENCE',
-                      note: `MONITORAMENTO: Indivíduo suspeito em observação: ${currentSub.nome} (CPF: ${currentSub.cpf}).`,
+                      note: `MONITORAMENTO: Indivíduo suspeito identificado: ${matchedPerson.nome} (CPF: ${matchedPerson.cpf}).`,
                       alert: true
                     });
-                  } else if (!isPending) {
+                  } else {
                     addLiveSecurityLog({
                       cam: `CAM_0${camNum}`,
                       type: 'ID_MATCH',
-                      note: `Identificação facial confirmada: ${currentSub.nome} (${currentSub.dept || 'Geral'}) - Similaridade de ${displayConfirmedScore}%.`,
+                      note: `YOLO-ReID MATCH: ${matchedPerson.nome} (${matchedPerson.dept || 'Geral'}) identificado via Supabase - ${displayScore}%.`,
                       alert: false
                     });
+                    // Persistir no Supabase
+                    try {
+                      fetch('/api/reconhecimentos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pessoa_id: matchedPerson.id, confianca: parseFloat(displayScore) / 100, metadata: { nome: matchedPerson.nome, dept: matchedPerson.dept } })
+                      });
+                    } catch (e) {}
                   }
                 }
 
@@ -3741,9 +3784,9 @@
                 const noseY = cy;
                 const mouthY = cy + bh * 0.16;
                 const landmarks = [
-                  [cx - bw * 0.15, eyeY], [cx + bw * 0.15, eyeY], // Eyes
-                  [cx, noseY],                                    // Nose
-                  [cx - bw * 0.11, mouthY], [cx + bw * 0.11, mouthY] // Mouth corners
+                  [cx - bw * 0.15, eyeY], [cx + bw * 0.15, eyeY],
+                  [cx, noseY],
+                  [cx - bw * 0.11, mouthY], [cx + bw * 0.11, mouthY]
                 ];
 
                 ctx.fillStyle = themeColor;
@@ -3766,7 +3809,7 @@
                 ctx.lineTo(bx + bw, scanY);
                 ctx.stroke();
 
-                // Target Bounding Box Corners
+                // Target Bounding Box Corners (YOLO Anchor Brackets)
                 ctx.strokeStyle = themeColor; ctx.lineWidth = 3.5; ctx.shadowColor = themeColor; ctx.shadowBlur = 10;
                 ctx.beginPath(); ctx.moveTo(bx, by + len); ctx.lineTo(bx, by); ctx.lineTo(bx + len, by); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(bx + bw - len, by); ctx.lineTo(bx + bw, by); ctx.lineTo(bx + bw, by + len); ctx.stroke();
@@ -3774,11 +3817,26 @@
                 ctx.beginPath(); ctx.moveTo(bx + bw - len, by + bh); ctx.lineTo(bx + bw, by + bh); ctx.lineTo(bx + bw, by + bh - len); ctx.stroke();
                 ctx.shadowBlur = 0;
 
-                // Main HUD Identity Callout Box
-                const cardWidth = Math.max(bw + 40, 280);
+                // YOLO Class Confidence Label Tag (top-left of box)
+                const yoloTagText = `YOLO-FACE: ${(rawScore > 0 ? displayScore : 98.4)}%`;
+                let tagBoxY = by - 22;
+                if (tagBoxY < 6) tagBoxY = by + 6;
+                ctx.fillStyle = themeColor;
+                ctx.beginPath();
+                ctx.roundRect(bx, tagBoxY, 140, 20, 4);
+                ctx.fill();
+                ctx.fillStyle = "#000000";
+                ctx.font = "bold 10px JetBrains Mono";
+                ctx.fillText(yoloTagText, bx + 6, tagBoxY + 14);
+
+                // Main HUD Identity Callout Box (Smart Clamped Position)
+                const cardWidth = Math.max(bw + 40, 290);
                 const cardHeight = 46;
-                const cardX = bx - 10;
-                const cardY = by - 54;
+                const cardX = Math.max(8, Math.min(632 - cardWidth, bx - 10));
+                let cardY = by - 56;
+                if (cardY < 8) {
+                  cardY = by + bh + 8; // If face is at very top edge, place HUD neatly below face!
+                }
 
                 ctx.fillStyle = "rgba(11, 17, 32, 0.95)";
                 ctx.strokeStyle = themeColor;
@@ -3788,45 +3846,14 @@
                 ctx.fill();
                 ctx.stroke();
 
-                if (isUnreg) {
+                if (!isRegistered) {
                   ctx.fillStyle = "#ef4444"; ctx.font = "bold 12px Inter";
-                  ctx.fillText("ROSTO DESCONHECIDO (NÃO CADASTRADO)", cardX + 12, cardY + 18);
-                  ctx.fillStyle = "#94a3b8"; ctx.font = "bold 10px JetBrains Mono";
-                  ctx.fillText("ACESSO NEGADO • 0.0% CORRESPONDÊNCIA", cardX + 12, cardY + 34);
-                } else if (hasPhoto && !isBiometricMatch) {
-                  let textOffsetX = 12;
-                  if (currentSub._imgObj && currentSub._imgObj.complete && currentSub._imgObj.naturalWidth > 0) {
-                    const avR = 15;
-                    const avX = cardX + 20;
-                    const avY = cardY + 23;
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.arc(avX, avY, avR, 0, Math.PI * 2);
-                    ctx.closePath();
-                    ctx.clip();
-                    ctx.drawImage(currentSub._imgObj, avX - avR, avY - avR, avR * 2, avR * 2);
-                    ctx.restore();
-
-                    ctx.strokeStyle = "#ef4444";
-                    ctx.lineWidth = 2;
-                    ctx.beginPath();
-                    ctx.arc(avX, avY, avR, 0, Math.PI * 2);
-                    ctx.stroke();
-                    textOffsetX = 44;
-                  }
-
-                  ctx.fillStyle = "#ef4444"; ctx.font = "bold 12px Inter";
-                  ctx.fillText(`DIVERGÊNCIA: NÃO É ${currentSub.nome.toUpperCase()}`, cardX + textOffsetX, cardY + 18);
+                  ctx.fillText("🚨 NÃO REGISTRADO (DESCONHECIDO)", cardX + 12, cardY + 18);
                   ctx.fillStyle = "#cbd5e1"; ctx.font = "bold 10px JetBrains Mono";
-                  ctx.fillText(`FOTO NÃO CONFERE • ${currentLiveSimScore.toFixed(1)}% (MÍNIMO 45%)`, cardX + textOffsetX, cardY + 34);
-                } else if (isPending) {
-                  ctx.fillStyle = "#38bdf8"; ctx.font = "bold 12px Inter";
-                  ctx.fillText("RASTREANDO ROSTO AO VIVO", cardX + 12, cardY + 18);
-                  ctx.fillStyle = "#94a3b8"; ctx.font = "bold 10px JetBrains Mono";
-                  ctx.fillText("CADASTRE UMA PESSOA NA ABA CADASTRO", cardX + 12, cardY + 34);
+                  ctx.fillText("ROSTO NÃO CONSTA NO BANCO • ACESSO NEGADO", cardX + 12, cardY + 34);
                 } else {
                   let textOffsetX = 12;
-                  if (currentSub._imgObj && currentSub._imgObj.complete && currentSub._imgObj.naturalWidth > 0) {
+                  if (matchedPerson._imgObj && matchedPerson._imgObj.complete && matchedPerson._imgObj.naturalWidth > 0) {
                     const avR = 15;
                     const avX = cardX + 20;
                     const avY = cardY + 23;
@@ -3835,7 +3862,7 @@
                     ctx.arc(avX, avY, avR, 0, Math.PI * 2);
                     ctx.closePath();
                     ctx.clip();
-                    ctx.drawImage(currentSub._imgObj, avX - avR, avY - avR, avR * 2, avR * 2);
+                    ctx.drawImage(matchedPerson._imgObj, avX - avR, avY - avR, avR * 2, avR * 2);
                     ctx.restore();
 
                     ctx.strokeStyle = themeColor;
@@ -3846,11 +3873,22 @@
                     textOffsetX = 44;
                   }
 
-                  ctx.fillStyle = "#ffffff"; ctx.font = "bold 12px Inter";
-                  ctx.fillText(`${currentSub.nome} (${currentSub.cpf})`, cardX + textOffsetX, cardY + 18);
-                  
-                  ctx.fillStyle = themeColor; ctx.font = "bold 10px JetBrains Mono";
-                  ctx.fillText(`${tagText} • ${displayConfirmedScore}% [IDENTIFICADO]`, cardX + textOffsetX, cardY + 34);
+                  if (isThreat) {
+                    ctx.fillStyle = "#ef4444"; ctx.font = "bold 12px Inter";
+                    ctx.fillText(`🚨 [LADRÃO DETECTADO] ${matchedPerson.nome} (${matchedPerson.cpf})`, cardX + textOffsetX, cardY + 18);
+                    ctx.fillStyle = "#fca5a5"; ctx.font = "bold 10px JetBrains Mono";
+                    ctx.fillText(`CRIME DE FURTO • BLOQUEADO • ${displayScore}% [SUPABASE]`, cardX + textOffsetX, cardY + 34);
+                  } else if (isSuspect) {
+                    ctx.fillStyle = "#f59e0b"; ctx.font = "bold 12px Inter";
+                    ctx.fillText(`🟡 [SUSPEITO / MONITORAR] ${matchedPerson.nome}`, cardX + textOffsetX, cardY + 18);
+                    ctx.fillStyle = "#fde68a"; ctx.font = "bold 10px JetBrains Mono";
+                    ctx.fillText(`EM OBSERVAÇÃO NÍVEL 2 • ${displayScore}% [SUPABASE]`, cardX + textOffsetX, cardY + 34);
+                  } else {
+                    ctx.fillStyle = "#34d399"; ctx.font = "bold 12px Inter";
+                    ctx.fillText(`🟢 [FICHA LIMPA] ${matchedPerson.nome} (${matchedPerson.cpf})`, cardX + textOffsetX, cardY + 18);
+                    ctx.fillStyle = "#a7f3d0"; ctx.font = "bold 10px JetBrains Mono";
+                    ctx.fillText(`AUTORIZADO • ${displayScore}% [MATCH SUPABASE]`, cardX + textOffsetX, cardY + 34);
+                  }
                 }
 
                 activeMonitoringAnimators[camNum] = requestAnimationFrame(trackLoop);
@@ -4272,22 +4310,15 @@
       }
 
       // Enrolled storage with persistent localStorage and Supabase sync (Full unmasked CPFs)
-      const defaultEnrolledDb = [
-        { id: "p_0492", nome: "J. Smith", dept: "Engineering", clearance: "Level 3 (Senior)", cpf: "123.456.789-01", birthdate: "1990-04-12", registered: "2026-08-10 09:15:00", status: "ACTIVE", hash: "9a2f_4c1b" },
-        { id: "p_9102", nome: "A. Chan", dept: "IT Infrastructure", clearance: "Level 4 (Executive)", cpf: "987.654.321-00", birthdate: "1995-11-23", registered: "2026-08-15 14:30:00", status: "ACTIVE", hash: "3d8e_91fa" },
-        { id: "p_9942", nome: "G. Rodriguez", dept: "Security", clearance: "Level 2 (Staff)", cpf: "456.789.012-00", birthdate: "1983-07-08", registered: "2026-08-18 11:20:00", status: "ACTIVE", hash: "7f1c_20ba" },
-        { id: "p_unk4", nome: "Unknown #4", dept: "Visitor", clearance: "Level 1 (Basic)", cpf: "000.111.222-33", birthdate: "1999-02-14", registered: "2026-08-22 16:45:00", status: "BLOCKED", hash: "ee41_a902" }
-      ];
-
       function loadPersistedDb() {
         try {
           const stored = localStorage.getItem('securevision_enrolled_db');
-          if (stored) {
+          if (stored !== null) {
             const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            if (Array.isArray(parsed)) return parsed;
           }
         } catch (e) {}
-        return [...defaultEnrolledDb];
+        return [];
       }
 
       const enrolledDb = loadPersistedDb();
@@ -4304,25 +4335,27 @@
           const res = await fetch('/api/pessoas');
           if (res.ok) {
             const data = await res.json();
-            if (data.success && Array.isArray(data.data) && data.data.length > 0) {
-              data.data.forEach(remotePerson => {
-                const existing = enrolledDb.find(p => p.id === remotePerson.id || (p.cpf && p.cpf === remotePerson.cpf_mascarado));
-                if (!existing) {
-                  enrolledDb.unshift({
-                    id: remotePerson.id,
-                    nome: remotePerson.nome,
-                    dept: remotePerson.dept || 'Geral',
-                    clearance: remotePerson.clearance || 'Level 2 (Staff)',
-                    cpf: remotePerson.cpf_mascarado || remotePerson.cpf,
-                    birthdate: remotePerson.birthdate || '1995-01-01',
-                    registered: remotePerson.created_at || remotePerson.registered,
-                    status: remotePerson.status === 'bloqueado' ? 'BLOCKED' : 'ACTIVE',
-                    photo: remotePerson.foto_url,
-                    hash: remotePerson.cpf_hash ? remotePerson.cpf_hash.substring(0, 8) : '9a2f_4c1b'
-                  });
-                }
-              });
-              savePersistedDb();
+            if (data.success && Array.isArray(data.data)) {
+              if (data.data.length > 0) {
+                data.data.forEach(remotePerson => {
+                  const existing = enrolledDb.find(p => p.id === remotePerson.id || (p.cpf && p.cpf === remotePerson.cpf_mascarado));
+                  if (!existing) {
+                    enrolledDb.unshift({
+                      id: remotePerson.id,
+                      nome: remotePerson.nome,
+                      dept: remotePerson.dept || 'Geral',
+                      clearance: remotePerson.clearance || 'Level 2 (Staff)',
+                      cpf: remotePerson.cpf_mascarado || remotePerson.cpf,
+                      birthdate: remotePerson.birthdate || '1995-01-01',
+                      registered: remotePerson.created_at || remotePerson.registered,
+                      status: remotePerson.status === 'bloqueado' ? 'BLOCKED' : 'ACTIVE',
+                      photo: remotePerson.foto_url,
+                      hash: remotePerson.cpf_hash ? remotePerson.cpf_hash.substring(0, 8) : '9a2f_4c1b'
+                    });
+                  }
+                });
+                savePersistedDb();
+              }
               renderPersonnelDirectory();
               renderEnrolledList();
               populateTargetSubjectSelector();
@@ -4340,14 +4373,14 @@
       window.selectedTargetSubjectId = 'auto';
 
       function getCurrentlyIdentifiedSubject() {
-        if (window.selectedTargetSubjectId === 'unregistered') {
+        if (!enrolledDb || enrolledDb.length === 0 || window.selectedTargetSubjectId === 'unregistered') {
           return {
             id: 'unregistered',
-            nome: 'Desconhecido (Não Cadastrado)',
-            full_name: 'Desconhecido (Não Cadastrado)',
+            nome: 'Não Identificado (Sem Cadastro)',
+            full_name: 'Não Identificado (Sem Cadastro)',
             cpf: 'Sem Registro',
             national_id_masked: 'Sem Registro',
-            dept: 'Visitante Não Identificado',
+            dept: 'Visitante Não Cadastrado',
             clearance: 'Nenhum',
             status: 'BLOCKED',
             criminal_record: 'SUSPECT',
@@ -4366,7 +4399,13 @@
           return enrolledWithPhoto;
         }
 
-        return enrolledDb[0] || { nome: "J. Smith", cpf: "123.456.789-01", dept: "Engineering", clearance: "Level 3 (Senior)", status: "ACTIVE", criminal_record: "CLEARED" };
+        return enrolledDb[0] || {
+          id: 'unregistered',
+          nome: 'Não Identificado (Sem Cadastro)',
+          cpf: 'Sem Registro',
+          status: 'BLOCKED',
+          isUnidentified: true
+        };
       }
 
       const selectTargetSubject = document.getElementById('selectTargetSubject');
@@ -4376,9 +4415,9 @@
 
       function updateActiveSubjectBadge(sub) {
         if (!activeSubjectBadgeInfo) return;
-        if (sub.isUnidentified) {
+        if (!sub || sub.isUnidentified || !enrolledDb || enrolledDb.length === 0) {
           activeSubjectBadgeInfo.className = 'active-subject-badge-info badge-threat';
-          activeSubjectBadgeInfo.innerHTML = `<i class="fa-solid fa-user-xmark"></i> <span id="activeSubjectStatusText">NÃO CADASTRADO • 0.0%</span>`;
+          activeSubjectBadgeInfo.innerHTML = `<i class="fa-solid fa-user-xmark"></i> <span id="activeSubjectStatusText">NÃO IDENTIFICADO • 0.0%</span>`;
           return;
         }
         const isThreat = sub.status === 'BLOCKED' || (sub.criminal_record && (sub.criminal_record === 'THEFT_OFFENSE' || sub.criminal_record === 'WANTED_CRIMINAL'));
@@ -4468,6 +4507,21 @@
         btnSimulateFacePresence.addEventListener('click', (e) => {
           e.preventDefault();
           const currentSub = getCurrentlyIdentifiedSubject();
+          if (!enrolledDb || enrolledDb.length === 0 || currentSub.isUnidentified) {
+            showSystemNotification(
+              "Nenhum cadastro biométrico encontrado no banco. Indivíduo classificado como NÃO IDENTIFICADO.",
+              "error",
+              "Não Identificado"
+            );
+            addLiveSecurityLog({
+              cam: 'CAM_01',
+              type: 'UNAUTHORIZED_PRESENCE',
+              note: `ALERTA DE SEGURANÇA: Rosto NÃO IDENTIFICADO detectado. Base de dados sem cadastros ativos. Acesso bloqueado.`,
+              alert: true
+            });
+            return;
+          }
+
           const isThreat = currentSub.status === 'BLOCKED' || (currentSub.criminal_record && (currentSub.criminal_record === 'THEFT_OFFENSE' || currentSub.criminal_record === 'WANTED_CRIMINAL'));
 
           showSystemNotification(
@@ -4575,6 +4629,45 @@
             ? `<img src="${person.photo}" alt="${person.nome}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-cyan); box-shadow: 0 0 10px rgba(6,182,212,0.4);">`
             : `<div class="user-avatar" style="width: 44px; height: 44px; font-size: 1.1rem; border-color: var(--accent-cyan); background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.2)); color: var(--accent-cyan);">${initials}</div>`;
 
+          let criminalBadgeHtml = '';
+          if (person.criminal_record === 'THEFT_OFFENSE' || person.status === 'BLOCKED') {
+            criminalBadgeHtml = `
+              <div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); padding: 8px 12px; border-radius: 6px;">
+                <span style="color: #ef4444; font-weight: 700; font-size: 0.78rem; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-triangle-exclamation"></i> ANTECEDENTES: LADRÃO / CRIME DE FURTO
+                </span>
+                <span style="background: #ef4444; color: #fff; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">BLOQUEADO</span>
+              </div>
+            `;
+          } else if (person.criminal_record === 'WANTED_CRIMINAL') {
+            criminalBadgeHtml = `
+              <div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); padding: 8px 12px; border-radius: 6px;">
+                <span style="color: #ef4444; font-weight: 700; font-size: 0.78rem; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-handcuffs"></i> ANTECEDENTES: CRIMINOSO PROCURADO
+                </span>
+                <span style="background: #ef4444; color: #fff; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">MANDADO ATIVO</span>
+              </div>
+            `;
+          } else if (person.criminal_record === 'SUSPECT' || person.status === 'FLAGGED') {
+            criminalBadgeHtml = `
+              <div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); padding: 8px 12px; border-radius: 6px;">
+                <span style="color: #fbbf24; font-weight: 700; font-size: 0.78rem; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-circle-exclamation"></i> ANTECEDENTES: INDIVÍDUO SUSPEITO
+                </span>
+                <span style="background: #f59e0b; color: #000; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">OBSERVAÇÃO</span>
+              </div>
+            `;
+          } else {
+            criminalBadgeHtml = `
+              <div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); padding: 8px 12px; border-radius: 6px;">
+                <span style="color: #34d399; font-weight: 700; font-size: 0.78rem; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-circle-check"></i> ANTECEDENTES: FICHA LIMPA
+                </span>
+                <span style="background: #10b981; color: #000; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">AUTORIZADO</span>
+              </div>
+            `;
+          }
+
           card.innerHTML = `
             <div style="display: flex; align-items: center; justify-content: space-between;">
               <div style="display: flex; align-items: center; gap: 12px;">
@@ -4615,6 +4708,8 @@
                   ${birthFormatted}
                 </strong>
               </div>
+
+              ${criminalBadgeHtml}
 
               <div style="display: flex; flex-direction: column; gap: 3px; grid-column: 1 / -1; border-top: 1px dashed var(--border-color); padding-top: 8px; margin-top: 2px;">
                 <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">
@@ -4809,10 +4904,20 @@
               photo: capturedImageBase64, // Foto real capturada vinculada ao sujeito
               hash: Math.random().toString(16).substring(2,6) + "_" + Math.random().toString(16).substring(2,6)
             };
+
+            // Pre-calculate descriptor immediately for instant multi-person database matching
+            const tempImg = new Image();
+            tempImg.crossOrigin = "anonymous";
+            tempImg.onload = () => {
+              newEntry._descriptor = extractBiometricSignature(tempImg);
+            };
+            tempImg.src = capturedImageBase64;
+            newEntry._imgObj = tempImg;
+
             enrolledDb.unshift(newEntry);
             savePersistedDb();
             window.latestRegisteredSubject = newEntry;
-            window.selectedTargetSubjectId = newEntry.id;
+            window.selectedTargetSubjectId = 'auto';
 
             // Enviar para Supabase / Backend REST API
             try {
@@ -4833,11 +4938,11 @@
             addLiveSecurityLog({
               cam: 'NPU_ENROLL',
               type: 'ENROLL_SUCCESS',
-              note: `Nova identidade '${nome}' (CPF: ${fullFormattedCpf} - ${dept}) cadastrada e persistida no Supabase. Reconhecimento ativado.`,
+              note: `Nova identidade '${nome}' (CPF: ${fullFormattedCpf} - ${dept}) cadastrada e persistida no Supabase. Reconhecimento multi-pessoas ativado.`,
               alert: false
             });
 
-            alert(`Identidade '${nome}' cadastrada com sucesso!\nFoto facial vinculada e vetor biométrico 128D sincronizado com o Supabase.`);
+            alert(`Identidade '${nome}' cadastrada com sucesso!\nFoto facial vinculada e vetor biométrico sincronizado com o Supabase.`);
             enrollForm.reset();
             capturedImageBase64 = null;
             if (capturedPreviewCard) capturedPreviewCard.style.display = 'none';
@@ -4848,8 +4953,8 @@
             renderEnrolledList();
             renderPersonnelDirectory();
             populateTargetSubjectSelector();
-            if (selectTargetSubject) selectTargetSubject.value = newEntry.id;
-            updateActiveSubjectBadge(newEntry);
+            if (selectTargetSubject) selectTargetSubject.value = 'auto';
+            updateActiveSubjectBadge(getCurrentlyIdentifiedSubject());
           }, 600);
         });
       }

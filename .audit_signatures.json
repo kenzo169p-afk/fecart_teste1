@@ -1,6 +1,6 @@
 {
-    "backend\\app.py": "7d9698df84f54bce6e3f3ff0c2bdc3e1834b008496642173ec684a8e8317ba79",
+    "backend\\app.py": "f61d7134734d14e6cc2e686402fb0c2432764b10f5cd32aa2742e7ec0517eeb8",
     "backend\\audit_monitor.py": "69d5bd900cd7b2e870d836943b4e42176a450b5161756a6d704d3ce8dba208e9",
     "backend\\authorize_changes.py": "a663838d71313f9c7b384f3a45b82b755aaa527d9b4f245c305d549bacf2319b",
-    "frontend\\index.html": "88ae1309a96ca9e2413d6b34c07b49af2b5617a6ca2e762693808dd36fb1f3e3"
+    "frontend\\index.html": "9081fcd5e825cb4477e613881878df91df31763dbfae9e3ae48ad5a9640eac60"
 }

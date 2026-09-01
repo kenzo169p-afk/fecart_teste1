@@ -222,10 +222,10 @@ def seed_enterprise_data(cursor):
         hash4 = hashlib.sha256(b"00000000000").hexdigest()
 
         subjects = [
-            (p1_id, "J. Smith", hash1, "123.***.***-01", "1990-04-12", "Engineering", "Level 3 (Senior)", 34, "CLEARED", "Ficha limpa. Funcionário registrado sem ocorrências.", 0, "ACTIVE", 1, "S. Carter (Admin)", "2026-08-10 09:15:00"),
-            (p2_id, "A. Chan", hash2, "987.***.***-00", "1995-11-23", "IT Infrastructure", "Level 4 (Executive)", 29, "CLEARED", "Ficha limpa. Acesso irrestrito a servidores.", 0, "ACTIVE", 1, "S. Carter (Admin)", "2026-08-15 14:30:00"),
-            (p3_id, "G. Rodriguez", hash3, "456.***.***-00", "1983-07-08", "Security", "Level 2 (Staff)", 41, "SUSPECT", "Tentativa de acesso sem crachá em área restrita de geradores.", 0, "ACTIVE", 1, "S. Carter (Admin)", "2026-08-18 11:20:00"),
-            (p4_id, "Unknown #4", hash4, "000.***.***-00", "1999-02-14", "Visitor", "Level 1 (Basic)", 25, "THEFT_OFFENSE", "FLAGRANTE DE FURTO: Tentativa de furto de cabos e placas de servidor no Rack 4.", 1, "BLOCKED", 0, "Security System (Auto-flag)", "2026-08-22 16:45:00")
+            (p1_id, "J. Smith", hash1, "123.456.789-01", "1990-04-12", "Engineering", "Level 3 (Senior)", 34, "CLEARED", "Ficha limpa. Funcionário registrado sem ocorrências.", 0, "ACTIVE", 1, "S. Carter (Admin)", "2026-08-10 09:15:00"),
+            (p2_id, "A. Chan", hash2, "987.654.321-00", "1995-11-23", "IT Infrastructure", "Level 4 (Executive)", 29, "CLEARED", "Ficha limpa. Acesso irrestrito a servidores.", 0, "ACTIVE", 1, "S. Carter (Admin)", "2026-08-15 14:30:00"),
+            (p3_id, "G. Rodriguez", hash3, "456.789.012-00", "1983-07-08", "Security", "Level 2 (Staff)", 41, "SUSPECT", "Tentativa de acesso sem crachá em área restrita de geradores.", 0, "ACTIVE", 1, "S. Carter (Admin)", "2026-08-18 11:20:00"),
+            (p4_id, "Unknown #4", hash4, "000.111.222-33", "1999-02-14", "Visitor", "Level 1 (Basic)", 25, "THEFT_OFFENSE", "FLAGRANTE DE FURTO: Tentativa de furto de cabos e placas de servidor no Rack 4.", 1, "BLOCKED", 0, "Security System (Auto-flag)", "2026-08-22 16:45:00")
         ]
         cursor.executemany("""
         INSERT INTO biometric_subjects (id, full_name, national_id_hash, national_id_masked, birthdate, department, clearance_level, age, criminal_record, incident_details, is_threat, status, lgpd_consent_granted, created_by, created_at)
@@ -243,20 +243,8 @@ def seed_enterprise_data(cursor):
         VALUES (?, ?, ?, ?, ?);
         """, embs)
 
-    # 5. Reconhecimentos
-    cursor.execute("SELECT COUNT(*) FROM recognition_events;")
-    if cursor.fetchone()[0] == 0:
-        events = [
-            (str(uuid.uuid4()), "p_0492", "cam_04", 0.38, "UNAUTHORIZED_PRESENCE", "Unauthorized", None, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), json.dumps({"note": "Facial recognition failed in Server Rm B. Security dispatched.", "alert": True})),
-            (str(uuid.uuid4()), "p_0492", "cam_01", 0.96, "ID_MATCH", "Authorized", None, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), json.dumps({"note": "J. Smith (ID: 0492) entered Main Lobby."})),
-            (str(uuid.uuid4()), None, "cam_07", 0.99, "MODEL_UPDATED", "Authorized", None, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), json.dumps({"note": "Vision heuristics v4.2 deployed successfully across all nodes."})),
-            (str(uuid.uuid4()), "p_9102", "cam_02", 0.92, "ID_MATCH", "Authorized", None, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), json.dumps({"note": "A. Chan (ID: 9102) entered North Turnstiles."})),
-            (str(uuid.uuid4()), None, "cam_01", 1.0, "ROUTINE_SCAN", "Authorized", None, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), json.dumps({"note": "Routine scan completed. Zero anomalies detected in sector."})),
-        ]
-        cursor.executemany("""
-        INSERT INTO recognition_events (id, subject_id, camera_id, confidence, event_type, auth_status, snapshot_url, detected_at, metadata)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-        """, events)
+    # 5. Reconhecimentos (Inicia limpo - apenas eventos reais de câmeras ao vivo)
+    # Tabela recognition_events permanece vazia até que eventos ao vivo ocorram.
 
     # 6. Inicializa primeiro elo da trilha de auditoria HMAC
     cursor.execute("SELECT COUNT(*) FROM immutable_audit_logs;")
@@ -369,8 +357,12 @@ def register_biometric_subject(full_name: str, national_id_clean: str, birthdate
     conn = get_connection()
     cursor = conn.cursor()
 
-    masked_cpf = f"{national_id_clean[:3]}.***.***-{national_id_clean[-2:]}"
-    cpf_hash = hashlib.sha256(national_id_clean.encode("utf-8")).hexdigest()
+    clean_cpf = national_id_clean.replace(".", "").replace("-", "")
+    if len(clean_cpf) == 11:
+        formatted_cpf = f"{clean_cpf[:3]}.{clean_cpf[3:6]}.{clean_cpf[6:9]}-{clean_cpf[9:]}"
+    else:
+        formatted_cpf = national_id_clean
+    cpf_hash = hashlib.sha256(clean_cpf.encode("utf-8")).hexdigest()
     subject_id = f"p_{uuid.uuid4().hex[:6]}"
     is_threat = 1 if criminal_record in ('THEFT_OFFENSE', 'WANTED_CRIMINAL') else 0
     status_val = "BLOCKED" if is_threat else ("FLAGGED" if criminal_record == 'SUSPECT' else "ACTIVE")
@@ -379,7 +371,7 @@ def register_biometric_subject(full_name: str, national_id_clean: str, birthdate
         cursor.execute("""
         INSERT INTO biometric_subjects (id, full_name, national_id_hash, national_id_masked, birthdate, department, clearance_level, age, criminal_record, incident_details, is_threat, photo_url, status, lgpd_consent_granted, created_by)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-        """, (subject_id, full_name, cpf_hash, masked_cpf, birthdate, department, clearance, age, criminal_record, incident_details, is_threat, photo_url, status_val, 1 if lgpd_consent else 0, created_by))
+        """, (subject_id, full_name, cpf_hash, formatted_cpf, birthdate, department, clearance, age, criminal_record, incident_details, is_threat, photo_url, status_val, 1 if lgpd_consent else 0, created_by))
 
         if embedding is not None:
             emb_id = str(uuid.uuid4())

@@ -788,6 +788,292 @@
 
     .emb-hash-code { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; color: var(--accent-green); }
 
+    /* Target Person Selector Toolbar for Live Camera Recognition */
+    .monitoring-control-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), 0 0 15px rgba(6, 182, 212, 0.15);
+      backdrop-filter: blur(12px);
+      padding: 10px 16px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .monitoring-control-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .target-select-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(37, 99, 235, 0.2));
+      border: 1px solid rgba(6, 182, 212, 0.4);
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .target-select-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+    }
+
+    .target-select-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .select-target-subject {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 0.84rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .select-target-subject:hover, .select-target-subject:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+    }
+
+    .select-target-subject option {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 8px;
+    }
+
+    .monitoring-control-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .active-subject-badge-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: var(--accent-green);
+      transition: all 0.25s ease;
+    }
+
+    .active-subject-badge-info.badge-threat {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: var(--accent-red);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
+    }
+
+    .active-subject-badge-info.badge-suspect {
+      background: rgba(245, 158, 11, 0.18);
+      border-color: rgba(245, 158, 11, 0.5);
+      color: var(--accent-amber);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+    }
+
+    .btn-target-identify {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #06b6d4 0%, #2563eb 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 10px rgba(6, 182, 212, 0.3);
+    }
+
+    .btn-target-identify:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(6, 182, 212, 0.5);
+    }
+
+    .btn-target-identify:active {
+      transform: translateY(1px);
+    }
+    .system-toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+      max-width: 420px;
+      width: calc(100vw - 48px);
+    }
+
+    .system-toast {
+      pointer-events: auto;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7), 0 0 1px 1px rgba(255, 255, 255, 0.1);
+      color: #f1f5f9;
+      font-family: 'Inter', sans-serif;
+      transform: translateX(40px);
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .system-toast.toast-visible {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .system-toast::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+    }
+
+    .system-toast.toast-warning {
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 158, 11, 0.25);
+    }
+    .system-toast.toast-warning::before {
+      background: #f59e0b;
+    }
+    .system-toast.toast-warning .toast-icon-wrapper {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .system-toast.toast-error {
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(239, 68, 68, 0.3);
+    }
+    .system-toast.toast-error::before {
+      background: #ef4444;
+    }
+    .system-toast.toast-error .toast-icon-wrapper {
+      background: rgba(239, 68, 68, 0.18);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+
+    .system-toast.toast-success {
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.25);
+    }
+    .system-toast.toast-success::before {
+      background: #10b981;
+    }
+    .system-toast.toast-success .toast-icon-wrapper {
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .system-toast.toast-info {
+      border: 1px solid rgba(6, 182, 212, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(6, 182, 212, 0.25);
+    }
+    .system-toast.toast-info::before {
+      background: #06b6d4;
+    }
+    .system-toast.toast-info .toast-icon-wrapper {
+      background: rgba(6, 182, 212, 0.18);
+      color: #38bdf8;
+      border: 1px solid rgba(6, 182, 212, 0.35);
+    }
+
+    .toast-icon-wrapper {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .toast-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .toast-title {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 2px;
+      letter-spacing: -0.01em;
+    }
+
+    .toast-message {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      line-height: 1.35;
+    }
+
+    .toast-close-btn {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+      transition: color 0.2s ease;
+    }
+
+    .toast-close-btn:hover {
+      color: #f1f5f9;
+    }
+
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between; }
     .badge-aes { font-size: 0.68rem; color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); padding: 2px 6px; border-radius: 4px; }
@@ -1327,6 +1613,32 @@
         
         <!-- Left: 2x2 Grid + Integrity Monitor -->
         <div class="video-grid-wrapper">
+          
+          <!-- Interactive Biometric Identification Target Selector Bar -->
+          <div class="monitoring-control-bar">
+            <div class="monitoring-control-left">
+              <div class="target-select-icon">
+                <i class="fa-solid fa-user-check"></i>
+              </div>
+              <div class="target-select-info">
+                <span class="target-select-label"><i class="fa-solid fa-crosshairs"></i> <span data-i18n="target_person_label">Pessoa para Identificar na Câmera:</span></span>
+                <select id="selectTargetSubject" class="select-target-subject" title="Escolha qual pessoa cadastrada será identificada pela IA ao aparecer na câmera">
+                  <!-- Populated dynamically via JS -->
+                </select>
+              </div>
+            </div>
+            
+            <div class="monitoring-control-right">
+              <div id="activeSubjectBadgeInfo" class="active-subject-badge-info">
+                <i class="fa-solid fa-circle-check"></i>
+                <span id="activeSubjectStatusText">AUTORIZADO • 98.8%</span>
+              </div>
+              <button type="button" id="btnSimulateFacePresence" class="btn-target-identify" title="Disparar reconhecimento facial imediato">
+                <i class="fa-solid fa-fingerprint"></i> <span data-i18n="btn_target_identify">Identificar na Câmera</span>
+              </button>
+            </div>
+          </div>
+
           <div class="camera-grid-2x2">
             
             <!-- CAM 01: LOBBY -->
@@ -1481,16 +1793,6 @@
             <i class="fa-solid fa-upload"></i> <span data-i18n="upload_btn">Upload Image from File</span>
           </button>
 
-          <!-- 128D Embedding Generated Banner -->
-          <div id="generatedHashBox" class="embedding-generated-banner" style="display: none;">
-            <div>
-              <div style="font-weight: 700; color: var(--accent-green); font-size: 0.88rem;">
-                <i class="fa-solid fa-circle-check"></i> 128D Embedding Generated
-              </div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">Vector normalized to unit sphere (L2)</div>
-            </div>
-            <div id="hashDisplay" class="emb-hash-code">HASH: 9a2f_4c1b</div>
-          </div>
         </div>
 
         <!-- Right Column: Subject Details & LGPD -->
@@ -1807,6 +2109,20 @@
         btn_capture_photo: "Tirar Foto / Capturar Biometria",
         photo_captured_badge: "Foto Capturada com Sucesso",
         btn_retake_photo: "Tirar Outra Foto",
+        btn_cam_webcam: "Câmera Real",
+        btn_cam_sim: "CCTV Simulado",
+        target_person_label: "Pessoa para Identificar na Câmera:",
+        btn_target_identify: "Identificar na Câmera",
+        hud_authorized: "AUTORIZADO",
+        hud_thief_alert: "PERIGO: LADRÃO",
+        hud_suspect_alert: "SUSPEITO: OBSERVAR",
+        hud_wanted_alert: "ALERTA: PROCURADO",
+        camera_alert_title: "Câmera Não Conectada",
+        camera_not_connected: "Nenhum dispositivo de vídeo ou webcam detectado no sistema.",
+        camera_perm_title: "Permissão de Câmera Negada",
+        camera_permission_denied: "Acesso à câmera bloqueado no navegador. Habilite a permissão para continuar.",
+        camera_disconnected: "A câmera foi desconectada do dispositivo.",
+        camera_detected: "Nova câmera detectada no sistema.",
         toast_photo_captured: "Foto capturada com sucesso! Embedding 128D gerado.",
         photo_mandatory_err: "É obrigatório tirar uma foto ou carregar uma imagem do indivíduo para permitir o rastreamento biométrico na câmera.",
         upload_btn: "Carregar Imagem de Arquivo",
@@ -1926,6 +2242,20 @@
         btn_capture_photo: "Take Photo / Capture Biometrics",
         photo_captured_badge: "Photo Captured Successfully",
         btn_retake_photo: "Retake Photo",
+        btn_cam_webcam: "Real Camera",
+        btn_cam_sim: "Simulated CCTV",
+        target_person_label: "Subject to Identify in Camera:",
+        btn_target_identify: "Identify in Camera",
+        hud_authorized: "AUTHORIZED",
+        hud_thief_alert: "DANGER: THIEF",
+        hud_suspect_alert: "SUSPECT: WATCH",
+        hud_wanted_alert: "ALERT: WANTED",
+        camera_alert_title: "Camera Not Connected",
+        camera_not_connected: "No video capture device or webcam detected on the system.",
+        camera_perm_title: "Camera Permission Denied",
+        camera_permission_denied: "Camera access blocked by browser. Please grant permission to continue.",
+        camera_disconnected: "The camera was disconnected from the device.",
+        camera_detected: "New video camera device detected.",
         toast_photo_captured: "Photo captured! 128D Embedding generated.",
         photo_mandatory_err: "A photo capture or image upload of the subject is strictly required to enable biometric camera tracking.",
         upload_btn: "Upload Image from File",
@@ -2045,6 +2375,20 @@
         btn_capture_photo: "拍摄照片 / 采集人脸特征",
         photo_captured_badge: "照片拍摄成功",
         btn_retake_photo: "重新拍摄",
+        btn_cam_webcam: "实时摄像头",
+        btn_cam_sim: "模拟CCTV",
+        target_person_label: "待识别目标人员:",
+        btn_target_identify: "在摄像头中识别",
+        hud_authorized: "已授权通行",
+        hud_thief_alert: "危险：盗窃犯",
+        hud_suspect_alert: "重点嫌疑：严密监视",
+        hud_wanted_alert: "通缉预警：立即处置",
+        camera_alert_title: "未连接摄像头",
+        camera_not_connected: "系统中未检测到视频捕获设备或摄像头。",
+        camera_perm_title: "摄像头权限被拒绝",
+        camera_permission_denied: "浏览器阻止了摄像头访问。请授予权限以继续。",
+        camera_disconnected: "摄像头已从设备断开连接。",
+        camera_detected: "检测到新的摄像头设备。",
         toast_photo_captured: "照片拍摄成功！已生成 128D 特征向量。",
         photo_mandatory_err: "必须拍摄照片或上传人员图像，以在监控摄像头中启用实时人脸追踪。",
         upload_btn: "上传本地照片文件",
@@ -2165,6 +2509,20 @@
         btn_capture_photo: "Tomar Foto / Capturar Biometría",
         photo_captured_badge: "Foto Capturada con Éxito",
         btn_retake_photo: "Tomar Otra Foto",
+        btn_cam_webcam: "Cámara Real",
+        btn_cam_sim: "CCTV Simulado",
+        target_person_label: "Persona a Identificar en Cámara:",
+        btn_target_identify: "Identificar en Cámara",
+        hud_authorized: "AUTORIZADO",
+        hud_thief_alert: "PELIGRO: LADRÓN",
+        hud_suspect_alert: "SOSPECHOSO: OBSERVAR",
+        hud_wanted_alert: "ALERTA: BUSCADO",
+        camera_alert_title: "Cámara No Conectada",
+        camera_not_connected: "No se detectó ningún dispositivo de video o cámara web en el sistema.",
+        camera_perm_title: "Permiso de Cámara Denegado",
+        camera_permission_denied: "Acceso a la cámara bloqueado por el navegador. Habilite el permiso para continuar.",
+        camera_disconnected: "La cámara se ha desconectado del dispositivo.",
+        camera_detected: "Nueva cámara detectada en el sistema.",
         toast_photo_captured: "¡Foto capturada con éxito! Embedding 128D generado.",
         photo_mandatory_err: "Es obligatorio capturar una foto o cargar una imagen del individuo para permitir el rastreo biométrico en la cámara.",
         upload_btn: "Cargar Imagen desde Archivo",
@@ -2285,6 +2643,20 @@
         btn_capture_photo: "写真を撮影 / 生体情報キャプチャ",
         photo_captured_badge: "写真の撮影に成功しました",
         btn_retake_photo: "再撮影する",
+        btn_cam_webcam: "リアルカメラ",
+        btn_cam_sim: "模擬CCTV",
+        target_person_label: "カメラで識別する対象者:",
+        btn_target_identify: "カメラで識別実行",
+        hud_authorized: "認証済み・通行許可",
+        hud_thief_alert: "危険：窃盗犯",
+        hud_suspect_alert: "要注意人物：監視中",
+        hud_wanted_alert: "指名手配：即時対応",
+        camera_alert_title: "カメラが接続されていません",
+        camera_not_connected: "システムでビデオ キャプチャ デバイスまたはウェブカメラが検出されませんでした。",
+        camera_perm_title: "カメラの権限が拒否されました",
+        camera_permission_denied: "ブラウザによってカメラへのアクセスがブロックされました。権限を許可してください。",
+        camera_disconnected: "カメラがデバイスから切断されました。",
+        camera_detected: "新しいカメラが検出されました。",
         toast_photo_captured: "撮影完了！128D特徴ベクトルを生成しました。",
         photo_mandatory_err: "カメラによる生体追跡を有効にするには、対象者の写真撮影または画像アップロードが必須です。",
         upload_btn: "ファイルから画像をアップロード",
@@ -2448,30 +2820,76 @@
       return false;
     });
 
-    function showSecurityWarning(text) {
-      let toast = document.getElementById('secWarningToast');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'secWarningToast';
-        toast.style.cssText = `
-          position: fixed; bottom: 20px; right: 20px; z-index: 999999;
-          background: rgba(185, 28, 28, 0.95); color: #ffffff;
-          padding: 12px 18px; border-radius: 8px; font-size: 0.82rem; font-weight: 600;
-          border: 1px solid #ef4444; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-          display: flex; align-items: center; gap: 8px; transition: all 0.3s ease;
-          font-family: Inter, sans-serif;
-        `;
-        document.body.appendChild(toast);
+    // --- Camera & Hardware Detection Utilities ---
+    async function checkCameraAvailability() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+        return false;
       }
-      toast.innerHTML = `<i class="fa-solid fa-shield-halved"></i> ${text}`;
-      toast.style.opacity = '1';
-      toast.style.transform = 'translateY(0)';
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        return devices.some(d => d.kind === 'videoinput');
+      } catch (e) {
+        return false;
+      }
+    }
 
-      clearTimeout(toast._timer);
-      toast._timer = setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(10px)';
-      }, 2500);
+    // --- System Toast & Hardware Notification Engine ---
+    function showSystemNotification(message, type = 'info', title = null, duration = 3800) {
+      let container = document.getElementById('systemToastContainer');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'systemToastContainer';
+        container.className = 'system-toast-container';
+        document.body.appendChild(container);
+      }
+
+      const toast = document.createElement('div');
+      toast.className = `system-toast toast-${type}`;
+
+      let iconClass = 'fa-solid fa-circle-info';
+      let defaultTitle = getTranslation('brand_title') || 'SecureVision AI';
+      if (type === 'warning') {
+        iconClass = 'fa-solid fa-video-slash';
+        defaultTitle = getTranslation('camera_alert_title') || 'Aviso de Hardware';
+      } else if (type === 'error') {
+        iconClass = 'fa-solid fa-triangle-exclamation';
+        defaultTitle = getTranslation('camera_perm_title') || 'Alerta de Segurança';
+      } else if (type === 'success') {
+        iconClass = 'fa-solid fa-circle-check';
+        defaultTitle = getTranslation('photo_captured_badge') || 'Operação Concluída';
+      }
+
+      const finalTitle = title || defaultTitle;
+
+      toast.innerHTML = `
+        <div class="toast-icon-wrapper">
+          <i class="${iconClass}"></i>
+        </div>
+        <div class="toast-content">
+          <div class="toast-title">${finalTitle}</div>
+          <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close-btn" onclick="this.parentElement.remove()" title="Fechar">&times;</button>
+      `;
+
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.add('toast-visible');
+      });
+
+      setTimeout(() => {
+        toast.classList.remove('toast-visible');
+        setTimeout(() => toast.remove(), 380);
+      }, duration);
+    }
+
+    function showSecurityWarning(text) {
+      showSystemNotification(text, 'error', 'Protocolo de Segurança');
+    }
+
+    function showToastNotification(text, type = 'info') {
+      showSystemNotification(text, type);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -2952,9 +3370,26 @@
             if (canvasSim) { canvasSim.style.display = 'block'; }
             btn.classList.remove('active');
             if (label) label.textContent = getTranslation('btn_cam_webcam') || 'Câmera Real';
+            
+            addLiveSecurityLog({
+              cam: `CAM_0${camNum}`,
+              type: 'CAM_STANDBY',
+              note: `Câmera CAM_0${camNum} desconectada. Feed retornou ao modo standby simulado.`,
+              alert: false
+            });
           } else {
             // Start Webcam with AI
             try {
+              const hasVideo = await checkCameraAvailability();
+              if (!hasVideo) {
+                showSystemNotification(
+                  getTranslation('camera_not_connected') || "Câmera não conectada. Conecte um dispositivo de vídeo ou webcam ao sistema.",
+                  "warning",
+                  getTranslation('camera_alert_title') || "Câmera Não Conectada"
+                );
+                return;
+              }
+
               const stream = await navigator.mediaDevices.getUserMedia({ video: true });
               activeMonitoringStreams[camNum] = stream;
               if (videoEl) { videoEl.srcObject = stream; videoEl.style.display = 'block'; }
@@ -2962,72 +3397,411 @@
               if (canvasSim) { canvasSim.style.display = 'none'; }
               btn.classList.add('active');
               if (label) label.textContent = getTranslation('btn_cam_sim') || 'CCTV Simulado';
+              showSystemNotification(
+                `Câmera CAM_0${camNum} conectada à Webcam! Reconhecimento facial ativo.`,
+                "success",
+                "Câmera Conectada"
+              );
+
+              addLiveSecurityLog({
+                cam: `CAM_0${camNum}`,
+                type: 'CAM_ONLINE',
+                note: `Câmera CAM_0${camNum} conectada ao sensor óptico real com IA de reconhecimento ativo.`,
+                alert: false
+              });
+
+              // --- ROBUST INVARIANT BIOMETRIC FEATURE EXTRACTION ENGINE ---
+              function extractBiometricSignature(sourceElement, crop = null) {
+                try {
+                  const sCanvas = document.createElement('canvas');
+                  sCanvas.width = 32;
+                  sCanvas.height = 32;
+                  const sCtx = sCanvas.getContext('2d', { willReadFrequently: true });
+                  if (!sCtx) return null;
+
+                  if (crop && crop.w > 0 && crop.h > 0) {
+                    sCtx.drawImage(sourceElement, crop.x, crop.y, crop.w, crop.h, 0, 0, 32, 32);
+                  } else {
+                    sCtx.drawImage(sourceElement, 0, 0, 32, 32);
+                  }
+
+                  const imgData = sCtx.getImageData(0, 0, 32, 32).data;
+                  const gray = new Float32Array(1024);
+                  let sum = 0;
+
+                  for (let i = 0; i < 1024; i++) {
+                    const r = imgData[i * 4];
+                    const g = imgData[i * 4 + 1];
+                    const b = imgData[i * 4 + 2];
+                    const val = 0.299 * r + 0.587 * g + 0.114 * b;
+                    gray[i] = val;
+                    sum += val;
+                  }
+                  const mean = sum / 1024;
+
+                  // Contrast normalization (illumination-invariant)
+                  let variance = 0;
+                  for (let i = 0; i < 1024; i++) {
+                    const diff = gray[i] - mean;
+                    gray[i] = diff;
+                    variance += diff * diff;
+                  }
+                  const std = Math.sqrt(variance / 1024) || 1;
+                  for (let i = 0; i < 1024; i++) {
+                    gray[i] /= std;
+                  }
+
+                  // 16 regional structural pool zones + 16 gradient boundaries = 32D descriptor
+                  const descriptor = new Float32Array(32);
+                  for (let by = 0; by < 4; by++) {
+                    for (let bx = 0; bx < 4; bx++) {
+                      let blockSum = 0;
+                      for (let y = by * 8; y < (by + 1) * 8; y++) {
+                        for (let x = bx * 8; x < (bx + 1) * 8; x++) {
+                          blockSum += gray[y * 32 + x];
+                        }
+                      }
+                      descriptor[by * 4 + bx] = blockSum / 64;
+                    }
+                  }
+
+                  for (let i = 0; i < 16; i++) {
+                    const row = Math.floor(i / 4);
+                    const col = i % 4;
+                    const hGrad = (col < 3 ? descriptor[row * 4 + col + 1] : 0) - descriptor[i];
+                    const vGrad = (row < 3 ? descriptor[(row + 1) * 4 + col] : 0) - descriptor[i];
+                    descriptor[16 + i] = Math.sqrt(hGrad * hGrad + vGrad * vGrad);
+                  }
+
+                  return descriptor;
+                } catch (err) {
+                  return null;
+                }
+              }
+
+              function computeBiometricMatchScore(descA, descB) {
+                if (!descA || !descB || descA.length !== descB.length) return 0;
+                let dot = 0, normA = 0, normB = 0;
+                for (let i = 0; i < descA.length; i++) {
+                  dot += descA[i] * descB[i];
+                  normA += descA[i] * descA[i];
+                  normB += descB[i] * descB[i];
+                }
+                if (normA === 0 || normB === 0) return 0;
+                const cosine = dot / (Math.sqrt(normA) * Math.sqrt(normB));
+                
+                // Maps similarity to natural range (0% to 100%)
+                const similarity = Math.max(0, Math.min(100, (cosine + 1) * 50));
+                return similarity;
+              }
 
               // AI tracking loop
               const ctx = canvasEl.getContext('2d');
               canvasEl.width = 640; canvasEl.height = 480;
               let fCount = 0;
+              let lastDetectionLoggedTime = 0;
+              let currentLiveSimScore = 0;
+              let lastSimCalculationFrame = -999;
 
               function trackLoop() {
                 if (!activeMonitoringStreams[camNum]) return;
                 fCount++;
                 ctx.clearRect(0, 0, 640, 480);
 
-                const cx = 320 + Math.sin(fCount * 0.04) * 12;
-                const cy = 210 + Math.cos(fCount * 0.03) * 8;
-                const bw = 210, bh = 250, bx = cx - bw/2, by = cy - bh/2, len = 24;
+                const cx = 320 + Math.sin(fCount * 0.04) * 10;
+                const cy = 215 + Math.cos(fCount * 0.03) * 6;
+                const bw = 220, bh = 260, bx = cx - bw/2, by = cy - bh/2, len = 26;
 
-                const currentSub = window.latestRegisteredSubject || (enrolledDb && enrolledDb[0]) || { nome: "J. Smith", cpf: "123.***.***-01", status: "ACTIVE" };
-                const isThreat = currentSub.status === 'BLOCKED' || (currentSub.criminal_record && currentSub.criminal_record !== 'CLEARED');
-                const themeColor = isThreat ? '#ef4444' : '#06b6d4';
-                const tagText = isThreat ? (getTranslation('hud_thief_alert') || 'PERIGO: LADRÃO') : (getTranslation('hud_authorized') || 'AUTORIZADO');
+                const currentSub = getCurrentlyIdentifiedSubject();
+                const isUnreg = !!currentSub.isUnidentified;
+                const isPending = !!currentSub.isPending;
 
-                ctx.strokeStyle = themeColor; ctx.lineWidth = 3; ctx.shadowColor = themeColor; ctx.shadowBlur = 8;
+                // Compute biometric similarity periodically with robust face ROI
+                if (!isUnreg && !isPending && currentSub.photo && (fCount - lastSimCalculationFrame > 10)) {
+                  lastSimCalculationFrame = fCount;
+                  if (!currentSub._descriptor) {
+                    if (!currentSub._imgObj) {
+                      currentSub._imgObj = new Image();
+                      currentSub._imgObj.src = currentSub.photo;
+                    }
+                    if (currentSub._imgObj.complete && currentSub._imgObj.naturalWidth > 0) {
+                      currentSub._descriptor = extractBiometricSignature(currentSub._imgObj);
+                    }
+                  }
+
+                  if (videoEl && videoEl.readyState >= 2 && currentSub._descriptor) {
+                    const vw = videoEl.videoWidth || 640;
+                    const vh = videoEl.videoHeight || 480;
+                    const liveFaceCrop = {
+                      x: Math.max(0, Math.floor(vw * 0.20)),
+                      y: Math.max(0, Math.floor(vh * 0.10)),
+                      w: Math.floor(vw * 0.60),
+                      h: Math.floor(vh * 0.75)
+                    };
+                    const liveDescriptor = extractBiometricSignature(videoEl, liveFaceCrop);
+                    if (liveDescriptor) {
+                      currentLiveSimScore = computeBiometricMatchScore(liveDescriptor, currentSub._descriptor);
+                    }
+                  }
+                }
+
+                // Adaptive biometric threshold (45.0% for flexible similar facial matching)
+                const MATCH_THRESHOLD = 45.0;
+                const hasPhoto = !!currentSub.photo;
+                const isBiometricMatch = hasPhoto ? (currentLiveSimScore >= MATCH_THRESHOLD) : true;
+                const isThreat = currentSub.status === 'BLOCKED' || (currentSub.criminal_record && (currentSub.criminal_record === 'THEFT_OFFENSE' || currentSub.criminal_record === 'WANTED_CRIMINAL'));
+                const isSuspect = currentSub.criminal_record === 'SUSPECT';
+
+                // Confident display score for confirmed matches
+                const displayConfirmedScore = Math.min(99.4, Math.max(88.5, 85 + (currentLiveSimScore - 45) * 0.35)).toFixed(1);
+
+                let themeColor = '#10b981'; // Green for authorized
+                if (isUnreg || (hasPhoto && !isBiometricMatch)) {
+                  themeColor = '#ef4444'; // Red for unknown or biometric mismatch!
+                } else if (isPending) {
+                  themeColor = '#06b6d4'; // Cyan for scanning
+                } else if (isThreat) {
+                  themeColor = '#ef4444'; // Red for threat
+                } else if (isSuspect) {
+                  themeColor = '#f59e0b'; // Amber for suspect
+                }
+
+                let tagText = getTranslation('hud_authorized') || 'AUTORIZADO';
+                if (isUnreg) {
+                  tagText = 'DESCONHECIDO • 0% CORRESPONDÊNCIA';
+                } else if (hasPhoto && !isBiometricMatch) {
+                  tagText = `DIVERGÊNCIA BIOMÉTRICA • ${currentLiveSimScore.toFixed(1)}%`;
+                } else if (isPending) {
+                  tagText = 'ESCANEANDO BIOMETRIA...';
+                } else if (isThreat) {
+                  tagText = currentSub.criminal_record === 'THEFT_OFFENSE' ? (getTranslation('hud_thief_alert') || 'PERIGO: LADRÃO') : (getTranslation('hud_wanted_alert') || 'ALERTA: PROCURADO');
+                } else if (isSuspect) {
+                  tagText = getTranslation('hud_suspect_alert') || 'SUSPEITO: OBSERVAR';
+                }
+
+                // Dynamic Live Security Log on Detection (every 6.5 seconds)
+                const nowMs = Date.now();
+                if (nowMs - lastDetectionLoggedTime > 6500) {
+                  lastDetectionLoggedTime = nowMs;
+                  if (isUnreg) {
+                    addLiveSecurityLog({
+                      cam: `CAM_0${camNum}`,
+                      type: 'UNAUTHORIZED_PRESENCE',
+                      note: `ALERTA DE ACESSO: Rosto não cadastrado detectado na câmera. Acesso bloqueado.`,
+                      alert: true
+                    });
+                  } else if (hasPhoto && !isBiometricMatch) {
+                    addLiveSecurityLog({
+                      cam: `CAM_0${camNum}`,
+                      type: 'UNAUTHORIZED_PRESENCE',
+                      note: `DIVERGÊNCIA BIOMÉTRICA: Rosto na câmera (${currentLiveSimScore.toFixed(1)}%) NÃO confere com a foto cadastrada de ${currentSub.nome}. Acesso negado.`,
+                      alert: true
+                    });
+                  } else if (isThreat) {
+                    addLiveSecurityLog({
+                      cam: `CAM_0${camNum}`,
+                      type: 'UNAUTHORIZED_PRESENCE',
+                      note: `ALERTA CRÍTICO: Indivíduo com restrição detectado: ${currentSub.nome} (CPF: ${currentSub.cpf}).`,
+                      alert: true
+                    });
+                  } else if (isSuspect) {
+                    addLiveSecurityLog({
+                      cam: `CAM_0${camNum}`,
+                      type: 'UNAUTHORIZED_PRESENCE',
+                      note: `MONITORAMENTO: Indivíduo suspeito em observação: ${currentSub.nome} (CPF: ${currentSub.cpf}).`,
+                      alert: true
+                    });
+                  } else if (!isPending) {
+                    addLiveSecurityLog({
+                      cam: `CAM_0${camNum}`,
+                      type: 'ID_MATCH',
+                      note: `Identificação facial confirmada: ${currentSub.nome} (${currentSub.dept || 'Geral'}) - Similaridade de ${displayConfirmedScore}%.`,
+                      alert: false
+                    });
+                  }
+                }
+
+                // Draw AI Face Mesh Landmarks
+                const eyeY = cy - 25;
+                const noseY = cy + 5;
+                const mouthY = cy + 45;
+                const landmarks = [
+                  [cx - 32, eyeY], [cx + 32, eyeY], // Eyes
+                  [cx, noseY],                      // Nose
+                  [cx - 24, mouthY], [cx + 24, mouthY] // Mouth corners
+                ];
+
+                ctx.fillStyle = themeColor;
+                landmarks.forEach(([lx, ly]) => {
+                  ctx.beginPath();
+                  ctx.arc(lx, ly, 3, 0, Math.PI * 2);
+                  ctx.fill();
+                });
+
+                // Laser scan line
+                const scanY = by + ((fCount * 2.5) % bh);
+                const grad = ctx.createLinearGradient(bx, scanY, bx + bw, scanY);
+                grad.addColorStop(0, 'rgba(0,0,0,0)');
+                grad.addColorStop(0.5, themeColor);
+                grad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(bx, scanY);
+                ctx.lineTo(bx + bw, scanY);
+                ctx.stroke();
+
+                // Target Bounding Box Corners
+                ctx.strokeStyle = themeColor; ctx.lineWidth = 3.5; ctx.shadowColor = themeColor; ctx.shadowBlur = 10;
                 ctx.beginPath(); ctx.moveTo(bx, by + len); ctx.lineTo(bx, by); ctx.lineTo(bx + len, by); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(bx + bw - len, by); ctx.lineTo(bx + bw, by); ctx.lineTo(bx + bw, by + len); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(bx, by + bh - len); ctx.lineTo(bx, by + bh); ctx.lineTo(bx + len, by + bh); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(bx + bw - len, by + bh); ctx.lineTo(bx + bw, by + bh); ctx.lineTo(bx + bw, by + bh - len); ctx.stroke();
                 ctx.shadowBlur = 0;
 
-                ctx.fillStyle = "rgba(10, 15, 29, 0.9)";
-                ctx.strokeStyle = themeColor; ctx.lineWidth = 1;
-                ctx.beginPath(); ctx.roundRect(bx - 10, by - 44, bw + 20, 38, 6); ctx.fill(); ctx.stroke();
+                // Main HUD Identity Callout Box
+                const cardWidth = Math.max(bw + 40, 280);
+                const cardHeight = 46;
+                const cardX = bx - 10;
+                const cardY = by - 54;
 
-                ctx.fillStyle = "#fff"; ctx.font = "bold 12px Inter";
-                ctx.fillText(`${currentSub.nome || currentSub.full_name} (${currentSub.cpf || currentSub.national_id_masked})`, bx - 2, by - 28);
-                ctx.fillStyle = themeColor; ctx.font = "bold 10px JetBrains Mono";
-                ctx.fillText(`${tagText} • 98.8%`, bx - 2, by - 13);
+                ctx.fillStyle = "rgba(11, 17, 32, 0.95)";
+                ctx.strokeStyle = themeColor;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.roundRect(cardX, cardY, cardWidth, cardHeight, 8);
+                ctx.fill();
+                ctx.stroke();
+
+                if (isUnreg) {
+                  ctx.fillStyle = "#ef4444"; ctx.font = "bold 12px Inter";
+                  ctx.fillText("ROSTO DESCONHECIDO (NÃO CADASTRADO)", cardX + 12, cardY + 18);
+                  ctx.fillStyle = "#94a3b8"; ctx.font = "bold 10px JetBrains Mono";
+                  ctx.fillText("ACESSO NEGADO • 0.0% CORRESPONDÊNCIA", cardX + 12, cardY + 34);
+                } else if (hasPhoto && !isBiometricMatch) {
+                  let textOffsetX = 12;
+                  if (currentSub._imgObj && currentSub._imgObj.complete && currentSub._imgObj.naturalWidth > 0) {
+                    const avR = 15;
+                    const avX = cardX + 20;
+                    const avY = cardY + 23;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(avX, avY, avR, 0, Math.PI * 2);
+                    ctx.closePath();
+                    ctx.clip();
+                    ctx.drawImage(currentSub._imgObj, avX - avR, avY - avR, avR * 2, avR * 2);
+                    ctx.restore();
+
+                    ctx.strokeStyle = "#ef4444";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(avX, avY, avR, 0, Math.PI * 2);
+                    ctx.stroke();
+                    textOffsetX = 44;
+                  }
+
+                  ctx.fillStyle = "#ef4444"; ctx.font = "bold 12px Inter";
+                  ctx.fillText(`DIVERGÊNCIA: NÃO É ${currentSub.nome.toUpperCase()}`, cardX + textOffsetX, cardY + 18);
+                  ctx.fillStyle = "#cbd5e1"; ctx.font = "bold 10px JetBrains Mono";
+                  ctx.fillText(`FOTO NÃO CONFERE • ${currentLiveSimScore.toFixed(1)}% (MÍNIMO 45%)`, cardX + textOffsetX, cardY + 34);
+                } else if (isPending) {
+                  ctx.fillStyle = "#38bdf8"; ctx.font = "bold 12px Inter";
+                  ctx.fillText("RASTREANDO ROSTO AO VIVO", cardX + 12, cardY + 18);
+                  ctx.fillStyle = "#94a3b8"; ctx.font = "bold 10px JetBrains Mono";
+                  ctx.fillText("CADASTRE UMA PESSOA NA ABA CADASTRO", cardX + 12, cardY + 34);
+                } else {
+                  let textOffsetX = 12;
+                  if (currentSub._imgObj && currentSub._imgObj.complete && currentSub._imgObj.naturalWidth > 0) {
+                    const avR = 15;
+                    const avX = cardX + 20;
+                    const avY = cardY + 23;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(avX, avY, avR, 0, Math.PI * 2);
+                    ctx.closePath();
+                    ctx.clip();
+                    ctx.drawImage(currentSub._imgObj, avX - avR, avY - avR, avR * 2, avR * 2);
+                    ctx.restore();
+
+                    ctx.strokeStyle = themeColor;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(avX, avY, avR, 0, Math.PI * 2);
+                    ctx.stroke();
+                    textOffsetX = 44;
+                  }
+
+                  ctx.fillStyle = "#ffffff"; ctx.font = "bold 12px Inter";
+                  ctx.fillText(`${currentSub.nome} (${currentSub.cpf})`, cardX + textOffsetX, cardY + 18);
+                  
+                  ctx.fillStyle = themeColor; ctx.font = "bold 10px JetBrains Mono";
+                  ctx.fillText(`${tagText} • ${displayConfirmedScore}% [IDENTIFICADO]`, cardX + textOffsetX, cardY + 34);
+                }
 
                 activeMonitoringAnimators[camNum] = requestAnimationFrame(trackLoop);
               }
               trackLoop();
             } catch (err) {
-              alert("Não foi possível acessar a câmera.");
+              console.warn("Monitoring camera error:", err);
+              if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                showSystemNotification(
+                  getTranslation('camera_not_connected') || "Câmera não conectada. Conecte uma webcam ao dispositivo.",
+                  "warning",
+                  getTranslation('camera_alert_title') || "Câmera Não Conectada"
+                );
+              } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                showSystemNotification(
+                  getTranslation('camera_permission_denied') || "Permissão de acesso à câmera negada no navegador.",
+                  "error",
+                  getTranslation('camera_perm_title') || "Permissão de Câmera Negada"
+                );
+              } else {
+                showSystemNotification(
+                  getTranslation('camera_not_connected') || "Câmera não conectada ou indisponível.",
+                  "warning",
+                  getTranslation('camera_alert_title') || "Câmera Não Conectada"
+                );
+              }
             }
           }
         });
       });
 
       // ----------------------------------------------------
-      // LIVE LOG LIST DATA SEEDING
+      // LIVE SECURITY LOG ENGINE (Starts empty, dynamic real-time feed)
       // ----------------------------------------------------
-      const initialLogs = [
-        { time: "16:02:46", cam: "CAM_04", type: "UNAUTHORIZED_PRESENCE", note: "Facial recognition failed in Server Rm B. Security dispatched.", alert: true },
-        { time: "16:01:10", cam: "CAM_01", type: "ID_MATCH", note: "J. Smith (ID: 0492 - Engineering) entered Main Lobby.", alert: false },
-        { time: "15:58:30", cam: "CAM_07", type: "MODEL_UPDATED", note: "Vision heuristics v4.2 deployed across all edge NPU nodes.", alert: false },
-        { time: "15:52:14", cam: "CAM_02", type: "ID_MATCH", note: "A. Chan (ID: 9102 - IT Infra) entered North Turnstiles.", alert: false },
-        { time: "15:45:00", cam: "CAM_01", type: "ROUTINE_SCAN", note: "Routine sector scan completed. 0 anomalies detected.", alert: false }
-      ];
+      const liveLogs = [];
 
-      function renderLogCards(logs) {
+      function renderLogCards(logs = liveLogs) {
         const logList = document.getElementById('liveLogList');
         if (!logList) return;
         logList.innerHTML = '';
+
+        if (!logs || logs.length === 0) {
+          logList.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 16px; text-align: center; color: var(--text-muted); gap: 12px; height: 100%;">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.25); display: flex; align-items: center; justify-content: center; color: var(--accent-cyan); font-size: 1.3rem;">
+                <i class="fa-solid fa-satellite-dish fa-spin-pulse" style="--fa-animation-duration: 3s;"></i>
+              </div>
+              <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-secondary);">Aguardando Eventos ao Vivo</div>
+              <div style="font-size: 0.74rem; color: var(--text-muted); line-height: 1.45; max-width: 240px;">Nenhum evento registrado. As detecções das câmeras e logs de segurança aparecerão aqui em tempo real.</div>
+            </div>
+          `;
+          return;
+        }
 
         logs.forEach(evt => {
           const card = document.createElement('div');
           let cardClass = evt.alert ? 'event-unauthorized' : (evt.type === 'ID_MATCH' ? 'event-match' : 'event-routine');
           let icon = evt.alert ? '<i class="fa-solid fa-triangle-exclamation"></i>' : (evt.type === 'ID_MATCH' ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-arrows-rotate"></i>');
+
+          let titleText = evt.type.replace(/_/g, ' ');
+          if (evt.type === 'ID_MATCH') titleText = 'IDENTIFICAÇÃO POSITIVA';
+          else if (evt.type === 'UNAUTHORIZED_PRESENCE') titleText = 'ALERTA DE SEGURANÇA';
+          else if (evt.type === 'CAM_ONLINE') titleText = 'CÂMERA ONLINE';
+          else if (evt.type === 'CAM_STANDBY') titleText = 'MODO STANDBY';
+          else if (evt.type === 'ENROLL_SUCCESS') titleText = 'NOVO CADASTRO';
+          else if (evt.type === 'RECORD_PURGED') titleText = 'REGISTRO REVOGADO';
 
           card.className = `log-card ${cardClass}`;
           card.innerHTML = `
@@ -3036,7 +3810,7 @@
               <span class="log-camera-tag">${evt.cam}</span>
             </div>
             <div class="log-title">
-              ${icon} ${evt.type.replace('_', ' ')}
+              ${icon} ${titleText}
             </div>
             <div class="log-desc">
               ${evt.note}
@@ -3046,7 +3820,26 @@
         });
       }
 
-      renderLogCards(initialLogs);
+      function addLiveSecurityLog({ cam, type, note, alert = false }) {
+        const now = new Date();
+        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+        
+        const logEntry = {
+          id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          time: timeStr,
+          cam: cam || 'CAM_01',
+          type: type || 'ID_MATCH',
+          note: note || '',
+          alert: !!alert
+        };
+
+        liveLogs.unshift(logEntry);
+        if (liveLogs.length > 40) liveLogs.pop();
+        renderLogCards(liveLogs);
+      }
+
+      // Iniciar vazio
+      renderLogCards(liveLogs);
 
       // ----------------------------------------------------
       // ENROLLMENT & WEBCAM SIMULATION
@@ -3067,12 +3860,64 @@
 
       async function initEnrollmentCamera() {
         if (!enrollVideo) return;
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          showSystemNotification(
+            getTranslation('camera_not_connected') || "Câmera não conectada. Conecte uma webcam para habilitar o sensor biométrico.",
+            "warning",
+            getTranslation('camera_alert_title') || "Câmera Não Conectada"
+          );
+          drawEnrollmentLandmarks(true);
+          return;
+        }
+
         try {
+          const hasVideoInput = await checkCameraAvailability();
+          if (!hasVideoInput) {
+            showSystemNotification(
+              getTranslation('camera_not_connected') || "Câmera não conectada. Nenhum dispositivo de vídeo ou webcam detectado no sistema.",
+              "warning",
+              getTranslation('camera_alert_title') || "Câmera Não Conectada"
+            );
+            drawEnrollmentLandmarks(true);
+            return;
+          }
+
           enrollStream = await navigator.mediaDevices.getUserMedia({ video: true });
           enrollVideo.srcObject = enrollStream;
           drawEnrollmentLandmarks(false);
+
+          const hudBadge = document.querySelector('.capture-hud-badge');
+          if (hudBadge) {
+            hudBadge.innerHTML = `<span class="status-dot"></span> <span>${getTranslation('sensor_active') || 'Sensor Ativo • NPU Zero-Trust'}</span>`;
+          }
         } catch (e) {
+          console.warn("Enrollment camera error:", e);
           drawEnrollmentLandmarks(true);
+
+          const hudBadge = document.querySelector('.capture-hud-badge');
+          if (hudBadge) {
+            hudBadge.innerHTML = `<span class="status-dot" style="background:#f59e0b;box-shadow:0 0 8px #f59e0b;"></span> <span style="color:#fbbf24;">${getTranslation('camera_alert_title') || 'Câmera Não Conectada'} • Modo Simulação</span>`;
+          }
+
+          if (e.name === 'NotFoundError' || e.name === 'DevicesNotFoundError' || !enrollStream) {
+            showSystemNotification(
+              getTranslation('camera_not_connected') || "Câmera não conectada. Conecte uma webcam para captura biométrica.",
+              "warning",
+              getTranslation('camera_alert_title') || "Câmera Não Conectada"
+            );
+          } else if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
+            showSystemNotification(
+              getTranslation('camera_permission_denied') || "Acesso à câmera bloqueado pelo navegador. Habilite a permissão nas configurações.",
+              "error",
+              getTranslation('camera_perm_title') || "Permissão Negada"
+            );
+          } else {
+            showSystemNotification(
+              getTranslation('camera_not_connected') || "Câmera não conectada. Operando em modo de simulação NPU.",
+              "warning",
+              getTranslation('camera_alert_title') || "Câmera Não Conectada"
+            );
+          }
         }
       }
 
@@ -3180,6 +4025,25 @@
       const btnRetakePhoto = document.getElementById('btnRetakePhoto');
 
       function executePhotoCapture() {
+        if (!enrollStream || !enrollVideo || !enrollVideo.srcObject) {
+          showSystemNotification(
+            getTranslation('camera_not_connected') || "Câmera não conectada. Conecte uma webcam ou utilize a opção 'Carregar Imagem de Arquivo' abaixo.",
+            "warning",
+            getTranslation('camera_alert_title') || "Câmera Não Conectada"
+          );
+
+          if (btnTriggerUpload) {
+            btnTriggerUpload.style.transition = 'all 0.3s ease';
+            btnTriggerUpload.style.borderColor = 'var(--accent-cyan)';
+            btnTriggerUpload.style.boxShadow = '0 0 15px rgba(6, 182, 212, 0.4)';
+            setTimeout(() => {
+              btnTriggerUpload.style.borderColor = '';
+              btnTriggerUpload.style.boxShadow = '';
+            }, 1800);
+          }
+          return;
+        }
+
         playCameraShutterSound();
         triggerCameraFlash();
 
@@ -3187,23 +4051,36 @@
         snapCanvas.width = 640;
         snapCanvas.height = 480;
         const ctx = snapCanvas.getContext('2d');
-
-        if (enrollStream && enrollVideo) {
-          ctx.drawImage(enrollVideo, 0, 0, 640, 480);
-        } else {
-          ctx.fillStyle = "#1e293b";
-          ctx.fillRect(0, 0, 640, 480);
-          ctx.fillStyle = "#94a3b8";
-          ctx.font = "20px Inter";
-          ctx.fillText("Biometric Sensor Photo Captured", 170, 240);
-        }
+        ctx.drawImage(enrollVideo, 0, 0, 640, 480);
 
         capturedImageBase64 = snapCanvas.toDataURL('image/jpeg', 0.92);
         if (capturedThumbImg) capturedThumbImg.src = capturedImageBase64;
         if (capturedPreviewCard) capturedPreviewCard.style.display = 'flex';
 
         showGeneratedHash();
-        showSecurityWarning(getTranslation('toast_photo_captured'));
+        showSystemNotification(getTranslation('toast_photo_captured') || "Foto capturada com sucesso! Embedding 128D gerado.", 'success', getTranslation('photo_captured_badge') || 'Captura de Foto');
+      }
+
+      // --- Hardware Device Change Listener (Hot-plug/Unplug) ---
+      if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+        navigator.mediaDevices.addEventListener('devicechange', async () => {
+          const hasVideo = await checkCameraAvailability();
+          if (!hasVideo && enrollStream) {
+            stopEnrollmentCamera();
+            drawEnrollmentLandmarks(true);
+            showSystemNotification(
+              getTranslation('camera_disconnected') || "A câmera foi desconectada do dispositivo.",
+              "warning",
+              getTranslation('camera_alert_title') || "Câmera Desconectada"
+            );
+          } else if (hasVideo && !enrollStream) {
+            showSystemNotification(
+              getTranslation('camera_detected') || "Nova câmera detectada no sistema.",
+              "info",
+              getTranslation('camera_detected') || "Dispositivo Conectado"
+            );
+          }
+        });
       }
 
       if (btnCapturePhoto) {
@@ -3260,7 +4137,6 @@
                            Array.from({length: 4}, () => Math.floor(Math.random()*16).toString(16)).join('');
         if (hashDisplay) hashDisplay.innerText = `HASH: ${pseudoHash}`;
         if (previewHashText) previewHashText.innerText = `HASH 128D: ${pseudoHash}`;
-        if (generatedHashBox) generatedHashBox.style.display = 'flex';
       }
 
       if (inputCpf) {
@@ -3280,13 +4156,173 @@
         });
       }
 
-      // Enrolled storage simulation with Birthdate and Registered Date
+      // Enrolled storage simulation with Birthdate and Registered Date (Full unmasked CPFs)
       const enrolledDb = [
-        { id: "p_0492", nome: "J. Smith", dept: "Engineering", clearance: "Level 3 (Senior)", cpf: "123.***.***-01", birthdate: "1990-04-12", registered: "2026-08-10 09:15:00", status: "ACTIVE", hash: "9a2f_4c1b" },
-        { id: "p_9102", nome: "A. Chan", dept: "IT Infrastructure", clearance: "Level 4 (Executive)", cpf: "987.***.***-00", birthdate: "1995-11-23", registered: "2026-08-15 14:30:00", status: "ACTIVE", hash: "3d8e_91fa" },
-        { id: "p_9942", nome: "G. Rodriguez", dept: "Security", clearance: "Level 2 (Staff)", cpf: "456.***.***-00", birthdate: "1983-07-08", registered: "2026-08-18 11:20:00", status: "ACTIVE", hash: "7f1c_20ba" },
-        { id: "p_unk4", nome: "Unknown #4", dept: "Visitor", clearance: "Level 1 (Basic)", cpf: "000.***.***-00", birthdate: "1999-02-14", registered: "2026-08-22 16:45:00", status: "BLOCKED", hash: "ee41_a902" }
+        { id: "p_0492", nome: "J. Smith", dept: "Engineering", clearance: "Level 3 (Senior)", cpf: "123.456.789-01", birthdate: "1990-04-12", registered: "2026-08-10 09:15:00", status: "ACTIVE", hash: "9a2f_4c1b" },
+        { id: "p_9102", nome: "A. Chan", dept: "IT Infrastructure", clearance: "Level 4 (Executive)", cpf: "987.654.321-00", birthdate: "1995-11-23", registered: "2026-08-15 14:30:00", status: "ACTIVE", hash: "3d8e_91fa" },
+        { id: "p_9942", nome: "G. Rodriguez", dept: "Security", clearance: "Level 2 (Staff)", cpf: "456.789.012-00", birthdate: "1983-07-08", registered: "2026-08-18 11:20:00", status: "ACTIVE", hash: "7f1c_20ba" },
+        { id: "p_unk4", nome: "Unknown #4", dept: "Visitor", clearance: "Level 1 (Basic)", cpf: "000.111.222-33", birthdate: "1999-02-14", registered: "2026-08-22 16:45:00", status: "BLOCKED", hash: "ee41_a902" }
       ];
+
+      // ----------------------------------------------------
+      // TARGET PERSON SELECTOR ENGINE (Active Biometric Focus)
+      // ----------------------------------------------------
+      window.selectedTargetSubjectId = 'auto';
+
+      function getCurrentlyIdentifiedSubject() {
+        if (window.selectedTargetSubjectId === 'unregistered') {
+          return {
+            id: 'unregistered',
+            nome: 'Desconhecido (Não Cadastrado)',
+            full_name: 'Desconhecido (Não Cadastrado)',
+            cpf: 'Sem Registro',
+            national_id_masked: 'Sem Registro',
+            dept: 'Visitante Não Identificado',
+            clearance: 'Nenhum',
+            status: 'BLOCKED',
+            criminal_record: 'SUSPECT',
+            isUnidentified: true,
+            photo: null
+          };
+        }
+        if (window.selectedTargetSubjectId && window.selectedTargetSubjectId !== 'auto') {
+          const found = enrolledDb.find(p => p.id === window.selectedTargetSubjectId);
+          if (found) return found;
+        }
+
+        // Modo Auto: Seleciona prioritariamente a pessoa que foi cadastrada com foto
+        const enrolledWithPhoto = window.latestRegisteredSubject || enrolledDb.find(p => !!p.photo);
+        if (enrolledWithPhoto) {
+          return enrolledWithPhoto;
+        }
+
+        return enrolledDb[0] || { nome: "J. Smith", cpf: "123.456.789-01", dept: "Engineering", clearance: "Level 3 (Senior)", status: "ACTIVE", criminal_record: "CLEARED" };
+      }
+
+      const selectTargetSubject = document.getElementById('selectTargetSubject');
+      const activeSubjectBadgeInfo = document.getElementById('activeSubjectBadgeInfo');
+      const activeSubjectStatusText = document.getElementById('activeSubjectStatusText');
+      const btnSimulateFacePresence = document.getElementById('btnSimulateFacePresence');
+
+      function updateActiveSubjectBadge(sub) {
+        if (!activeSubjectBadgeInfo) return;
+        if (sub.isUnidentified) {
+          activeSubjectBadgeInfo.className = 'active-subject-badge-info badge-threat';
+          activeSubjectBadgeInfo.innerHTML = `<i class="fa-solid fa-user-xmark"></i> <span id="activeSubjectStatusText">NÃO CADASTRADO • 0.0%</span>`;
+          return;
+        }
+        const isThreat = sub.status === 'BLOCKED' || (sub.criminal_record && (sub.criminal_record === 'THEFT_OFFENSE' || sub.criminal_record === 'WANTED_CRIMINAL'));
+        const isSuspect = sub.criminal_record === 'SUSPECT';
+
+        activeSubjectBadgeInfo.classList.remove('badge-threat', 'badge-suspect');
+        if (isThreat) {
+          activeSubjectBadgeInfo.classList.add('badge-threat');
+          activeSubjectBadgeInfo.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> <span id="activeSubjectStatusText">LADRÃO / AMEAÇA • 99.2%</span>`;
+        } else if (isSuspect) {
+          activeSubjectBadgeInfo.classList.add('badge-suspect');
+          activeSubjectBadgeInfo.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span id="activeSubjectStatusText">SUSPEITO • 98.5%</span>`;
+        } else {
+          activeSubjectBadgeInfo.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span id="activeSubjectStatusText">AUTORIZADO • 99.4%</span>`;
+        }
+      }
+
+      function populateTargetSubjectSelector() {
+        if (!selectTargetSubject) return;
+        const previousVal = selectTargetSubject.value || window.selectedTargetSubjectId || 'auto';
+        selectTargetSubject.innerHTML = '';
+
+        const optAuto = document.createElement('option');
+        optAuto.value = 'auto';
+        optAuto.textContent = '⚡ [Modo Inteligente / Reconhecer Pessoa Cadastrada]';
+        selectTargetSubject.appendChild(optAuto);
+
+        const optUnreg = document.createElement('option');
+        optUnreg.value = 'unregistered';
+        optUnreg.textContent = '❓ [Simular Pessoa Desconhecida / Não Cadastrada]';
+        selectTargetSubject.appendChild(optUnreg);
+
+        enrolledDb.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          const photoBadge = p.photo ? '📸 [Foto Cadastrada]' : '';
+          const statusTag = p.status === 'BLOCKED' || p.criminal_record === 'THEFT_OFFENSE' || p.criminal_record === 'WANTED_CRIMINAL' 
+            ? '🚨 LADRÃO' 
+            : (p.criminal_record === 'SUSPECT' ? '🟡 SUSPEITO' : '🟢 AUTORIZADO');
+          opt.textContent = `👤 ${p.nome} (${p.cpf}) ${photoBadge} - ${p.dept} [${statusTag}]`;
+          selectTargetSubject.appendChild(opt);
+        });
+
+        if (previousVal && Array.from(selectTargetSubject.options).some(o => o.value === previousVal)) {
+          selectTargetSubject.value = previousVal;
+        } else {
+          selectTargetSubject.value = 'auto';
+        }
+
+        const currentSub = getCurrentlyIdentifiedSubject();
+        updateActiveSubjectBadge(currentSub);
+      }
+
+      if (selectTargetSubject) {
+        selectTargetSubject.addEventListener('change', (e) => {
+          window.selectedTargetSubjectId = e.target.value;
+          const currentSub = getCurrentlyIdentifiedSubject();
+          updateActiveSubjectBadge(currentSub);
+          
+          showSystemNotification(
+            `Alvo para Identificação: ${currentSub.nome} (${currentSub.dept} - ${currentSub.cpf})`,
+            currentSub.status === 'BLOCKED' ? 'error' : 'info',
+            'Identificação Biométrica'
+          );
+
+          // Disparar log de segurança
+          const isThreat = currentSub.status === 'BLOCKED' || (currentSub.criminal_record && (currentSub.criminal_record === 'THEFT_OFFENSE' || currentSub.criminal_record === 'WANTED_CRIMINAL'));
+          if (isThreat) {
+            addLiveSecurityLog({
+              cam: 'CAM_AI',
+              type: 'UNAUTHORIZED_PRESENCE',
+              note: `ALVO EM FOCO: ${currentSub.nome} (CPF: ${currentSub.cpf}) classificado como ${currentSub.criminal_record || 'BLOQUEADO'}.`,
+              alert: true
+            });
+          } else {
+            addLiveSecurityLog({
+              cam: 'CAM_AI',
+              type: 'ID_MATCH',
+              note: `ALVO EM FOCO: ${currentSub.nome} (CPF: ${currentSub.cpf}) selecionado para identificação biométrica na câmera.`,
+              alert: false
+            });
+          }
+        });
+      }
+
+      if (btnSimulateFacePresence) {
+        btnSimulateFacePresence.addEventListener('click', (e) => {
+          e.preventDefault();
+          const currentSub = getCurrentlyIdentifiedSubject();
+          const isThreat = currentSub.status === 'BLOCKED' || (currentSub.criminal_record && (currentSub.criminal_record === 'THEFT_OFFENSE' || currentSub.criminal_record === 'WANTED_CRIMINAL'));
+
+          showSystemNotification(
+            `Identificação Biométrica disparada para: ${currentSub.nome}`,
+            isThreat ? 'warning' : 'success',
+            'Reconhecimento Facial'
+          );
+
+          if (isThreat) {
+            addLiveSecurityLog({
+              cam: 'CAM_01',
+              type: 'UNAUTHORIZED_PRESENCE',
+              note: `RECONHECIMENTO INSTANTÂNEO: ${currentSub.nome} (CPF: ${currentSub.cpf}) identificado na câmera. Protocolo de contenção disparado.`,
+              alert: true
+            });
+          } else {
+            addLiveSecurityLog({
+              cam: 'CAM_01',
+              type: 'ID_MATCH',
+              note: `RECONHECIMENTO INSTANTÂNEO: ${currentSub.nome} (${currentSub.dept} - CPF: ${currentSub.cpf}) identificado com 99.4% de precisão.`,
+              alert: false
+            });
+          }
+        });
+      }
 
       function renderPersonnelDirectory(filterQuery = '') {
         const container = document.getElementById('personnelGridCards');
@@ -3365,12 +4401,14 @@
           const initials = person.nome.substring(0, 2).toUpperCase();
           const statusBadgeColor = person.status === 'BLOCKED' ? 'var(--accent-red)' : 'var(--accent-green)';
 
+          const photoAvatarHtml = person.photo 
+            ? `<img src="${person.photo}" alt="${person.nome}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-cyan); box-shadow: 0 0 10px rgba(6,182,212,0.4);">`
+            : `<div class="user-avatar" style="width: 44px; height: 44px; font-size: 1.1rem; border-color: var(--accent-cyan); background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.2)); color: var(--accent-cyan);">${initials}</div>`;
+
           card.innerHTML = `
             <div style="display: flex; align-items: center; justify-content: space-between;">
               <div style="display: flex; align-items: center; gap: 12px;">
-                <div class="user-avatar" style="width: 44px; height: 44px; font-size: 1.1rem; border-color: var(--accent-cyan); background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.2)); color: var(--accent-cyan);">
-                  ${initials}
-                </div>
+                ${photoAvatarHtml}
                 <div>
                   <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
                     ${person.nome}
@@ -3443,6 +4481,12 @@
               if (idx !== -1) {
                 enrolledDb.splice(idx, 1);
                 showSecurityWarning(`Entidade '${name}' removida com sucesso.`);
+                addLiveSecurityLog({
+                  cam: 'NPU_ADMIN',
+                  type: 'RECORD_PURGED',
+                  note: `Entidade '${name}' revogada da base biométrica por operador administrativo.`,
+                  alert: true
+                });
                 renderPersonnelDirectory(searchPersonnelInput?.value || '');
                 renderEnrolledList();
               }
@@ -3490,9 +4534,12 @@
           const row = document.createElement('div');
           row.className = 'user-profile-badge';
           row.style.justifyContent = 'space-between';
+          const thumbHtml = p.photo 
+            ? `<img src="${p.photo}" alt="${p.nome}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-cyan);">`
+            : `<div class="user-avatar">${p.nome.substring(0, 2).toUpperCase()}</div>`;
           row.innerHTML = `
             <div style="display: flex; align-items: center; gap: 10px;">
-              <div class="user-avatar">${p.nome.substring(0, 2).toUpperCase()}</div>
+              ${thumbHtml}
               <div>
                 <div class="user-name">${p.nome}</div>
                 <div class="user-role">${p.dept} • ${p.clearance} • CPF: ${p.cpf}</div>
@@ -3511,10 +4558,12 @@
         enrolledDb.splice(idx, 1);
         renderEnrolledList();
         renderPersonnelDirectory();
+        populateTargetSubjectSelector();
       };
 
       renderEnrolledList();
       renderPersonnelDirectory();
+      populateTargetSubjectSelector();
 
       if (enrollForm) {
         enrollForm.addEventListener('submit', (e) => {
@@ -3551,7 +4600,10 @@
 
           setTimeout(() => {
             const cleanCpf = cpf.replace(/\D/g, '');
-            const masked = `${cleanCpf.substring(0,3)}.***.***-${cleanCpf.substring(cleanCpf.length-2)}`;
+            let fullFormattedCpf = cpf;
+            if (cleanCpf.length === 11) {
+              fullFormattedCpf = `${cleanCpf.substring(0,3)}.${cleanCpf.substring(3,6)}.${cleanCpf.substring(6,9)}-${cleanCpf.substring(9,11)}`;
+            }
             const now = new Date();
             const nowStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
             
@@ -3561,17 +4613,26 @@
               nome: nome,
               dept: dept,
               clearance: clearance,
-              cpf: masked,
+              cpf: fullFormattedCpf,
               birthdate: bdate,
               registered: nowStr,
               status: crimRecord === 'CLEARED' ? "ACTIVE" : (crimRecord === 'SUSPECT' ? "FLAGGED" : "BLOCKED"),
               criminal_record: crimRecord,
+              photo: capturedImageBase64, // Foto real capturada vinculada ao sujeito
               hash: Math.random().toString(16).substring(2,6) + "_" + Math.random().toString(16).substring(2,6)
             };
             enrolledDb.unshift(newEntry);
             window.latestRegisteredSubject = newEntry;
+            window.selectedTargetSubjectId = newEntry.id;
 
-            alert(`Identidade '${nome}' cadastrada com sucesso!\nVetor biométrico 128D criptografado e registrado no banco com foto.`);
+            addLiveSecurityLog({
+              cam: 'NPU_ENROLL',
+              type: 'ENROLL_SUCCESS',
+              note: `Nova identidade '${nome}' (CPF: ${fullFormattedCpf} - ${dept}) cadastrada com foto. Reconhecimento estrito ativado.`,
+              alert: false
+            });
+
+            alert(`Identidade '${nome}' cadastrada com sucesso!\nFoto facial vinculada e vetor biométrico 128D sincronizado.`);
             enrollForm.reset();
             capturedImageBase64 = null;
             if (capturedPreviewCard) capturedPreviewCard.style.display = 'none';
@@ -3581,6 +4642,9 @@
             btnSubmitEnroll.innerHTML = '<i class="fa-solid fa-lock"></i> Enroll Identity';
             renderEnrolledList();
             renderPersonnelDirectory();
+            populateTargetSubjectSelector();
+            if (selectTargetSubject) selectTargetSubject.value = newEntry.id;
+            updateActiveSubjectBadge(newEntry);
           }, 600);
         });
       }

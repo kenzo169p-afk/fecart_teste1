@@ -29,30 +29,72 @@ document.addEventListener('contextmenu', (e) => {
   return false;
 });
 
-function showToastNotification(text) {
-  let toast = document.getElementById('secWarningToast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'secWarningToast';
-    toast.style.cssText = `
-      position: fixed; bottom: 20px; right: 20px; z-index: 999999;
-      background: rgba(185, 28, 28, 0.95); color: #ffffff;
-      padding: 12px 18px; border-radius: 8px; font-size: 0.82rem; font-weight: 600;
-      border: 1px solid #ef4444; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-      display: flex; align-items: center; gap: 8px; transition: all 0.3s ease;
-      font-family: Inter, sans-serif;
-    `;
-    document.body.appendChild(toast);
+// --- Camera & Hardware Detection Utilities ---
+async function checkCameraAvailability() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+    return false;
   }
-  toast.innerHTML = `<i class="fa-solid fa-shield-halved"></i> ${text}`;
-  toast.style.opacity = '1';
-  toast.style.transform = 'translateY(0)';
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return devices.some(d => d.kind === 'videoinput');
+  } catch (e) {
+    return false;
+  }
+}
 
-  clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateY(10px)';
-  }, 2500);
+// --- System Toast & Hardware Notification Engine ---
+function showSystemNotification(message, type = 'info', title = null, duration = 3800) {
+  let container = document.getElementById('systemToastContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'systemToastContainer';
+    container.className = 'system-toast-container';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `system-toast toast-${type}`;
+
+  let iconClass = 'fa-solid fa-circle-info';
+  let defaultTitle = (window.getSystemTranslation && window.getSystemTranslation('brand_title')) || 'SecureVision AI';
+  if (type === 'warning') {
+    iconClass = 'fa-solid fa-video-slash';
+    defaultTitle = (window.getSystemTranslation && window.getSystemTranslation('camera_alert_title')) || 'Aviso de Hardware';
+  } else if (type === 'error') {
+    iconClass = 'fa-solid fa-triangle-exclamation';
+    defaultTitle = (window.getSystemTranslation && window.getSystemTranslation('camera_perm_title')) || 'Alerta de Segurança';
+  } else if (type === 'success') {
+    iconClass = 'fa-solid fa-circle-check';
+    defaultTitle = (window.getSystemTranslation && window.getSystemTranslation('photo_captured_badge')) || 'Operação Concluída';
+  }
+
+  const finalTitle = title || defaultTitle;
+
+  toast.innerHTML = `
+    <div class="toast-icon-wrapper">
+      <i class="${iconClass}"></i>
+    </div>
+    <div class="toast-content">
+      <div class="toast-title">${finalTitle}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+    <button class="toast-close-btn" onclick="this.parentElement.remove()" title="Fechar">&times;</button>
+  `;
+
+  container.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.classList.add('toast-visible');
+  });
+
+  setTimeout(() => {
+    toast.classList.remove('toast-visible');
+    setTimeout(() => toast.remove(), 380);
+  }, duration);
+}
+
+function showToastNotification(text, type = 'info') {
+  showSystemNotification(text, type);
 }
 
 // --- Comprehensive 3-Language Master Translation Dictionary ---
@@ -120,6 +162,12 @@ const translations = {
     btn_capture_photo: "Tirar Foto / Capturar Biometria",
     photo_captured_badge: "Foto Capturada com Sucesso",
     btn_retake_photo: "Tirar Outra Foto",
+    camera_alert_title: "Câmera Não Conectada",
+    camera_not_connected: "Nenhum dispositivo de vídeo ou webcam detectado no sistema.",
+    camera_perm_title: "Permissão de Câmera Negada",
+    camera_permission_denied: "Acesso à câmera bloqueado no navegador. Habilite a permissão para continuar.",
+    camera_disconnected: "A câmera foi desconectada do dispositivo.",
+    camera_detected: "Nova câmera detectada no sistema.",
     toast_photo_captured: "Foto capturada com sucesso! Embedding 128D gerado.",
     photo_mandatory_err: "É obrigatório tirar uma foto ou carregar uma imagem do indivíduo para permitir o rastreamento biométrico na câmera.",
     upload_btn: "Carregar Imagem de Arquivo",
@@ -285,6 +333,12 @@ const translations = {
     btn_capture_photo: "Take Photo / Capture Biometrics",
     photo_captured_badge: "Photo Captured Successfully",
     btn_retake_photo: "Retake Photo",
+    camera_alert_title: "Camera Not Connected",
+    camera_not_connected: "No video capture device or webcam detected on the system.",
+    camera_perm_title: "Camera Permission Denied",
+    camera_permission_denied: "Camera access blocked by browser. Please grant permission to continue.",
+    camera_disconnected: "The camera was disconnected from the device.",
+    camera_detected: "New video camera device detected.",
     toast_photo_captured: "Photo captured! 128D Embedding generated.",
     photo_mandatory_err: "A photo capture or image upload of the subject is strictly required to enable biometric camera tracking.",
     upload_btn: "Upload Image from File",
@@ -450,6 +504,12 @@ const translations = {
     btn_capture_photo: "拍摄照片 / 采集人脸特征",
     photo_captured_badge: "照片拍摄成功",
     btn_retake_photo: "重新拍摄",
+    camera_alert_title: "未连接摄像头",
+    camera_not_connected: "系统中未检测到视频捕获设备或摄像头。",
+    camera_perm_title: "摄像头权限被拒绝",
+    camera_permission_denied: "浏览器阻止了摄像头访问。请授予权限以继续。",
+    camera_disconnected: "摄像头已从设备断开连接。",
+    camera_detected: "检测到新的摄像头设备。",
     toast_photo_captured: "照片拍摄成功！已生成 128D 特征向量。",
     photo_mandatory_err: "必须拍摄照片或上传人员图像，以在监控摄像头中启用实时人脸追踪。",
     upload_btn: "上传本地照片文件",
@@ -615,6 +675,12 @@ const translations = {
     btn_capture_photo: "Tomar Foto / Capturar Biometría",
     photo_captured_badge: "Foto Capturada con Éxito",
     btn_retake_photo: "Tomar Otra Foto",
+    camera_alert_title: "Cámara No Conectada",
+    camera_not_connected: "No se detectó ningún dispositivo de video o cámara web en el sistema.",
+    camera_perm_title: "Permiso de Cámara Denegado",
+    camera_permission_denied: "Acceso a la cámara bloqueado por el navegador. Habilite el permiso para continuar.",
+    camera_disconnected: "La cámara se ha desconectado del dispositivo.",
+    camera_detected: "Nueva cámara detectada en el sistema.",
     toast_photo_captured: "¡Foto capturada con éxito! Embedding 128D generado.",
     photo_mandatory_err: "Es obligatorio capturar una foto o cargar una imagen del individuo para permitir el rastreo biométrico en la cámara.",
     upload_btn: "Cargar Imagen desde Archivo",
@@ -780,6 +846,12 @@ const translations = {
     btn_capture_photo: "写真を撮影 / 生体情報キャプチャ",
     photo_captured_badge: "写真の撮影に成功しました",
     btn_retake_photo: "再撮影する",
+    camera_alert_title: "カメラが接続されていません",
+    camera_not_connected: "システムでビデオ キャプチャ デバイスまたはウェブカメラが検出されませんでした。",
+    camera_perm_title: "カメラの権限が拒否されました",
+    camera_permission_denied: "ブラウザによってカメラへのアクセスがブロックされました。権限を許可してください。",
+    camera_disconnected: "カメラがデバイスから切断されました。",
+    camera_detected: "新しいカメラが検出されました。",
     toast_photo_captured: "撮影完了！128D特徴ベクトルを生成しました。",
     photo_mandatory_err: "カメラによる生体追跡を有効にするには、対象者の写真撮影または画像アップロードが必須です。",
     upload_btn: "ファイルから画像をアップロード",
@@ -1297,12 +1369,25 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!logList) return;
 
       logList.innerHTML = '';
+      if (!events || events.length === 0) {
+        logList.innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 16px; text-align: center; color: var(--text-muted); gap: 12px; height: 100%;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.25); display: flex; align-items: center; justify-content: center; color: var(--accent-cyan); font-size: 1.3rem;">
+              <i class="fa-solid fa-satellite-dish fa-spin-pulse" style="--fa-animation-duration: 3s;"></i>
+            </div>
+            <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-secondary);">Aguardando Eventos ao Vivo</div>
+            <div style="font-size: 0.74rem; color: var(--text-muted); line-height: 1.45; max-width: 240px;">Nenhum evento registrado. As detecções das câmeras e logs de segurança aparecerão aqui em tempo real.</div>
+          </div>
+        `;
+        return;
+      }
+
       events.forEach(evt => {
         const card = document.createElement('div');
         let cardClass = evt.alert ? 'event-unauthorized' : (evt.tipo_evento === 'ID_MATCH' ? 'event-match' : 'event-routine');
         let icon = evt.alert ? '<i class="fa-solid fa-triangle-exclamation"></i>' : (evt.tipo_evento === 'ID_MATCH' ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-arrows-rotate"></i>');
 
-        let titleText = (evt.tipo_evento || '').replace('_', ' ');
+        let titleText = (evt.tipo_evento || '').replace(/_/g, ' ');
         if (evt.tipo_evento === 'ROUTINE_SCAN') titleText = window.getSystemTranslation('evt_routine');
         if (evt.tipo_evento === 'ID_MATCH') titleText = window.getSystemTranslation('evt_match');
         if (evt.tipo_evento === 'MODEL_UPDATED') titleText = window.getSystemTranslation('evt_model');
@@ -1364,6 +1449,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!videoEl || !canvasEl) return;
 
     try {
+      const hasVideo = await checkCameraAvailability();
+      if (!hasVideo) {
+        showSystemNotification(
+          (window.getSystemTranslation && window.getSystemTranslation('camera_not_connected')) || "Câmera não conectada. Conecte um dispositivo de vídeo ou webcam ao sistema.",
+          "warning",
+          (window.getSystemTranslation && window.getSystemTranslation('camera_alert_title')) || "Câmera Não Conectada"
+        );
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { width: { ideal: 640 }, height: { ideal: 480 } }
       });
@@ -1381,10 +1476,32 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       startBiometricRecognitionLoop(camNum, videoEl, canvasEl);
-      showToastNotification(`Câmera CAM_${camNum} conectada à Webcam! Reconhecimento facial ativo.`);
+      showSystemNotification(
+        `Câmera CAM_${camNum} conectada à Webcam! Reconhecimento facial ativo.`,
+        "success",
+        "Câmera Conectada"
+      );
     } catch (err) {
       console.error("Erro ao acessar câmera real:", err);
-      alert("Não foi possível acessar a câmera do dispositivo. Verifique as permissões de câmera do navegador.");
+      if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        showSystemNotification(
+          (window.getSystemTranslation && window.getSystemTranslation('camera_not_connected')) || "Câmera não conectada. Conecte uma webcam ao dispositivo.",
+          "warning",
+          (window.getSystemTranslation && window.getSystemTranslation('camera_alert_title')) || "Câmera Não Conectada"
+        );
+      } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        showSystemNotification(
+          (window.getSystemTranslation && window.getSystemTranslation('camera_permission_denied')) || "Permissão de acesso à câmera negada no navegador.",
+          "error",
+          (window.getSystemTranslation && window.getSystemTranslation('camera_perm_title')) || "Permissão de Câmera Negada"
+        );
+      } else {
+        showSystemNotification(
+          (window.getSystemTranslation && window.getSystemTranslation('camera_not_connected')) || "Câmera não conectada ou indisponível.",
+          "warning",
+          (window.getSystemTranslation && window.getSystemTranslation('camera_alert_title')) || "Câmera Não Conectada"
+        );
+      }
     }
   }
 
@@ -1601,12 +1718,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function initEnrollmentCamera() {
     if (!enrollVideo) return;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showSystemNotification(
+        (window.getSystemTranslation && window.getSystemTranslation('camera_not_connected')) || "Câmera não conectada. Conecte uma webcam para habilitar o sensor biométrico.",
+        "warning",
+        (window.getSystemTranslation && window.getSystemTranslation('camera_alert_title')) || "Câmera Não Conectada"
+      );
+      drawFaceMeshSimulation(true);
+      return;
+    }
+
     try {
+      const hasVideoInput = await checkCameraAvailability();
+      if (!hasVideoInput) {
+        showSystemNotification(
+          (window.getSystemTranslation && window.getSystemTranslation('camera_not_connected')) || "Câmera não conectada. Nenhum dispositivo de vídeo ou webcam detectado no sistema.",
+          "warning",
+          (window.getSystemTranslation && window.getSystemTranslation('camera_alert_title')) || "Câmera Não Conectada"
+        );
+        drawFaceMeshSimulation(true);
+        return;
+      }
+
       enrollStream = await navigator.mediaDevices.getUserMedia({ video: true });
       enrollVideo.srcObject = enrollStream;
       drawFaceMeshSimulation(false);
+
+      const hudBadge = document.querySelector('.capture-hud-badge');
+      if (hudBadge) {
+        hudBadge.innerHTML = `<span class="status-dot"></span> <span>${(window.getSystemTranslation && window.getSystemTranslation('sensor_active')) || 'Sensor Ativo • NPU Zero-Trust'}</span>`;
+      }
     } catch (err) {
+      console.warn("Enrollment camera error:", err);
       drawFaceMeshSimulation(true);
+
+      const hudBadge = document.querySelector('.capture-hud-badge');
+      if (hudBadge) {
+        hudBadge.innerHTML = `<span class="status-dot" style="background:#f59e0b;box-shadow:0 0 8px #f59e0b;"></span> <span style="color:#fbbf24;">${(window.getSystemTranslation && window.getSystemTranslation('camera_alert_title')) || 'Câmera Não Conectada'} • Modo Simulação</span>`;
+      }
+
+      if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError' || !enrollStream) {
+        showSystemNotification(
+          (window.getSystemTranslation && window.getSystemTranslation('camera_not_connected')) || "Câmera não conectada. Conecte uma webcam para captura biométrica.",
+          "warning",
+          (window.getSystemTranslation && window.getSystemTranslation('camera_alert_title')) || "Câmera Não Conectada"
+        );
+      } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        showSystemNotification(
+          (window.getSystemTranslation && window.getSystemTranslation('camera_permission_denied')) || "Acesso à câmera bloqueado pelo navegador. Habilite a permissão nas configurações.",
+          "error",
+          (window.getSystemTranslation && window.getSystemTranslation('camera_perm_title')) || "Permissão Negada"
+        );
+      } else {
+        showSystemNotification(
+          (window.getSystemTranslation && window.getSystemTranslation('camera_not_connected')) || "Câmera não conectada. Operando em modo de simulação NPU.",
+          "warning",
+          (window.getSystemTranslation && window.getSystemTranslation('camera_alert_title')) || "Câmera Não Conectada"
+        );
+      }
     }
   }
 
@@ -1735,6 +1904,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnRetakePhoto = document.getElementById('btnRetakePhoto');
 
   function executePhotoCapture() {
+    if (!enrollStream || !enrollVideo || !enrollVideo.srcObject) {
+      showSystemNotification(
+        (window.getSystemTranslation && window.getSystemTranslation('camera_not_connected')) || "Câmera não conectada. Conecte uma webcam ou utilize a opção 'Carregar Imagem de Arquivo' abaixo.",
+        "warning",
+        (window.getSystemTranslation && window.getSystemTranslation('camera_alert_title')) || "Câmera Não Conectada"
+      );
+
+      if (btnTriggerUpload) {
+        btnTriggerUpload.style.transition = 'all 0.3s ease';
+        btnTriggerUpload.style.borderColor = 'var(--accent-cyan)';
+        btnTriggerUpload.style.boxShadow = '0 0 15px rgba(6, 182, 212, 0.4)';
+        setTimeout(() => {
+          btnTriggerUpload.style.borderColor = '';
+          btnTriggerUpload.style.boxShadow = '';
+        }, 1800);
+      }
+      return;
+    }
+
     playCameraShutterSound();
     triggerCameraFlash();
 
@@ -1742,16 +1930,7 @@ document.addEventListener('DOMContentLoaded', () => {
     snapCanvas.width = 640;
     snapCanvas.height = 480;
     const ctx = snapCanvas.getContext('2d');
-
-    if (enrollStream && enrollVideo) {
-      ctx.drawImage(enrollVideo, 0, 0, 640, 480);
-    } else {
-      ctx.fillStyle = "#1e293b";
-      ctx.fillRect(0, 0, 640, 480);
-      ctx.fillStyle = "#94a3b8";
-      ctx.font = "20px Inter";
-      ctx.fillText("Biometric Sensor Photo Captured", 170, 240);
-    }
+    ctx.drawImage(enrollVideo, 0, 0, 640, 480);
 
     capturedImageBase64 = snapCanvas.toDataURL('image/jpeg', 0.92);
     
@@ -1760,7 +1939,33 @@ document.addEventListener('DOMContentLoaded', () => {
     if (capturedPreviewCard) capturedPreviewCard.style.display = 'flex';
 
     displayGeneratedHash();
-    showToastNotification(window.getSystemTranslation('toast_photo_captured'));
+    showSystemNotification(
+      (window.getSystemTranslation && window.getSystemTranslation('toast_photo_captured')) || "Foto capturada com sucesso! Embedding 128D gerado.",
+      'success',
+      (window.getSystemTranslation && window.getSystemTranslation('photo_captured_badge')) || 'Captura de Foto'
+    );
+  }
+
+  // --- Hardware Device Change Listener (Hot-plug/Unplug) ---
+  if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+    navigator.mediaDevices.addEventListener('devicechange', async () => {
+      const hasVideo = await checkCameraAvailability();
+      if (!hasVideo && enrollStream) {
+        stopEnrollmentCamera();
+        drawFaceMeshSimulation(true);
+        showSystemNotification(
+          (window.getSystemTranslation && window.getSystemTranslation('camera_disconnected')) || "A câmera foi desconectada do dispositivo.",
+          "warning",
+          (window.getSystemTranslation && window.getSystemTranslation('camera_alert_title')) || "Câmera Desconectada"
+        );
+      } else if (hasVideo && !enrollStream) {
+        showSystemNotification(
+          (window.getSystemTranslation && window.getSystemTranslation('camera_detected')) || "Nova câmera detectada no sistema.",
+          "info",
+          (window.getSystemTranslation && window.getSystemTranslation('camera_detected')) || "Dispositivo Conectado"
+        );
+      }
+    });
   }
 
   if (btnCapturePhoto) {
@@ -1817,7 +2022,6 @@ document.addEventListener('DOMContentLoaded', () => {
                        Array.from({length: 4}, () => Math.floor(Math.random()*16).toString(16)).join('');
     if (hashDisplay) hashDisplay.innerText = `${window.getSystemTranslation('hash_display')}${pseudoHash}`;
     if (previewHashText) previewHashText.innerText = `HASH 128D: ${pseudoHash}`;
-    if (generatedHashBox) generatedHashBox.style.display = 'flex';
   }
 
   if (inputCpf) {
@@ -1902,10 +2106,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const resData = await resp.json();
         if (resp.ok) {
+          const cleanId = national_id.replace(/\D/g, '');
+          const fullFormatted = cleanId.length === 11 ? `${cleanId.substring(0,3)}.${cleanId.substring(3,6)}.${cleanId.substring(6,9)}-${cleanId.substring(9,11)}` : national_id;
           window.latestRegisteredSubject = {
             id: resData.subject_id,
             full_name: full_name,
-            national_id_masked: `${national_id.substring(0,3)}.***.***-${national_id.substring(national_id.length-2)}`,
+            national_id_masked: fullFormatted,
+            national_id: fullFormatted,
             department: dept,
             clearance_level: clearance,
             criminal_record: crimRecord,

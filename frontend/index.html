@@ -89,9 +89,9 @@
 
     .sidebar-brand,
     .sidebar-header {
-      padding: 20px 18px;
-      border-bottom: 1px solid var(--border-color);
-      background: linear-gradient(180deg, rgba(15, 23, 42, 0.7) 0%, rgba(10, 15, 30, 0.4) 100%);
+      padding: 20px 20px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      background: linear-gradient(180deg, #0b1120 0%, #080d1a 100%);
       display: flex;
       align-items: center;
       gap: 14px;
@@ -107,33 +107,33 @@
       left: 0;
       right: 0;
       height: 1px;
-      background: linear-gradient(90deg, transparent 0%, rgba(6, 182, 212, 0.5) 50%, transparent 100%);
+      background: linear-gradient(90deg, transparent 0%, rgba(6, 182, 212, 0.4) 50%, transparent 100%);
     }
 
     .brand-icon-box {
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: 12px;
-      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(59, 130, 246, 0.25) 100%);
-      border: 1px solid rgba(6, 182, 212, 0.5);
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.18) 0%, rgba(37, 99, 235, 0.24) 100%);
+      border: 1px solid rgba(6, 182, 212, 0.45);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       color: var(--accent-cyan);
-      box-shadow: 0 0 16px rgba(6, 182, 212, 0.35), inset 0 0 10px rgba(59, 130, 246, 0.25);
+      box-shadow: 0 4px 18px rgba(6, 182, 212, 0.25), inset 0 0 10px rgba(6, 182, 212, 0.15);
       flex-shrink: 0;
       position: relative;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
     }
 
     .brand-icon-box:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 24px rgba(6, 182, 212, 0.6), inset 0 0 12px rgba(6, 182, 212, 0.4);
+      transform: translateY(-1px) scale(1.04);
+      box-shadow: 0 6px 24px rgba(6, 182, 212, 0.45), inset 0 0 12px rgba(6, 182, 212, 0.25);
     }
 
     .brand-icon-box i {
-      filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.8));
+      filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.7));
     }
 
     .brand-info-col {
@@ -146,41 +146,39 @@
     .brand-title-row {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
     }
 
     .brand-title-text {
-      font-size: 1.12rem;
+      font-size: 1.15rem;
       font-weight: 800;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #ffffff 40%, #bae6fd 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.025em;
+      color: #ffffff;
       white-space: nowrap;
       font-family: 'Inter', sans-serif;
     }
 
     .brand-ai-badge {
-      background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(59, 130, 246, 0.25));
+      background: rgba(6, 182, 212, 0.16);
       color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.5);
-      border-radius: 4px;
-      padding: 1px 5px;
-      font-size: 0.65rem;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 5px;
+      padding: 1.5px 6px;
+      font-size: 0.62rem;
       font-weight: 800;
-      letter-spacing: 0.5px;
-      box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+      letter-spacing: 0.06em;
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
       line-height: 1.1;
     }
 
     .vigilance-hud-pill {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
       background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: 20px;
-      padding: 2px 8px;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 6px;
+      padding: 2.5px 8px;
       width: fit-content;
     }
 
@@ -207,7 +205,7 @@
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      background-color: rgba(16, 185, 129, 0.6);
+      background-color: rgba(16, 185, 129, 0.5);
       animation: radar-beacon-anim 2s cubic-bezier(0, 0, 0.2, 1) infinite;
     }
 
@@ -846,28 +844,37 @@
 
     .select-target-subject {
       width: 100%;
-      background: var(--bg-card);
-      border: 1px solid rgba(59, 130, 246, 0.4);
-      border-radius: 6px;
-      color: #ffffff;
-      font-size: 0.84rem;
-      font-weight: 600;
-      padding: 6px 12px;
-      outline: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-family: inherit;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-color: #ffffff !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23000000'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 12px center !important;
+      background-size: 16px 16px !important;
+      border: 1.5px solid rgba(6, 182, 212, 0.7) !important;
+      border-radius: 8px !important;
+      color: #000000 !important;
+      font-size: 0.88rem !important;
+      font-weight: 700 !important;
+      padding: 8px 36px 8px 12px !important;
+      outline: none !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      font-family: inherit !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
     }
 
     .select-target-subject:hover, .select-target-subject:focus {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+      border-color: #06b6d4 !important;
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.5) !important;
     }
 
     .select-target-subject option {
-      background: #0f172a;
-      color: #ffffff;
-      padding: 8px;
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      padding: 10px 14px !important;
+      font-weight: 600 !important;
     }
 
     .monitoring-control-right {
@@ -3410,6 +3417,73 @@
                 alert: false
               });
 
+              // --- OPTICAL HUMAN FACE & PRESENCE SENSOR ---
+              function detectFaceInVideo(vEl) {
+                if (!vEl || vEl.readyState < 2 || !vEl.videoWidth) return null;
+                try {
+                  const sCanvas = document.createElement('canvas');
+                  sCanvas.width = 80;
+                  sCanvas.height = 60;
+                  const sCtx = sCanvas.getContext('2d', { willReadFrequently: true });
+                  if (!sCtx) return null;
+
+                  sCtx.drawImage(vEl, 0, 0, 80, 60);
+                  const data = sCtx.getImageData(0, 0, 80, 60).data;
+
+                  let skinCount = 0;
+                  let minX = 80, maxX = 0, minY = 60, maxY = 0;
+                  let sumX = 0, sumY = 0;
+
+                  for (let y = 6; y < 54; y++) {
+                    for (let x = 10; x < 70; x++) {
+                      const idx = (y * 80 + x) * 4;
+                      const r = data[idx];
+                      const g = data[idx + 1];
+                      const b = data[idx + 2];
+
+                      const max = Math.max(r, g, b);
+                      const min = Math.min(r, g, b);
+                      const isSkin = (r > 60 && g > 35 && b > 20 && (max - min) > 14 && (r - g) >= 7 && (r - b) >= 10);
+
+                      if (isSkin) {
+                        skinCount++;
+                        sumX += x;
+                        sumY += y;
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+                      }
+                    }
+                  }
+
+                  // If pointing at lamp, ceiling, wall, light tube, or empty room -> NO FACE PRESENT
+                  if (skinCount < 50) {
+                    return null;
+                  }
+
+                  const normCX = (sumX / skinCount) / 80;
+                  const normCY = (sumY / skinCount) / 60;
+                  const normW = Math.min(0.65, Math.max(0.30, (maxX - minX + 12) / 80));
+                  const normH = Math.min(0.75, Math.max(0.38, (maxY - minY + 16) / 60));
+
+                  return {
+                    cx: normCX * 640,
+                    cy: normCY * 480,
+                    w: normW * 640,
+                    h: normH * 480,
+                    crop: {
+                      x: Math.max(0, Math.floor((normCX - normW / 2) * vEl.videoWidth)),
+                      y: Math.max(0, Math.floor((normCY - normH / 2) * vEl.videoHeight)),
+                      w: Math.max(1, Math.floor(normW * vEl.videoWidth)),
+                      h: Math.max(1, Math.floor(normH * vEl.videoHeight))
+                    }
+                  };
+                } catch (err) {
+                  return null;
+                }
+              }
+
               // --- ROBUST INVARIANT BIOMETRIC FEATURE EXTRACTION ENGINE ---
               function extractBiometricSignature(sourceElement, crop = null) {
                 try {
@@ -3508,9 +3582,52 @@
                 fCount++;
                 ctx.clearRect(0, 0, 640, 480);
 
-                const cx = 320 + Math.sin(fCount * 0.04) * 10;
-                const cy = 215 + Math.cos(fCount * 0.03) * 6;
-                const bw = 220, bh = 260, bx = cx - bw/2, by = cy - bh/2, len = 26;
+                const isRealCam = (videoEl && videoEl.srcObject && videoEl.readyState >= 2);
+                const liveFace = isRealCam ? detectFaceInVideo(videoEl) : null;
+
+                // When camera is pointing at ceiling/lamp/empty space without a human face:
+                if (isRealCam && !liveFace) {
+                  // Standby Radar scanning HUD
+                  const scanY = (fCount * 3) % 480;
+                  ctx.strokeStyle = "rgba(6, 182, 212, 0.35)";
+                  ctx.lineWidth = 1.5;
+                  ctx.beginPath();
+                  ctx.moveTo(0, scanY);
+                  ctx.lineTo(640, scanY);
+                  ctx.stroke();
+
+                  // Subtle Reticle
+                  ctx.strokeStyle = "rgba(148, 163, 184, 0.3)";
+                  ctx.lineWidth = 1;
+                  ctx.beginPath();
+                  ctx.arc(320, 240, 40, 0, Math.PI * 2);
+                  ctx.moveTo(320, 190); ctx.lineTo(320, 290);
+                  ctx.moveTo(270, 240); ctx.lineTo(370, 240);
+                  ctx.stroke();
+
+                  // Standby Badge
+                  ctx.fillStyle = "rgba(11, 17, 32, 0.9)";
+                  ctx.strokeStyle = "rgba(56, 189, 248, 0.4)";
+                  ctx.lineWidth = 1;
+                  ctx.beginPath();
+                  ctx.roundRect(160, 22, 320, 32, 6);
+                  ctx.fill();
+                  ctx.stroke();
+
+                  ctx.fillStyle = "#38bdf8";
+                  ctx.font = "bold 11px JetBrains Mono";
+                  ctx.fillText("PROCURANDO ROSTOS NO ENQUADRAMENTO...", 176, 42);
+
+                  activeMonitoringAnimators[camNum] = requestAnimationFrame(trackLoop);
+                  return;
+                }
+
+                // If face is present, track dynamically
+                const cx = liveFace ? liveFace.cx : (320 + Math.sin(fCount * 0.04) * 10);
+                const cy = liveFace ? liveFace.cy : (215 + Math.cos(fCount * 0.03) * 6);
+                const bw = liveFace ? liveFace.w : 220;
+                const bh = liveFace ? liveFace.h : 260;
+                const bx = cx - bw/2, by = cy - bh/2, len = 26;
 
                 const currentSub = getCurrentlyIdentifiedSubject();
                 const isUnreg = !!currentSub.isUnidentified;
@@ -3530,15 +3647,13 @@
                   }
 
                   if (videoEl && videoEl.readyState >= 2 && currentSub._descriptor) {
-                    const vw = videoEl.videoWidth || 640;
-                    const vh = videoEl.videoHeight || 480;
-                    const liveFaceCrop = {
-                      x: Math.max(0, Math.floor(vw * 0.20)),
-                      y: Math.max(0, Math.floor(vh * 0.10)),
-                      w: Math.floor(vw * 0.60),
-                      h: Math.floor(vh * 0.75)
+                    const liveCrop = liveFace ? liveFace.crop : {
+                      x: Math.max(0, Math.floor(videoEl.videoWidth * 0.20)),
+                      y: Math.max(0, Math.floor(videoEl.videoHeight * 0.10)),
+                      w: Math.floor(videoEl.videoWidth * 0.60),
+                      h: Math.floor(videoEl.videoHeight * 0.75)
                     };
-                    const liveDescriptor = extractBiometricSignature(videoEl, liveFaceCrop);
+                    const liveDescriptor = extractBiometricSignature(videoEl, liveCrop);
                     if (liveDescriptor) {
                       currentLiveSimScore = computeBiometricMatchScore(liveDescriptor, currentSub._descriptor);
                     }
@@ -3622,13 +3737,13 @@
                 }
 
                 // Draw AI Face Mesh Landmarks
-                const eyeY = cy - 25;
-                const noseY = cy + 5;
-                const mouthY = cy + 45;
+                const eyeY = cy - bh * 0.1;
+                const noseY = cy;
+                const mouthY = cy + bh * 0.16;
                 const landmarks = [
-                  [cx - 32, eyeY], [cx + 32, eyeY], // Eyes
-                  [cx, noseY],                      // Nose
-                  [cx - 24, mouthY], [cx + 24, mouthY] // Mouth corners
+                  [cx - bw * 0.15, eyeY], [cx + bw * 0.15, eyeY], // Eyes
+                  [cx, noseY],                                    // Nose
+                  [cx - bw * 0.11, mouthY], [cx + bw * 0.11, mouthY] // Mouth corners
                 ];
 
                 ctx.fillStyle = themeColor;
